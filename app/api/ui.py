@@ -1,5 +1,5 @@
 # =============================================================================
-# YORBIT v4 — Ta trajectoire vers le monde
+# YORBITY — Ta trajectoire vers le monde (multilingue, détection auto)
 # - Parcours guidé 4 questions → conditions d'admission déroulées (style Campus France)
 # - Procédure adaptée au pays d'ORIGINE (ex : Gabon → France = Études en France)
 # - Services d'accompagnement PAR DESTINATION, intégrés aux étapes, sans prix affichés
@@ -9,14 +9,32 @@
 # =============================================================================
 import sqlite3, os, datetime
 import streamlit as st
+from i18n import t, T, detecter_langue, LANGUES, RTL
 
-APP_NAME = "Yorbit"
+APP_NAME = "Yorbity"
 TAGLINE = "Ta trajectoire vers le monde"
 DB = "data/mobilite.db"
-ADMIN_PWD = os.environ.get("ADMIN_PASSWORD", "yorbit2026")
+ADMIN_PWD = os.environ.get("ADMIN_PASSWORD", "yorbity2026")
 TODAY = datetime.date.today().isoformat()
 
 st.set_page_config(page_title=APP_NAME, page_icon="🚀", layout="centered")
+
+# ---------- Langue : détection auto (1re visite) + sélecteur ----------
+if "lang" not in st.session_state:
+    st.session_state.lang = detecter_langue("fr")
+_lcodes = list(LANGUES.keys())
+with st.sidebar:
+    st.markdown("### 🌐 " + t("langue_label", st.session_state.lang))
+    choix_lang = st.selectbox(" ", _lcodes,
+        index=_lcodes.index(st.session_state.lang),
+        format_func=lambda c: LANGUES[c], label_visibility="collapsed")
+    if choix_lang != st.session_state.lang:
+        st.session_state.lang = choix_lang
+        st.rerun()
+LG = st.session_state.lang
+if LG in RTL:
+    st.markdown("<style>.main .block-container{direction:rtl; text-align:right;}</style>",
+                unsafe_allow_html=True)
 
 # ---------- Style ----------
 st.markdown("""
@@ -704,38 +722,44 @@ if "svc" not in st.session_state: st.session_state.svc = None
 st.markdown(f"""
 <div style='text-align:center; padding:.4rem 0 .8rem;'>
   <h1 style='margin-bottom:0; font-size:2.7rem;'>🚀 {APP_NAME}</h1>
-  <p style='color:#6b7280; margin-top:.15rem; font-size:1.05rem;'>{TAGLINE}</p>
+  <p style='color:#6b7280; margin-top:.15rem; font-size:1.05rem;'>{t('tagline', LG)}</p>
 </div>""", unsafe_allow_html=True)
+
+# ---------- Listes traduites (affichage) + valeurs canoniques (logique) ----------
+T_TYPES    = T["types"][LG]
+T_NIVEAUX  = T["niveaux"][LG]
+T_DOMAINES = T["domaines"][LG]
+CANON_TYPES   = T["types"]["fr"]
+CANON_NIVEAUX = T["niveaux"]["fr"]
+CANON_DOM     = T["domaines"]["fr"]
 
 # =============================================================================
 # LE PARCOURS — 4 questions
 # =============================================================================
 c1, c2 = st.columns(2)
-origine = c1.selectbox("🌍 Ton pays d'origine", ["Choisir…"] + sorted(ORIGINES.keys()))
+origine = c1.selectbox(t("q_origine", LG), [t("choisir", LG)] + sorted(ORIGINES.keys()))
 dest_codes = sorted([c for c in D if c in actifs], key=lambda c: D[c]["nom"])
-destination = c2.selectbox("🎯 Pays de destination", ["Choisir…"] + dest_codes,
-    format_func=lambda c: c if c == "Choisir…" else f"{D[c]['flag']} {D[c]['nom']}")
+destination = c2.selectbox(t("q_dest", LG), [t("choisir", LG)] + dest_codes,
+    format_func=lambda c: c if c == t("choisir", LG) else f"{D[c]['flag']} {D[c]['nom']}")
 c3, c4 = st.columns(2)
-type_ = c3.selectbox("📌 Type de projet",
-    ["Choisir…", "Formation (admission)", "Bourse", "Stage / Emploi étudiant"])
-niveau = c4.selectbox("🎓 Niveau visé",
-    ["Choisir…", "Licence / Bachelor", "Master", "Doctorat", "Formation professionnelle", "Je suis au lycée"])
-domaine = st.selectbox("📚 Domaine d'études",
-    ["Tous les domaines", "Informatique & numérique", "Ingénierie", "Santé & médecine",
-     "Gestion, commerce & finance", "Droit & sciences politiques", "Sciences",
-     "Agriculture & environnement", "Arts, design & architecture",
-     "Lettres & sciences humaines", "Éducation", "Tourisme & hôtellerie"])
+type_ = c3.selectbox(t("q_type", LG), [t("choisir", LG)] + T_TYPES)
+niveau = c4.selectbox(t("q_niveau", LG), [t("choisir", LG)] + T_NIVEAUX)
+domaine = st.selectbox(t("q_domaine", LG), T_DOMAINES)
 
 st.divider()
 
 # =============================================================================
 # RÉSULTAT
 # =============================================================================
-if "Choisir…" in (origine, destination, type_, niveau):
-    st.info("👆 Réponds aux 4 questions : ton parcours détaillé s'affiche instantanément ici.")
+if t("choisir", LG) in (origine, destination, type_, niveau):
+    st.info(t("intro", LG))
 else:
     d = D[destination]
     code_orig, dev_orig = ORIGINES[origine]
+    # Convertir les choix affichés (traduits) en valeurs canoniques FR pour la logique
+    type_c   = CANON_TYPES[T_TYPES.index(type_)]     if type_   in T_TYPES   else type_
+    niveau_c = CANON_NIVEAUX[T_NIVEAUX.index(niveau)] if niveau in T_NIVEAUX else niveau
+    domaine_c= CANON_DOM[T_DOMAINES.index(domaine)]   if domaine in T_DOMAINES else domaine
 
     # ---- Prix d'appel = service le moins cher proposé pour cette destination
     prix_min_fcfa = min(SVC[s][2] for s in d["services"])
@@ -750,33 +774,33 @@ else:
 <div class='hero'>
   <h2>{d['flag']} {origine} → {d['nom']}</h2>
   <p>{d['resume']}</p>
-  <span class='prix'>✨ Commence ton projet à partir de {prix_txt}</span>
+  <span class='prix'>{t("start_from", LG)} {prix_txt}</span>
 </div>""", unsafe_allow_html=True)
 
     st.markdown(
         f"<span class='badge'>{type_}</span><span class='badge'>{niveau}</span>"
-        + (f"<span class='badge'>{domaine}</span>" if domaine != "Tous les domaines" else ""),
+        + (f"<span class='badge'>{domaine}</span>" if domaine_c != "Tous les domaines" else ""),
         unsafe_allow_html=True)
 
     colA, colB = st.columns(2)
-    colA.markdown(f"**💶 Budget à prouver :** {d['ressources']}")
-    colB.markdown(f"**⚖️ Travail étudiant :** {d['travail']}")
-    st.markdown(f"**🎯 Après le diplôme :** {d['post']}")
+    colA.markdown(f"**{t('budget', LG)}** {d['ressources']}")
+    colB.markdown(f"**{t('travail', LG)}** {d['travail']}")
+    st.markdown(f"**{t('apres', LG)}** {d['post']}")
 
     # ---- Bourses d'abord si le projet est "Bourse"
-    if type_ == "Bourse":
-        st.markdown("### 💰 Les bourses pour toi")
+    if type_c == "Bourse":
+        st.markdown("### " + t("bourses_pour_toi", LG))
         for nom_b, det, lien in d["bourses"]:
             with st.expander(f"💰 {nom_b}", expanded=True):
                 st.write(det)
                 if lien: st.markdown(f"[🔗 Site officiel]({lien})")
 
-    if type_ == "Stage / Emploi étudiant":
+    if type_c == "Stage / Emploi étudiant":
         st.success(f"💼 En {d['nom']}, tu peux travailler **{d['travail']}** pendant tes études, "
                    f"et après le diplôme : {d['post']}. La porte d'entrée reste le statut étudiant :")
 
     # ---- Étapes (adaptées à l'origine pour la France)
-    st.markdown("### 🗺️ Ton chemin, étape par étape")
+    st.markdown("### " + t("chemin", LG))
     if destination == "FR":
         etapes = d["etapes_eef"] if code_orig in EEF else d["etapes_std"]
         if code_orig in EEF:
@@ -787,22 +811,21 @@ else:
 
     for i, etape in enumerate(etapes, 1):
         titre, det, lien, svc_code = (etape + (None,))[:4] if len(etape) == 3 else etape
-        with st.expander(f"Étape {i} — {titre}", expanded=(i == 1)):
+        with st.expander(f"{t('etape', LG)} {i} — {titre}", expanded=(i == 1)):
             st.write(det)
             if lien:
-                st.markdown(f"[🔗 Lien officiel]({lien})")
+                st.markdown(f"[{t('lien_officiel', LG)}]({lien})")
             if svc_code and svc_code in d["services"]:
-                if st.button(f"🤝 Besoin d'aide pour cette étape ? On s'en occupe",
+                if st.button(t("aide_etape", LG),
                              key=f"btn_{i}_{svc_code}"):
                     st.session_state.svc = svc_code
 
-    st.link_button(f"🌐 Portail officiel — {d['nom']}", d["portail"])
+    st.link_button(f"{t('portail', LG)} {d['nom']}", d["portail"])
 
     # ---- Bloc accompagnement (services filtrés par destination, SANS prix)
     st.markdown("---")
-    st.markdown(f"## 🤝 On t'accompagne jusqu'en {d['nom']}")
-    st.write("Choisis les démarches que tu veux déléguer — notre équipe s'en charge, "
-             "tu gardes le contrôle et la visibilité à chaque étape.")
+    st.markdown(f"## {t('accompagne', LG)} {d['nom']}")
+    st.write(t("accompagne_desc", LG))
 
     noms_services = []
     for s in d["services"]:
@@ -812,30 +835,29 @@ else:
         with st.expander(nom_s, expanded=ouvert):
             st.write(desc_s)
 
-    st.markdown("#### 📩 Parle-nous de ton projet — réponse sous 24 h")
+    st.markdown("#### " + t("form_titre", LG))
     with st.form("lead"):
         f1, f2 = st.columns(2)
-        nom_lead = f1.text_input("Ton nom complet")
-        contact = f2.text_input("WhatsApp ou e-mail")
+        nom_lead = f1.text_input(t("nom", LG))
+        contact = f2.text_input(t("contact", LG))
         pre = 0
         if st.session_state.svc and SVC[st.session_state.svc][0] in noms_services:
             pre = noms_services.index(SVC[st.session_state.svc][0])
-        service_choisi = st.selectbox("La démarche qui t'intéresse", noms_services, index=pre)
-        msg = st.text_area("Ton projet en 2 lignes (optionnel)")
-        ok = st.form_submit_button("🚀 Lancer mon projet")
+        service_choisi = st.selectbox(t("service_interet", LG), noms_services, index=pre)
+        msg = st.text_area(t("projet_2lignes", LG))
+        ok = st.form_submit_button(t("lancer", LG))
         if ok:
             if nom_lead.strip() and contact.strip():
                 con.execute("INSERT INTO leads(date,nom,contact,origine,destination,service,message) "
                             "VALUES(?,?,?,?,?,?,?)",
                             (TODAY, nom_lead, contact, origine, d["nom"], service_choisi, msg))
                 con.commit()
-                st.success("✅ Reçu ! Un conseiller te contacte sous 24–48 h avec un devis personnalisé.")
+                st.success(t("recu", LG))
                 st.balloons()
             else:
-                st.error("Nom et contact sont obligatoires.")
+                st.error(t("champs_requis", LG))
 
-    st.caption("Nous préparons et organisons tes démarches avec toi. Personne ne peut "
-               "garantir une admission ou un visa — méfie-toi de ceux qui le promettent.")
+    st.caption(t("disclaimer", LG))
 
 # =============================================================================
 # ADMIN
