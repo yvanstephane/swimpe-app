@@ -22,7 +22,31 @@ Traductions automatiques appliquées aux requêtes :
 import os
 import re
 
-DATABASE_URL = os.environ.get("DATABASE_URL", "").strip()
+def _lire_secret(cle, defaut=""):
+    v = os.environ.get(cle)
+    if v:
+        return v
+    try:
+        import streamlit as _st
+        if hasattr(_st, "secrets") and cle in _st.secrets:
+            return str(_st.secrets[cle])
+    except Exception:
+        pass
+    return defaut
+
+try:
+    import streamlit as _st_init
+    if hasattr(_st_init, "secrets"):
+        for _k in list(_st_init.secrets.keys()):
+            if _k not in os.environ:
+                try:
+                    os.environ[_k] = str(_st_init.secrets[_k])
+                except Exception:
+                    pass
+except Exception:
+    pass
+
+DATABASE_URL = _lire_secret("DATABASE_URL", "").strip()
 MODE_PG = bool(DATABASE_URL)   # True si on doit parler PostgreSQL
 
 
