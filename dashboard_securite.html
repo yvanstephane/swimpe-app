@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Yorbity SOC — Monitoring de sécurité</title>
+<style>
+  :root {
+    --bg:#0b1220; --panel:#111a2e; --bord:#1e2a44; --txt:#e5eaf4; --mut:#8b98b8;
+    --info:#3b82f6; --faible:#22c55e; --moyen:#eab308; --eleve:#f97316; --critique:#ef4444;
+  }
+  * { box-sizing:border-box; margin:0; }
+  body { background:var(--bg); color:var(--txt);
+          font-family:-apple-system,'Segoe UI',Roboto,sans-serif; padding:24px; }
+  h1 { font-size:1.4rem; margin-bottom:4px; }
+  .sous { color:var(--mut); font-size:.85rem; margin-bottom:20px; }
+  .cartes { display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr));
+             gap:12px; margin-bottom:20px; }
+  .carte { background:var(--panel); border:1px solid var(--bord); border-radius:12px;
+            padding:14px 16px; }
+  .carte .num { font-size:1.6rem; font-weight:700; }
+  .carte .lab { color:var(--mut); font-size:.78rem; }
+  .barre-sev { display:flex; height:10px; border-radius:6px; overflow:hidden;
+                margin:6px 0 16px; border:1px solid var(--bord); }
+  .filtres { display:flex; gap:10px; flex-wrap:wrap; margin-bottom:14px; }
+  select, input { background:var(--panel); color:var(--txt); border:1px solid var(--bord);
+                   border-radius:8px; padding:8px 10px; font-size:.85rem; }
+  table { width:100%; border-collapse:collapse; background:var(--panel);
+           border:1px solid var(--bord); border-radius:12px; overflow:hidden; }
+  th, td { padding:9px 12px; text-align:left; font-size:.82rem;
+            border-bottom:1px solid var(--bord); }
+  th { color:var(--mut); font-weight:600; background:#0e1730;
+        position:sticky; top:0; }
+  tr:hover td { background:#16223c; }
+  .badge { padding:2px 9px; border-radius:999px; font-size:.72rem; font-weight:600; }
+  .b-info { background:#1e3a8a55; color:#93c5fd; }
+  .b-faible { background:#14532d55; color:#86efac; }
+  .b-moyen { background:#71360b55; color:#fde047; }
+  .b-eleve { background:#7c2d1255; color:#fdba74; }
+  .b-critique { background:#7f1d1d66; color:#fca5a5; }
+  .note { color:var(--mut); font-size:.75rem; margin-top:14px; }
+</style>
+</head>
+<body>
+  <h1>🛡️ Yorbity SOC — Monitoring de sécurité</h1>
+  <div class="sous">Tableau de bord défensif · généré le 06/07/2026 04:54 ·
+       lecture seule · aucune donnée personnelle en clair (e-mails masqués, IP hachées)</div>
+
+  <div class="cartes">
+    <div class="carte"><div class="num">60</div><div class="lab">Événements (total)</div></div>
+    <div class="carte"><div class="num">2</div><div class="lab">Aujourd'hui</div></div>
+    <div class="carte"><div class="num" style="color:var(--eleve)">1</div><div class="lab">Alertes élevées / critiques</div></div>
+    <div class="carte"><div class="num" id="affiches">–</div><div class="lab">Affichés (filtre)</div></div>
+  </div>
+
+  <div class="barre-sev" id="barreSev" title="Répartition par sévérité"></div>
+
+  <div class="filtres">
+    <select id="fSev">
+      <option value="">Toutes sévérités</option>
+      <option>info</option><option>faible</option><option>moyen</option>
+      <option>eleve</option><option>critique</option>
+    </select>
+    <select id="fType"><option value="">Tous types</option></select>
+    <input id="fTexte" placeholder="Rechercher (acteur, détail…)" size="28">
+  </div>
+
+  <table>
+    <thead><tr>
+      <th>Horodatage</th><th>Sévérité</th><th>Type</th>
+      <th>Description</th><th>Acteur</th><th>IP (hash)</th><th>Détail</th>
+    </tr></thead>
+    <tbody id="corps"></tbody>
+  </table>
+
+  <div class="note">
+    🔒 Principes appliqués : données échappées côté génération (anti-injection),
+    e-mails masqués et IP hachées (vie privée / RGPD), lecture seule (aucune action
+    exécutable depuis ce tableau). Règle de détection active : ≥5 échecs de connexion
+    en 10 min → alerte « rafale » élevée.
+  </div>
+
+<script>
+"use strict";
+// Données injectées de façon SÛRE : sérialisation JSON (aucun code exécutable)
+const EVENEMENTS = [{"id": 60, "horodatage": "2026-07-06T04:32:57", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "c***@s***.cn", "ip_hash": "d861b7e91033", "detail": "événement de démonstration"}, {"id": 59, "horodatage": "2026-07-04T17:00:06", "type": "login_echec", "severite": "faible", "description": "Échec de connexion", "acteur": "c***@s***.cn", "ip_hash": "cdd7d7174701", "detail": "événement de démonstration"}, {"id": 58, "horodatage": "2026-06-30T06:19:50", "type": "requete_anormale", "severite": "moyen", "description": "Entrée utilisateur suspecte détectée", "acteur": "j***@t***.org", "ip_hash": "230ef0fb721e", "detail": "événement de démonstration"}, {"id": 57, "horodatage": "2026-07-02T10:05:33", "type": "inscription", "severite": "info", "description": "Nouveau compte créé", "acteur": "m***@e***.com", "ip_hash": "8a41be1b9384", "detail": "événement de démonstration"}, {"id": 56, "horodatage": "2026-06-30T05:06:32", "type": "paiement_ok", "severite": "info", "description": "Paiement validé", "acteur": "m***@e***.com", "ip_hash": "cdd7d7174701", "detail": "événement de démonstration"}, {"id": 55, "horodatage": "2026-07-02T23:11:23", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "m***@e***.com", "ip_hash": "c74177bda558", "detail": "événement de démonstration"}, {"id": 54, "horodatage": "2026-07-02T10:48:55", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "j***@t***.org", "ip_hash": "230ef0fb721e", "detail": "événement de démonstration"}, {"id": 53, "horodatage": "2026-07-01T02:34:17", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "m***@e***.com", "ip_hash": "ddbea5471056", "detail": "événement de démonstration"}, {"id": 52, "horodatage": "2026-06-30T03:47:12", "type": "login_echec", "severite": "faible", "description": "Échec de connexion", "acteur": "m***@e***.com", "ip_hash": "5aa23fc6904a", "detail": "événement de démonstration"}, {"id": 51, "horodatage": "2026-07-01T14:12:08", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "f***@d***.ga", "ip_hash": "230ef0fb721e", "detail": "événement de démonstration"}, {"id": 50, "horodatage": "2026-06-30T17:05:43", "type": "login_echec", "severite": "faible", "description": "Échec de connexion", "acteur": "c***@s***.cn", "ip_hash": "fec52565aa0c", "detail": "événement de démonstration"}, {"id": 49, "horodatage": "2026-07-01T03:23:17", "type": "admin_acces", "severite": "moyen", "description": "Accès au panneau admin", "acteur": "a***@y***.com", "ip_hash": "cc0be94233c2", "detail": "événement de démonstration"}, {"id": 48, "horodatage": "2026-07-04T06:07:38", "type": "login_rafale", "severite": "eleve", "description": "Rafale d&#x27;échecs de connexion (possible force brute)", "acteur": "c***@s***.cn", "ip_hash": "fec52565aa0c", "detail": "événement de démonstration"}, {"id": 47, "horodatage": "2026-06-29T20:48:03", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "f***@d***.ga", "ip_hash": "8a41be1b9384", "detail": "événement de démonstration"}, {"id": 46, "horodatage": "2026-07-04T15:54:53", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "m***@e***.com", "ip_hash": "cdd7d7174701", "detail": "événement de démonstration"}, {"id": 45, "horodatage": "2026-07-03T20:06:47", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "a***@y***.com", "ip_hash": "59d2ad65e315", "detail": "événement de démonstration"}, {"id": 44, "horodatage": "2026-07-02T13:57:31", "type": "login_echec", "severite": "faible", "description": "Échec de connexion", "acteur": "m***@e***.com", "ip_hash": "ddbea5471056", "detail": "événement de démonstration"}, {"id": 43, "horodatage": "2026-07-03T09:52:50", "type": "inscription", "severite": "info", "description": "Nouveau compte créé", "acteur": "c***@m***.br", "ip_hash": "a9fcca236a6b", "detail": "événement de démonstration"}, {"id": 42, "horodatage": "2026-06-30T22:01:36", "type": "requete_anormale", "severite": "moyen", "description": "Entrée utilisateur suspecte détectée", "acteur": "c***@m***.br", "ip_hash": "fec52565aa0c", "detail": "événement de démonstration"}, {"id": 41, "horodatage": "2026-06-30T02:20:33", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "c***@s***.cn", "ip_hash": "fec52565aa0c", "detail": "événement de démonstration"}, {"id": 40, "horodatage": "2026-07-02T21:03:50", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "a***@y***.com", "ip_hash": "67c29aecb747", "detail": "événement de démonstration"}, {"id": 39, "horodatage": "2026-06-30T11:49:10", "type": "inscription", "severite": "info", "description": "Nouveau compte créé", "acteur": "a***@y***.com", "ip_hash": "440a628a0c97", "detail": "événement de démonstration"}, {"id": 38, "horodatage": "2026-06-30T01:24:21", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "m***@e***.com", "ip_hash": "8a41be1b9384", "detail": "événement de démonstration"}, {"id": 37, "horodatage": "2026-06-30T09:11:29", "type": "paiement_echec", "severite": "faible", "description": "Paiement échoué", "acteur": "f***@d***.ga", "ip_hash": "ddbea5471056", "detail": "événement de démonstration"}, {"id": 36, "horodatage": "2026-07-02T18:49:32", "type": "admin_echec", "severite": "moyen", "description": "Mot de passe admin incorrect", "acteur": "m***@e***.com", "ip_hash": "a9fcca236a6b", "detail": "événement de démonstration"}, {"id": 35, "horodatage": "2026-07-05T01:46:16", "type": "login_echec", "severite": "faible", "description": "Échec de connexion", "acteur": "a***@y***.com", "ip_hash": "a1ceb3dc7b12", "detail": "événement de démonstration"}, {"id": 34, "horodatage": "2026-07-02T15:37:26", "type": "paiement_ok", "severite": "info", "description": "Paiement validé", "acteur": "j***@t***.org", "ip_hash": "440a628a0c97", "detail": "événement de démonstration"}, {"id": 33, "horodatage": "2026-07-02T15:37:15", "type": "paiement_ok", "severite": "info", "description": "Paiement validé", "acteur": "m***@e***.com", "ip_hash": "631f08140b24", "detail": "événement de démonstration"}, {"id": 32, "horodatage": "2026-06-30T01:46:05", "type": "requete_anormale", "severite": "moyen", "description": "Entrée utilisateur suspecte détectée", "acteur": "f***@d***.ga", "ip_hash": "c607e1c549bd", "detail": "événement de démonstration"}, {"id": 31, "horodatage": "2026-07-03T03:52:15", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "c***@s***.cn", "ip_hash": "a1ceb3dc7b12", "detail": "événement de démonstration"}, {"id": 30, "horodatage": "2026-07-02T10:42:01", "type": "inscription", "severite": "info", "description": "Nouveau compte créé", "acteur": "f***@d***.ga", "ip_hash": "16306f61c07c", "detail": "événement de démonstration"}, {"id": 29, "horodatage": "2026-07-02T07:58:10", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "m***@e***.com", "ip_hash": "5aa23fc6904a", "detail": "événement de démonstration"}, {"id": 28, "horodatage": "2026-07-02T00:48:07", "type": "login_echec", "severite": "faible", "description": "Échec de connexion", "acteur": "c***@s***.cn", "ip_hash": "c607e1c549bd", "detail": "événement de démonstration"}, {"id": 27, "horodatage": "2026-06-30T15:50:31", "type": "inscription", "severite": "info", "description": "Nouveau compte créé", "acteur": "c***@s***.cn", "ip_hash": "8a41be1b9384", "detail": "événement de démonstration"}, {"id": 26, "horodatage": "2026-06-30T21:56:24", "type": "login_echec", "severite": "faible", "description": "Échec de connexion", "acteur": "m***@e***.com", "ip_hash": "440a628a0c97", "detail": "événement de démonstration"}, {"id": 25, "horodatage": "2026-07-04T16:03:56", "type": "login_echec", "severite": "faible", "description": "Échec de connexion", "acteur": "j***@t***.org", "ip_hash": "c607e1c549bd", "detail": "événement de démonstration"}, {"id": 24, "horodatage": "2026-06-30T23:24:47", "type": "admin_acces", "severite": "moyen", "description": "Accès au panneau admin", "acteur": "c***@s***.cn", "ip_hash": "cc0be94233c2", "detail": "événement de démonstration"}, {"id": 23, "horodatage": "2026-07-05T05:27:12", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "c***@m***.br", "ip_hash": "59d2ad65e315", "detail": "événement de démonstration"}, {"id": 22, "horodatage": "2026-07-02T17:02:26", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "c***@m***.br", "ip_hash": "c74177bda558", "detail": "événement de démonstration"}, {"id": 21, "horodatage": "2026-06-29T19:30:16", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "a***@y***.com", "ip_hash": "16306f61c07c", "detail": "événement de démonstration"}, {"id": 20, "horodatage": "2026-06-30T13:39:49", "type": "paiement_ok", "severite": "info", "description": "Paiement validé", "acteur": "c***@s***.cn", "ip_hash": "d861b7e91033", "detail": "événement de démonstration"}, {"id": 19, "horodatage": "2026-07-03T22:25:55", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "m***@e***.com", "ip_hash": "ddbea5471056", "detail": "événement de démonstration"}, {"id": 18, "horodatage": "2026-07-03T13:09:46", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "c***@m***.br", "ip_hash": "59d2ad65e315", "detail": "événement de démonstration"}, {"id": 17, "horodatage": "2026-07-05T00:09:36", "type": "inscription", "severite": "info", "description": "Nouveau compte créé", "acteur": "c***@m***.br", "ip_hash": "ddbea5471056", "detail": "événement de démonstration"}, {"id": 16, "horodatage": "2026-07-04T17:42:51", "type": "login_echec", "severite": "faible", "description": "Échec de connexion", "acteur": "f***@d***.ga", "ip_hash": "8a41be1b9384", "detail": "événement de démonstration"}, {"id": 15, "horodatage": "2026-07-03T00:44:18", "type": "login_echec", "severite": "faible", "description": "Échec de connexion", "acteur": "f***@d***.ga", "ip_hash": "67c29aecb747", "detail": "événement de démonstration"}, {"id": 14, "horodatage": "2026-06-29T07:23:39", "type": "paiement_ok", "severite": "info", "description": "Paiement validé", "acteur": "j***@t***.org", "ip_hash": "5aa23fc6904a", "detail": "événement de démonstration"}, {"id": 13, "horodatage": "2026-07-05T17:13:34", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "c***@m***.br", "ip_hash": "ddbea5471056", "detail": "événement de démonstration"}, {"id": 12, "horodatage": "2026-07-01T21:00:00", "type": "paiement_ok", "severite": "info", "description": "Paiement validé", "acteur": "f***@d***.ga", "ip_hash": "cc0be94233c2", "detail": "événement de démonstration"}, {"id": 11, "horodatage": "2026-07-03T13:19:03", "type": "export_donnees", "severite": "moyen", "description": "Export de données par un admin", "acteur": "a***@y***.com", "ip_hash": "631f08140b24", "detail": "événement de démonstration"}, {"id": 10, "horodatage": "2026-07-01T02:18:59", "type": "paiement_ok", "severite": "info", "description": "Paiement validé", "acteur": "a***@y***.com", "ip_hash": "5aa23fc6904a", "detail": "événement de démonstration"}, {"id": 9, "horodatage": "2026-06-30T06:31:56", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "a***@y***.com", "ip_hash": "d861b7e91033", "detail": "événement de démonstration"}, {"id": 8, "horodatage": "2026-07-03T20:21:48", "type": "requete_anormale", "severite": "moyen", "description": "Entrée utilisateur suspecte détectée", "acteur": "m***@e***.com", "ip_hash": "10dc059b817e", "detail": "événement de démonstration"}, {"id": 7, "horodatage": "2026-07-03T19:44:57", "type": "inscription", "severite": "info", "description": "Nouveau compte créé", "acteur": "j***@t***.org", "ip_hash": "fec52565aa0c", "detail": "événement de démonstration"}, {"id": 6, "horodatage": "2026-07-02T01:54:53", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "m***@e***.com", "ip_hash": "67c29aecb747", "detail": "événement de démonstration"}, {"id": 5, "horodatage": "2026-07-01T15:43:51", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "a***@y***.com", "ip_hash": "230ef0fb721e", "detail": "événement de démonstration"}, {"id": 4, "horodatage": "2026-07-02T16:00:42", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "m***@e***.com", "ip_hash": "59d2ad65e315", "detail": "événement de démonstration"}, {"id": 3, "horodatage": "2026-07-03T06:01:42", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "m***@e***.com", "ip_hash": "8a41be1b9384", "detail": "événement de démonstration"}, {"id": 2, "horodatage": "2026-07-01T01:11:03", "type": "login_ok", "severite": "info", "description": "Connexion réussie", "acteur": "c***@m***.br", "ip_hash": "59d2ad65e315", "detail": "événement de démonstration"}, {"id": 1, "horodatage": "2026-07-06T00:42:34", "type": "inscription", "severite": "info", "description": "Nouveau compte créé", "acteur": "f***@d***.ga", "ip_hash": "ddbea5471056", "detail": "événement de démonstration"}];
+
+const corps = document.getElementById("corps");
+const fSev = document.getElementById("fSev");
+const fType = document.getElementById("fType");
+const fTexte = document.getElementById("fTexte");
+
+// Remplir le filtre des types
+[...new Set(EVENEMENTS.map(e => e.type))].sort().forEach(t => {
+  const o = document.createElement("option"); o.textContent = t; fType.appendChild(o);
+});
+
+// Échappement côté client aussi (défense en profondeur)
+function esc(x) {
+  const d = document.createElement("div"); d.textContent = String(x ?? ""); return d.innerHTML;
+}
+
+function rendre() {
+  const sev = fSev.value, typ = fType.value, q = fTexte.value.toLowerCase();
+  const filtres = EVENEMENTS.filter(e =>
+    (!sev || e.severite === sev) &&
+    (!typ || e.type === typ) &&
+    (!q || (e.acteur + " " + e.detail + " " + e.description).toLowerCase().includes(q))
+  );
+  document.getElementById("affiches").textContent = filtres.length;
+  corps.innerHTML = filtres.map(e => `
+    <tr>
+      <td>${esc(e.horodatage).replace("T","&nbsp;")}</td>
+      <td><span class="badge b-${esc(e.severite)}">${esc(e.severite)}</span></td>
+      <td>${esc(e.type)}</td>
+      <td>${esc(e.description)}</td>
+      <td>${esc(e.acteur)}</td>
+      <td><code>${esc(e.ip_hash)}</code></td>
+      <td>${esc(e.detail)}</td>
+    </tr>`).join("");
+}
+
+// Barre de répartition des sévérités
+(function() {
+  const ordre = ["info","faible","moyen","eleve","critique"];
+  const cpt = Object.fromEntries(ordre.map(s => [s, 0]));
+  EVENEMENTS.forEach(e => { if (cpt[e.severite] !== undefined) cpt[e.severite]++; });
+  const total = Math.max(1, EVENEMENTS.length);
+  const barre = document.getElementById("barreSev");
+  ordre.forEach(s => {
+    const seg = document.createElement("div");
+    seg.style.width = (100 * cpt[s] / total) + "%";
+    seg.style.background = getComputedStyle(document.documentElement)
+                             .getPropertyValue("--" + s);
+    seg.title = s + " : " + cpt[s];
+    barre.appendChild(seg);
+  });
+})();
+
+fSev.onchange = fType.onchange = rendre;
+fTexte.oninput = rendre;
+rendre();
+</script>
+</body>
+</html>

@@ -1,0 +1,30 @@
+=== SONDE NOMS PAYS (Lot D) — Wed 15 Jul 2026 06:57:51 CEST ===
+--- A. le module bourses_web_ui appelle chercher_web comment ? ---
+4:#   1) ✓ vérifié Yorbity  (tiroir A : moteur_bourses_v1, filtré origine/destination)
+5:#   2) 🏛️ officiel        (web trié par tri_bourses_v1, domaine de confiance)
+50:def _rendre_verifiees(code_orig, destination):
+56:        bourses = mb.chercher(code_orig, destination)
+70:def _rendre_web(code_orig, destination, domaine=""):
+77:    nom_dest = destination
+79:    requete = (f"bourses études {domaine} {nom_dest} étudiants internationaux "
+83:            resultats, etat = rw.chercher_web(requete)
+134:def afficher(code_orig, destination, domaine="", connecte=False, est_admin=False):
+150:        n = _rendre_verifiees(code_orig, destination)
+155:            _rendre_web(code_orig, destination, domaine)
+159:                         key=f"web_bourses_{code_orig}_{destination}"):
+160:                _rendre_web(code_orig, destination, domaine)
+
+--- B. comment obtenir le nom d'un pays depuis son code (ex. FR->France) ? ---
+34:from pays_i18n import nom_pays
+938:        st.markdown(f"## {t('accompagne', LG)} {nom_pays(_d['nom'], LG)}")
+1103:    return nom_pays(p, LG)
+1111:    dest_codes = sorted([c for c in D if c in actifs and (not _vis_d or D[c]["nom"] in _vis_d)],
+1112:                        key=lambda c: D[c]["nom"])
+1115:    dest_codes = sorted([c for c in D if c in actifs], key=lambda c: D[c]["nom"])
+1118:    return f"{D[c]['flag']} {nom_pays(D[c]['nom'], LG)}"
+1182:  <h2>{d['flag']} {nom_pays(origine, LG)} → {nom_pays(d['nom'], LG)}</h2>
+1186:    <a href='{_url_acc}' target='_blank' style='text-decoration:none; background:#e9b949; color:#1f2937; padding:.55rem 1.1rem; border-radius:10px; font-weight:600; display:inline-block; box-shadow:0 1px 3px rgba(0,0,0,.18);'>{t('accompagne', LG)} {nom_pays(d['nom'], LG)} →</a>
+1276:        st.link_button(f"{t('portail', LG)} {nom_pays(d['nom'], LG)}", d["portail"])
+
+--- C. la fonction afficher() recoit-elle destination en code ou en nom ? (appel dans ui.py) ---
+1234:            bourses_web_ui_v1.afficher(code_orig, destination, domaine_c,

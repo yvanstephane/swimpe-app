@@ -1,0 +1,24 @@
+=== SONDE NOM ORIGINE — Wed 15 Jul 2026 07:05:02 CEST ===
+--- A. comment 'origine' / code_orig devient un nom lisible ---
+18:    _sq_connect_origine = sqlite3.connect
+22:        con = _sq_connect_origine(*args, **kwargs)
+1104:origine = c2.selectbox(t("q_origine", LG), [t("choisir", LG)] + _orig_list, format_func=_lbl_o)
+1140:    code_orig, dev_orig = ORIGINES[origine]
+1182:  <h2>{d['flag']} {nom_pays(origine, LG)} → {nom_pays(d['nom'], LG)}</h2>
+1234:            bourses_web_ui_v1.afficher(code_orig, destination, domaine_c,
+1240:    _mode_opp = opportunites_ui.afficher(type_c, destination, code_orig, tr, poste=_poste_rech, domaine=domaine_c)
+1246:            etapes = d["etapes_eef"] if code_orig in EEF else d["etapes_std"]
+1247:            if code_orig in EEF:
+1342:                services_cfg.definir_origine(_p, False)
+1344:                services_cfg.definir_origine(_p, True)
+
+--- B. la ligne exacte de l'appel afficher() (pour l'ancre) ---
+1234:            bourses_web_ui_v1.afficher(code_orig, destination, domaine_c,
+1235-                                       nom_pays=d["nom"],
+1236-                                       connecte=(espace.user_connecte() is not None),
+1237-                                       est_admin=espace.est_admin())
+1238-        except Exception as _e_bw:
+
+--- C. signature de nom_pays (que prend-elle en entree ?) ---
+/Users/yvannkoo/mobilite-ia/app/api/admin_projets.py:13:    def nom_pays(nom, lang):
+/Users/yvannkoo/mobilite-ia/app/api/pays_i18n.py:169:def nom_pays(nom_fr, lang):

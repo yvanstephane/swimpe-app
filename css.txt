@@ -1,0 +1,27 @@
+=== occurrences ===
+88:    st.markdown("<style>.main .block-container{direction:rtl; text-align:right;}</style>",
+93:<style>
+96:.hero h2 {color:white; margin:0 0 .3rem; font-size:1.5rem;}
+97:.hero p {margin:0; opacity:.92; font-size:1.02rem;}
+98:.prix {display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.4);
+100:.badge {display:inline-block; background:#eff6ff; color:#1d4ed8; border-radius:999px;
+101:  padding:.15rem .7rem; font-size:.8rem; margin-right:.4rem;}
+103:</style>""", unsafe_allow_html=True)
+889:  <h1 style='margin-bottom:0; font-size:2.7rem;'>🚀 {APP_NAME}</h1>
+890:  <p style='color:#6b7280; margin-top:.15rem; font-size:1.05rem;'>{t('tagline', LG)}</p>
+1091:    <a href='{_url_acc}' target='_blank' style='text-decoration:none; background:#e9b949; color:#1f2937; padding:.55rem 1.1rem; border-radius:10px; font-weight:600; display:inline-block; box-shadow:0 1px 3px rgba(0,0,0,.18);'>{t('accompagne', LG)} {nom_pays(d['nom'], LG)} →</a>
+1092:    <a href='{_url_contact}' target='_blank' style='text-decoration:none; background:rgba(255,255,255,.94); color:#1f2937; padding:.55rem 1.1rem; border-radius:10px; font-weight:600; display:inline-block; box-shadow:0 1px 3px rgba(0,0,0,.18);'>{t('form_titre', LG).split('—')[0].strip()} →</a>
+
+=== blocs <style> complets ===
+88:     st.markdown("<style>.main .block-container{direction:rtl; text-align:right;}</style>",
+93: <style>
+94: .hero {background: linear-gradient(135deg,#1e3a8a 0%,#3b82f6 55%,#06b6d4 100%);
+95:   color:white; border-radius:18px; padding:1.6rem 1.8rem; margin:0.8rem 0 1.2rem;}
+96: .hero h2 {color:white; margin:0 0 .3rem; font-size:1.5rem;}
+97: .hero p {margin:0; opacity:.92; font-size:1.02rem;}
+98: .prix {display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.4);
+99:   padding:.45rem 1rem; border-radius:999px; margin-top:.7rem; font-weight:600;}
+100: .badge {display:inline-block; background:#eff6ff; color:#1d4ed8; border-radius:999px;
+101:   padding:.15rem .7rem; font-size:.8rem; margin-right:.4rem;}
+102: div[data-testid="stExpander"] {border-radius:12px; border:1px solid #e5e7eb; margin-bottom:.4rem;}
+103: </style>""", unsafe_allow_html=True)

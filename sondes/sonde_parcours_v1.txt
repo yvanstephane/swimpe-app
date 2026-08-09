@@ -1,0 +1,46 @@
+=== SONDE PARCOURS CLIENT — Wed 15 Jul 2026 03:37:32 CEST ===
+--- 1. qui fabrique 'Ton chemin, etape par etape' ? ---
+/Users/yvannkoo/mobilite-ia/app/api/i18n.py:119:   "fr":"🗺️ Ton chemin, étape par étape", "en":"🗺️ Your path, step by step",
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:433:  ("Pré-inscription sur Universitaly", "La plateforme officielle reliée à ton consulat — l'équivalent italien de Campus France.", "https://www.universitaly.it", "ADMIS"),
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:434:  ("Demander la bourse régionale DSU", "Sur critères sociaux : logement + cantine + ~5 200 €/an. Peu de candidats étrangers la connaissent.", None, "BOURSE"),
+--- 2. le type de projet est-il filtre ? ---
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:4:# - Procédure adaptée au pays d'ORIGINE (ex : Gabon → France = Études en France)
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:39:# Libellés du projet « Métier spécialisé » dans toutes les langues (grise le niveau)
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:41:# Accroche du bandeau selon le type de projet (le résumé études reste pour Formation)
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:43:    "Bourse": "Bourses accessibles selon ton pays d'origine — sélection mise à jour en continu.",
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:44:    "Stage / Emploi étudiant": "Offres de stage et d'emploi étudiant ouvertes à ton profil — mises à jour en continu.",
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:45:    "Métier spécialisé": "Postes pour travailleurs qualifiés ouverts aux candidats internationaux — mis à jour en continu.",
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:164:# Pays soumis à la procédure Études en France (EEF / Campus France)
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:183: "EEF":     ("🗂 Prise en charge du dossier Études en France",
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:215:    "ADMIS":    {"Formation (admission)"},
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:216:    "EEF":      {"Formation (admission)"},
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:217:    "PACK":     {"Formation (admission)"},
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:218:    "ORIENT":   {"Formation (admission)", "Bourse"},
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:219:    "BOURSE":   {"Formation (admission)", "Bourse"},
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:220:    "FONDS":    {"Formation (admission)", "Stage / Emploi étudiant"},
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:221:    "VISA":     {"Formation (admission)", "Stage / Emploi étudiant", "Métier spécialisé"},
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:222:    "LOGEMENT": {"Formation (admission)", "Stage / Emploi étudiant", "Métier spécialisé"},
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:226:def _services_pour_type(codes, type_projet):
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:229:    filt = [s for s in codes if type_projet in SVC_TYPES.get(s, {type_projet})]
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:240: resume="Études quasi gratuites à l'université publique (exonérations fréquentes des "
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:247:  ("Créer ton dossier Études en France (Campus France)",
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:279:   "Ton pays n'est pas soumis à la procédure Études en France : tu candidates via "
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:287: bourses=[("Bourse Eiffel", "Master/doctorat d'excellence, ~1 000–1 700 €/mois, déposée par l'établissement.", "https://www.campusfrance.org/fr/le-programme-de-bourses-eiffel"),
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:288:          ("Bourses bilatérales", "Selon accords entre ton gouvernement et la France.", "https://www.campusfrance.org/fr/les-bourses")])
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:291: resume="Études + travail + immigration possible après le diplôme (PGWP → résidence). "
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:319:          ("Bourses d'entrée des universités", "Automatiques ou sur dossier selon l'établissement.", None)])
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:344: bourses=[("Fulbright", "Bourse complète master/doctorat, via l'ambassade US de ton pays.", "https://foreign.fulbrightonline.org"),
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:390:  ("🇧🇪 Bourses ARES — coopération belge",
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:392:   "ou Formation continue (2–6 mois) dans les universités FWB (ULB, UCLouvain, ULiège, "
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:499: bourses=[("Bourses des universités + Camões", "Selon accords (pays lusophones surtout).", None)])
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:522: bourses=[("Bourses IKY", "Fondation d'État, selon accords bilatéraux.", "https://www.iky.gr")])
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:526:        "Bourses d'État pour les pays en développement.",
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:535: bourses=[("Bourses du gouvernement tchèque", "Pays en développement, via l'ambassade.", "https://www.mzv.cz")])
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:546: bourses=[("NAWA — Banach / Poland My First Choice", "Bourses complètes pour pays en développement.", "https://nawa.gov.pl/en")])
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:561: bourses=[("Bourses de l'État roumain", "Tous cycles, année de roumain incluse — via l'ambassade.", "https://www.mae.ro/en/node/10251")])
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:573: bourses=[("Stipendium Hungaricum", "Bourse complète, tous cycles.", "https://stipendiumhungaricum.hu")])
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:616: resume="Bourse CSC dans 289 universités : scolarité + logement + allocation mensuelle. "
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:630:        "coût de vie imbattable. Bourses ICCR complètes via les ambassades.",
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:652: bourses=[("Bourses HEC / accords bilatéraux", "Selon conventions avec ton pays.", "https://www.hec.gov.pk")])
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:655: resume="Bourse KNB dédiée aux pays en développement : scolarité + allocation + billets. "
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:688: bourses=[("Bourses d'universités (AIT, Chula…)", "Selon programmes.", None)])

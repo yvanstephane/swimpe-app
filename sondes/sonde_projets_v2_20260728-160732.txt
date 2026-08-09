@@ -1,0 +1,265 @@
+SONDE PROJETS v2 — 2026-07-28 16:07:32
+Projet : /Users/yvannkoo/mobilite-ia
+================================================================
+
+[0] CORRECTIFS DU JOUR
+    · patch bandeau prix (ligne ~1295) : APPLIQUÉ ✓
+    · fiches RU…KZ avec services vides : 0/8 ✓ (toutes remplies)
+    ✓ Les deux correctifs sont en place — Bourse → Algérie doit s'afficher.
+
+[1] SCHÉMAS SQL (mobilite.db)
+    · opportunites (150 ligne(s)) : id:INTEGER, type:TEXT, titre:TEXT, destination:TEXT, origines_eligibles:TEXT, niveau:TEXT, domaine:TEXT, montant:TEXT, deadline:TEXT, source_url:TEXT, maj:TEXT, statut:TEXT
+        ex: id=1 | type=bourse | titre=Bourse MEXT (gouvernement du Japo… | destination=JP | origines_eligibles=TOUS | niveau=licence,master,doctorat | domaine=tous domaines | montant=Scolarité complète + ~143-145 000… | deadline=None | source_url=https://www.studyinjapan.go.jp/fr… | maj=2026-07-04 | statut=a_verifier
+        ex: id=2 | type=bourse | titre=Global Korea Scholarship (GKS) — … | destination=KR | origines_eligibles=TOUS | niveau=licence,master,doctorat | domaine=tous domaines | montant=Scolarité + 900 000 KRW/mois + vo… | deadline=None | source_url=https://www.studyinkorea.go.kr | maj=2026-07-04 | statut=a_verifier
+--- DDL opportunites ---
+CREATE TABLE opportunites(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  type TEXT,              -- formation | bourse | emploi | stage
+  titre TEXT,
+  destination TEXT,       -- code ISO destination
+  origines_eligibles TEXT,-- 'TOUS' ou liste de codes 'CM,GA,HT'
+  niveau TEXT,            -- lycee/licence/master/doctorat/pro
+  domaine TEXT,
+  montant TEXT,
+  deadline TEXT,          -- AAAA-MM-JJ si connue
+  source_url TEXT,
+  maj TEXT,
+  statut TEXT DEFAULT 'a_verifier')
+    · eligibilite (0 ligne(s)) : destination:TEXT, type:TEXT, regle:TEXT, note:TEXT, statut:TEXT
+--- DDL eligibilite ---
+CREATE TABLE eligibilite(
+        destination TEXT, type TEXT, regle TEXT DEFAULT 'TOUS',
+        note TEXT DEFAULT '', statut TEXT DEFAULT 'a_verifier',
+        PRIMARY KEY(destination, type))
+    · corridors (7440 ligne(s)) : origine:TEXT, destination:TEXT, score:INT, statut:TEXT, specificites:TEXT, maj:TEXT
+        ex: origine=AW | destination=FR | score=0 | statut=a_verifier | specificites=None | maj=2026-07-04
+        ex: origine=AW | destination=CA | score=0 | statut=a_verifier | specificites=None | maj=2026-07-04
+--- DDL corridors ---
+CREATE TABLE corridors(
+  origine TEXT, destination TEXT, score INT DEFAULT 0,
+  statut TEXT DEFAULT 'a_verifier', specificites TEXT, maj TEXT,
+  PRIMARY KEY(origine, destination))
+    · config_tarifs (2 ligne(s)) : service:TEXT, prix:INT
+        ex: service=ORIENT | prix=12000
+        ex: service=ADMIS | prix=47000
+--- DDL config_tarifs ---
+CREATE TABLE config_tarifs(service TEXT PRIMARY KEY, prix INT)
+    · config_services (176 ligne(s)) : destination:TEXT, service:TEXT, actif:INT
+        ex: destination=AF | service=ENTRETIEN | actif=0
+        ex: destination=AF | service=FONDS | actif=0
+--- DDL config_services ---
+CREATE TABLE config_services(
+        destination TEXT, service TEXT, actif INT,
+        PRIMARY KEY(destination, service))
+    · destinations (30 ligne(s)) : code:TEXT, nom:TEXT, tier:INT, procedure:TEXT, fiche:TEXT, statut:TEXT, maj:TEXT, sources:TEXT
+        ex: code=FR | nom=France | tier=1 | procedure=etudes_en_france|dap|parcoursup | fiche=7380 EUR/an; AVI ~470 EUR | statut=a_verifier | maj=2026-07-04 | sources=
+        ex: code=CA | nom=Canada | tier=1 | procedure=ircc_pal|ircc_caq | fiche=22895 CAD hors QC + scolarité; QC… | statut=a_verifier | maj=2026-07-04 | sources=
+--- DDL destinations ---
+CREATE TABLE destinations(
+  code TEXT PRIMARY KEY, nom TEXT, tier INT, procedure TEXT,
+  fiche TEXT, statut TEXT DEFAULT 'a_verifier', maj TEXT, sources TEXT)
+
+[2] FONCTIONS CLÉS (source intégrale dans le rapport)
+    ✓ opportunites_ui.py:_offres() — ligne 36, 17 lignes → rapport
+
+--- SOURCE opportunites_ui.py:_offres() ---
+def _offres(dest_code, types, code_orig):
+    con = sqlite3.connect(DB); con.row_factory = sqlite3.Row
+    try:
+        q = ",".join("?" * len(types))
+        rows = con.execute(
+            f"SELECT * FROM opportunites WHERE destination=? AND type IN ({q}) "
+            "ORDER BY type, id", (dest_code, *types)).fetchall()
+    except sqlite3.Error:
+        rows = []
+    finally:
+        con.close()
+    ok = []
+    for r in rows:
+        elig = (r["origines_eligibles"] or "TOUS").strip().upper()
+        if elig == "TOUS" or code_orig.upper() in [c.strip() for c in elig.split(",")]:
+            ok.append(dict(r))
+    return ok
+    ✓ eligibilite.py:autorise() — ligne 24, 22 lignes → rapport
+
+--- SOURCE eligibilite.py:autorise() ---
+def autorise(dest_code, type_p, code_orig):
+    """(ok, note). Sans règle définie : ouvert par défaut (l'admin restreint)."""
+    _init()
+    con = sqlite3.connect(DB); con.row_factory = sqlite3.Row
+    row = con.execute("SELECT * FROM eligibilite WHERE destination=? AND type=?",
+                      (dest_code.upper(), type_p)).fetchone()
+    if not row:
+        row = con.execute("SELECT * FROM eligibilite WHERE destination=? AND type='*'",
+                          (dest_code.upper(),)).fetchone()
+    con.close()
+    if not row:
+        return True, ""
+    regle = (row["regle"] or "TOUS").strip().upper()
+    note = row["note"] or ""
+    o = (code_orig or "").strip().upper()
+    if regle == "TOUS":
+        return True, note
+    if regle.startswith("SAUF:"):
+        exclus = [c.strip() for c in regle[5:].split(",") if c.strip()]
+        return (o not in exclus), note
+    inclus = [c.strip() for c in regle.split(",") if c.strip()]
+    return (o in inclus), note
+    ✓ eligibilite.py:definir() — ligne 48, 6 lignes → rapport
+
+--- SOURCE eligibilite.py:definir() ---
+def definir(dest_code, type_p, regle, note=""):
+    _init()
+    con = sqlite3.connect(DB)
+    con.execute("INSERT OR REPLACE INTO eligibilite VALUES(?,?,?,?, 'a_verifier')",
+                (dest_code.upper(), type_p, regle.strip().upper() or "TOUS", note.strip()))
+    con.commit(); con.close()
+    ✓ services_cfg.py:tarifs_tous() — ligne 76, 7 lignes → rapport
+
+--- SOURCE services_cfg.py:tarifs_tous() ---
+def tarifs_tous(defauts):
+    """dict {code: prix effectif} — prix admin si défini, sinon défaut du code."""
+    _init_tarifs()
+    con = sqlite3.connect(DB)
+    rows = dict(con.execute("SELECT service, prix FROM config_tarifs"))
+    con.close()
+    return {k: rows.get(k, v) for k, v in defauts.items()}
+
+[3] FORMATS JSON
+    · plans_pays_v1.json : 5 destination(s) : IT, BE, MCF, CA, DE
+      structure de « IT » : nom, libelle_ecran, groupe1[2], groupe2[1], etapes_communes[5], canaux_groupe2[2], badanti[2], alertes_pays[4], notes_admin[3], bouclier
+--- PLAN COMPLET « IT » ---
+{
+  "nom": "Italie — Decreto Flussi 2026-2028",
+  "libelle_ecran": "🇮🇹 Italie — travail (Decreto Flussi)",
+  "groupe1": {
+    "pays": [
+      "AL",
+      "DZ",
+      "BD",
+      "BA",
+      "KR",
+      "CI",
+      "EG",
+      "SV",
+      "EC",
+      "ET",
+      "GM",
+      "GE",
+      "GH",
+      "GT",
+      "IN",
+      "JP",
+      "JO",
+      "KG",
+      "XK",
+      "MK",
+      "ML",
+      "MA",
+      "MU",
+      "MD",
+      "ME",
+      "NE",
+      "NG",
+      "UZ",
+      "PK",
+      "PE",
+      "PH",
+      "SN",
+      "RS",
+      "LK",
+      "SD",
+      "TH",
+      "TN",
+      "UA"
+    ],
+    "libelle_client": "Bonne nouvelle : ton pays fait partie des 38 pays à QUOTA RÉSERVÉ (25 000 places/an rien que pour ces pays). Click day : {cd_groupe1} à 9h00."
+  },
+  "groupe2": {
+    "libelle_client": "Ton pays passe par la quote générale (click day : {cd_groupe2} à 9h00) — la compétition y est plus large, MAIS deux portes moins connues s'ouvrent à toi (voir plus bas)."
+  },
+  "etapes_communes": [
+    {
+      "titre": "Trouver l'employeur italien AVANT tout",
+      "detail": "Sans employeur, aucune démarche n'est possible : c'est LUI qui dépose la demande. Piste n°1 : les offres Yorbity + candidature à distance (CV en italien, lettre ciblée — services DOSSIER/TRAD). Argument décisif à mettre dans ta candidature : en 2024, 30 % des travailleurs attendus ne sont jamais arrivés (2/3 en 2023) — présente-toi comme le candidat FIABLE et DOCUMENTÉ que les employeurs cherchent (documents prêts, joignable, sérieux prouvé).",
+      "lien": null,
+      "ressources": [
+        {
+          "nom": "Offres Yorbity (sources officielles, mises à jour)",
+          "url": ""
+        },
+        {
+          "nom": "DecretoFlussiItalia — portail de mise en relation travailleurs ↔ employeurs",
+          "url": "https://decretoflussiitalia.it"
+        },
+        {
+          "nom": "Job in Country (Coldiretti) — intermédiation agricole autorisée par le ministère",
+          "url": "https://lavoro.coldiretti.it"
+        },
+        {
+          "nom": "Associations d'employeurs autorisées (Coldiretti, Confagricoltura, CIA, CNA…) — liste officielle",
+          "url": "https://www.lavoro.gov.it/temi-e-priorita/immigrazione/focus-on/ingresso-e-soggiorno-per-lavoro-in-italia/pagine/semplificazione-procedure-per-le-organizzazioni-datoriali"
+        },
+        {
+          "nom": "Portails d'emploi italiens : Indeed.it, InfoJobs.it, Subito.it (rubrique lavoro)",
+          "url": "https://it.indeed.com"
+        },
+        {
+          "nom": "Profils qualifiés : Carte Bleue UE — demande possible TOUTE L'ANNÉE, sans click day",
+          "url": "https://www.cliclavoro.gov.it/focus-on/stranieri-in-italia/assunzione-lavoratori-extra-ue"
+        }
+      ]
+    },
+    {
+      "titre": "Préparer tes documents pendant la recherche",
+      "detail": "Passeport valide, casier judiciaire international, diplômes traduits, certificats de travail. Un dossier prêt = un employeur rassuré (service DOSSIER).",
+      "lien": null,
+      "ressources": [
+        {
+          "nom": "Casier judiciaire de ton pays (extrait récent) + traduction assermentée",
+          "url": ""
+        },
+        {
+          "nom": "CV format italien/Europass",
+          "url": "https://europa.eu/europass/fr"
+        }
+      ]
+    },
+    {
+      "titre": "L'employeur précompile sur le Portale ALI (octobre–décembre)",
+      "detail": "Fenêtre annuelle d'automne (2026 : 23 oct → 7 déc). L'employeur a besoin d'une PEC, de la vérification au Centro per l'Impiego et du document d'asseveration. Max 3 demandes par employeur privé.",
+      "lien": "https://portaleservizi.dlci.interno.it/AliSportello/ali/home.htm",
+      "ressources": [
+        {
+          "nom": "Portale ALI (l'employeur y précompile — SPID/CIE requis)",
+          "url": "https://portaleservizi.dlci.interno.it/AliSportello/ali/home.htm"
+        },
+        {
+          "nom": "Vérification Centro per l'Impiego : NON requise pour saisonniers et travailleu
+    · sources_pays_v1.json : 15 pays : CA, DE, GB, FR, BE, LU, ES, SE, US, NL
+--- SOURCES COMPLÈTES « CA » ---
+{
+  "nom": "Canada",
+  "metier": {
+    "source": "Job Bank / Guichet-Emplois (flux Atom, fglo=1)",
+    "flux": "api_publique",
+    "sans_permis": true,
+    "preuve": "sonde",
+    "note": "en production ; fr via lang=fr"
+  },
+  "stage_emploi": {
+    "source": "Job Bank (fsrc=21)",
+    "flux": "api_publique",
+    "sans_permis": false,
+    "preuve": "sonde",
+    "note": "intersection fglo∩etudiant = vide (sonde)"
+  },
+  "etudes": {
+    "source": "EduCanada, IRCC permis d'etudes",
+    "flux": "portail"
+  },
+  "bourse": {
+    "source": "EduCanada, Vanier",
+    "flux": "portail"
+  }
+}

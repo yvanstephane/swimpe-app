@@ -1,0 +1,76 @@
+=== SONDE MELANGE TRAVAIL/ETUDES — Wed 15 Jul 2026 04:22:30 CEST ===
+--- A. ou apparait le vocabulaire TRAVAIL-migration dans ui.py ? ---
+425:        "souvent 500–3 000 €/an, bourses DSU) et le TRAVAIL via le Decreto Flussi "
+428:            "Travail : employeur requis avant toute démarche",
+429: travail="20 h/semaine (études) · Temps plein (Decreto Flussi)",
+430: post="Permesso de recherche d'emploi 12 mois (études) · Renouvellement contrat (travail)",
+437:  # ── Decreto Flussi (Métier / Saisonnier) ──────────────────────────────────
+438:  ("🛂 Decreto Flussi — trouver un emploi en Italie",
+440:   "L'employeur fait TOUT : il dépose la demande de nulla osta sur le Portale ALI, "
+1245:    # _lot6_parcours_v1 : masquer les étapes "travail" (Decreto Flussi) hors parcours métier
+--- B. les 4 champs description d'Italie (verbatim) ---
+423:D["IT"] = dict(nom="Italie", flag="🇮🇹",
+424- resume="Deux voies complémentaires pour l'Italie : les ÉTUDES (frais calculés sur tes revenus, "
+425-        "souvent 500–3 000 €/an, bourses DSU) et le TRAVAIL via le Decreto Flussi "
+426-        "(497 550 entrées 2026-2028 — quota réservé pour 14 pays africains, voie générale pour tous).",
+427- ressources="≈6 500 €/an à justifier (hors bourse DSU) pour les études · "
+428-            "Travail : employeur requis avant toute démarche",
+429- travail="20 h/semaine (études) · Temps plein (Decreto Flussi)",
+430- post="Permesso de recherche d'emploi 12 mois (études) · Renouvellement contrat (travail)",
+431- portail="https://studyinitaly.esteri.it",
+432- services=["ORIENT","ADMIS","DOSSIER","BOURSE","VISA","TRAD","PACK"],
+433- etapes=[
+434-  ("Pré-inscription sur Universitaly", "La plateforme officielle reliée à ton consulat — l'équivalent italien de Campus France.", "https://www.universitaly.it", "ADMIS"),
+435-  ("Demander la bourse régionale DSU", "Sur critères sociaux : logement + cantine + ~5 200 €/an. Peu de candidats étrangers la connaissent.", None, "BOURSE"),
+436-  ("Visa D études", "Admission + fonds + logement + assurance.", None, "VISA"),
+437-  # ── Decreto Flussi (Métier / Saisonnier) ──────────────────────────────────
+--- C. rendu des descriptions (1178-1226) ---
+                + "&type=" + _up.quote(type_c or ""))
+    _url_contact = _url_acc.replace("page=accompagnement", "page=contact")
+    # ---- Bandeau héro marketing
+    st.markdown(f"""
+<div class='hero'>
+  <h2>{d['flag']} {nom_pays(origine, LG)} → {nom_pays(d['nom'], LG)}</h2>
+  <p>{tr(d['resume']) if type_c == "Formation (admission)" else tr(_PITCH_PROJET.get(type_c, ''))}</p>
+  <div style='display:flex; flex-wrap:wrap; align-items:center; gap:.7rem; margin-top:1.15rem;'>  <!-- patch_finitions -->
+    <span class='prix' style='margin:0;'>{t("start_from", LG)} {_prix_banniere}</span>
+    <a href='{_url_acc}' target='_blank' style='text-decoration:none; background:#e9b949; color:#1f2937; padding:.55rem 1.1rem; border-radius:10px; font-weight:600; display:inline-block; box-shadow:0 1px 3px rgba(0,0,0,.18);'>{t('accompagne', LG)} {nom_pays(d['nom'], LG)} →</a>
+    <a href='{_url_contact}' target='_blank' style='text-decoration:none; background:rgba(255,255,255,.94); color:#1f2937; padding:.55rem 1.1rem; border-radius:10px; font-weight:600; display:inline-block; box-shadow:0 1px 3px rgba(0,0,0,.18);'>{t('form_titre', LG).split('—')[0].strip()} →</a>
+  </div>
+</div>""", unsafe_allow_html=True)
+
+    # Badges type/niveau retires (patch_finitions) : redondants avec les selecteurs.
+
+    # ---- Infos budget/travail/après : uniquement pour Formation (admission) ----
+    if type_c == "Formation (admission)":
+        colA, colB = st.columns(2)
+        colA.markdown(f"**{t('budget', LG)}** {tr(d['ressources'])}")
+        colB.markdown(f"**{t('travail', LG)}** {tr(d['travail'])}")
+        st.markdown(f"**{t('apres', LG)}** {tr(d['post'])}")
+
+    # ---- Bourses d'abord si le projet est "Bourse"
+    if type_c == "Bourse":
+        st.markdown("### " + t("bourses_pour_toi", LG))
+        _connecte = espace.user_connecte() is not None
+        for nom_b, det, lien in d["bourses"]:
+            with st.expander(f"💰 {tr(nom_b)}", expanded=True):
+                if _connecte:
+                    st.write(tr(det))
+                    if lien: st.markdown(f"[🔗 Site officiel]({lien})")
+                else:
+                    # Aperçu : 1re phrase seulement, puis invitation à créer un compte
+                    apercu = tr(det.split(".")[0]) + "…"
+                    st.write(apercu)
+                    st.warning("🔒 Crée un compte gratuit pour voir les montants exacts, "
+                               "les conditions détaillées et le lien de candidature.")
+                    if st.button(tr("Débloquer gratuitement"), key=f"unlock_{nom_b}"):
+                        st.session_state.show_auth = True
+                        st.rerun()
+
+    if type_c == "Stage / Emploi étudiant":
+        st.success(tr(f"💼 En {d['nom']}, tu peux travailler **{d['travail']}** pendant tes études, "
+                   f"et après le diplôme : {d['post']}. La porte d'entrée reste le statut étudiant :"))
+
+    # ---- Contenu par TYPE DE PROJET (offres emploi/stage/bourse filtrées) ----
+    # --- habillage destination (patch_theme.py) ---
+    try:

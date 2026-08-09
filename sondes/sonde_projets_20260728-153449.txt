@@ -1,0 +1,235 @@
+SONDE PROJETS v1 — 2026-07-28 15:34:49
+Projet : /Users/yvannkoo/mobilite-ia
+================================================================
+
+[1] MODULES app/api
+    ✓ opportunites_ui.py : 130 lignes, 3 fonction(s) : _est_admin, _offres, afficher
+        · opportunites_ui.py — v2 — Contenu par TYPE DE PROJET (page résultat)
+        · Stage/Emploi : offres de la base + JOB BOARD en direct (jobs_api/Adzuna).
+    ✓ offres_cfg.py : 115 lignes, 5 fonction(s) : _init, toutes, definir, supprimer, ecran
+        · offres_cfg.py — Forfaits Premium configurables par l'admin (base EUR)
+        · Table config_offres(code, label, prix_eur, jours, actif).
+    ✓ offres_sync.py : 276 lignes, 13 fonction(s) : _init, param, definir_param, liens_actifs, descriptions_actives, agent_valide, _existe, ingerer, _ingerer_sources_obsolete, prechauffer_traductions …
+        · offres_sync.py — Synchronisation continue du job board + contrôle des liens
+        · - Paramètre admin : liens des offres visibles ou non pour les visiteurs
+    ✓ recherche_poste.py : 85 lignes, 5 fonction(s) : concerne, _postes_base, options, selecteur, filtre
+        · recherche_poste.py — Champ « Poste recherché » (façon Guichet-Emplois/Indeed)
+        · Remplace « Niveau visé » quand le projet est Métier spécialisé ou Stage/Emploi.
+    ✓ eligibilite.py : 125 lignes, 6 fonction(s) : _init, autorise, definir, supprimer, _destinations, ecran
+        · eligibilite.py — Règles d'ADMISSIBILITÉ par destination × type de projet
+        · Gérées par l'ADMIN (expertise immigration — aucune API ne fournit cela).
+    ✓ moteur_plans.py : 252 lignes, 11 fonction(s) : _kb_path, _kb, couvertes, _prochaine, _fmt, _dates_ctx, _nom_pays, _rendre_etape, generer_plan, _personnaliser_ollama …
+        · moteur_plans.py — Moteur de plans d'accompagnement (écran admin)
+        · Principe : AUCUN fait inventé. Tout vient de data/plans_pays_v1.json
+    ✓ services_cfg.py : 88 lignes, 9 fonction(s) : _init, effectifs, definir, _init_origines, origines_desactivees, definir_origine, _init_tarifs, tarifs_tous, definir_tarif
+        · services_cfg.py — Services proposés PAR destination, configurables en admin
+        · Stockés en base (table config_services). Au premier passage sur une
+
+[2] AIGUILLAGE PAR TYPE DE PROJET (opportunites_ui.afficher)
+    fonction afficher() : ligne 55, 76 lignes
+      · mention « Bourse » aux lignes [71, 74]
+      · mention « Formation » aux lignes [60]
+      · mention « Stage » aux lignes [72, 108]
+      · mention « Métier » aux lignes [73, 112]
+      · mention « Emploi » aux lignes [72, 108]
+      · JSON cités   : aucun
+      · tables SQL   : aucune
+      · modules appelés : offres_sync.descriptions_actives, offres_sync.liens_actifs, offres_sync.sync_si_necessaire, recherche_poste.filtre
+
+--- SOURCE INTÉGRALE DE afficher() ---
+def afficher(type_c, dest_code, code_orig, tr, poste="", domaine=""):
+    """Affiche le contenu spécifique au projet. Retourne True si le mode
+    « opportunités » est actif (→ ui.py masque les procédures d'études)."""
+    types = TYPES_PAR_PROJET.get(type_c)
+    if not types:
+        return False           # Formation (admission) : comportement normal
+
+    try:
+        import offres_sync
+        offres_sync.sync_si_necessaire(dest_code)   # rafraîchissement continu
+        _liens = offres_sync.liens_actifs()
+        _desc = offres_sync.descriptions_actives()
+    except Exception:
+        _liens = False
+        _desc = True
+    admin = _est_admin()
+    est_bourse = (type_c == "Bourse")
+    titres = {"Stage / Emploi étudiant": "💼 Offres de stage & d'emploi étudiant",
+              "Métier spécialisé": "🔧 Métiers spécialisés qui recrutent à l'international",
+              "Bourse": "💰 Bourses ouvertes à ton profil"}
+    st.markdown("### " + tr(titres.get(type_c, "Offres")))
+
+    offres = _offres(dest_code, types, code_orig)
+    if poste:
+        try:
+            import recherche_poste
+            offres = recherche_poste.filtre(offres, poste)
+        except Exception:
+            pass
+    for o in offres:
+        ic = ICONES.get(o.get("type", ""), "📌")
+        with st.expander(f"{ic} {tr(o['titre'])}"):
+            if admin or _desc:
+                if o.get("montant"):
+                    st.markdown("**" + tr("Montant / rémunération :") + "** " + tr(o["montant"]))
+                if o.get("niveau"):
+                    st.markdown("**" + tr("Niveau :") + "** " + tr(o["niveau"]))
+                if o.get("domaine"):
+                    st.markdown("**" + tr("Domaine :") + "** " + tr(o["domaine"]))
+                if o.get("deadline"):
+                    st.markdown("**" + tr("Date limite :") + "** " + o["deadline"])
+            else:
+                st.caption("🔒 " + tr("Description réservée — contacte-nous via le "
+                                      "formulaire en bas de page."))
+            if o.get("source_url"):
+                if admin or _liens:
+                    lib = "🔗 " + (tr("Lien (admin)") if admin and not _liens
+                                   else tr("Voir l'offre"))
+                    st.link_button(lib, o["source_url"])
+                else:
+                    st.caption("📌 " + tr("Référence à indiquer dans le formulaire :")
+                               + f" OPP-{o.get('id', '')}")
+
+    # ---- Job board en direct (API), pour Stage / Emploi uniquement ----
+    n_live = 0
+    if not est_bourse and jobs_api is not None:
+        if jobs_api.disponible() and jobs_api.couvre(dest_code):
+            _tl = ("metier",) if type_c == "Métier spécialisé" else ("stage", "emploi")
+            n_live = jobs_api.afficher(dest_code, tr, admin=admin,
+                                       code_orig=code_orig, types_live=_tl,
+                                       poste=poste, domaine=domaine)
+        elif admin and not jobs_api.disponible():
+            st.caption("⚙️ Job board en direct inactif : ajoute ADZUNA_APP_ID et "
+                       "ADZUNA_APP_KEY dans le fichier .env (compte gratuit sur "
+                       "developer.adzuna.com).")
+
+    if not offres and n_live == 0:
+        st.info(tr("Aucune offre correspondant à ton pays d'origine n'est "
+                   "référencée pour cette destination pour le moment. "
+                   "Décris ton projet dans le formulaire en bas de page : "
+                   "notre équipe fera une recherche ciblée pour toi."))
+        return True
+
+    st.caption(tr("Intéressé·e par une de ces offres ? Indique sa référence "
+                  "dans le formulaire en bas de page, on s'occupe du dossier."))
+    return True
+      · JSON cités dans tout le module : aucun
+
+[3] INVENTAIRE data/
+    · bourses_verifiees_v1.json : dict — meta[6], bourses[67]
+    · domaines_officiels_v1.json : dict — meta[4], suffixes_officiels[28], domaines_officiels[94]
+    · plans_pays_v1.json : dict — meta[6], destinations[5]
+    · refus_par_pays_v1.json : dict — meta[4], taux_schengen_zone_afrique, taux_refus_canada_afr_fr, taux_schengen_pays[6], causes_principales[3], specificites[3], sources[3], pays_schengen[29]
+    · sources_pays_v1.json : dict — _doc, version, pays[15]
+    · trad_cache_bak-20260711-002100.json : liste de 21061 éléments
+    · mobilite.db : 25 table(s)
+        - config_devises : 20 ligne(s)
+        - config_origines : 1 ligne(s)
+        - config_params : 10 ligne(s)
+        - config_pays : 196 ligne(s)
+        - config_projet_pays : 929 ligne(s)
+        - config_services : 176 ligne(s)
+        - config_tarifs : 2 ligne(s)
+        - corridors : 7440 ligne(s)
+        - destinations : 30 ligne(s)
+        - dossiers : 0 ligne(s)
+        - eligibilite : 0 ligne(s)
+        - jobs_cache : 23 ligne(s)
+        - leads : 0 ligne(s)
+        - opportunites : 150 ligne(s)
+        - origines : 249 ligne(s)
+        - paiements : 1 ligne(s)
+        - projets : 0 ligne(s)
+        - recherche_web_cache : 6 ligne(s)
+        - recherche_web_etat : 1 ligne(s)
+        - recherche_web_usage : 1 ligne(s)
+        - reset_codes : 0 ligne(s)
+        - security_events : 63 ligne(s)
+        - sqlite_sequence : 4 ligne(s)
+        - trad_cache : 18869 ligne(s)
+        - users : 2 ligne(s)
+
+[4] MÉCANISME D'ÉLIGIBILITÉ PAR ORIGINE (eligibilite.py)
+    125 lignes ; 1 mention(s) d'« origine » ; fonctions : _init, autorise, definir, supprimer, _destinations, ecran
+
+--- 80 PREMIÈRES LIGNES DE eligibilite.py ---
+# =============================================================================
+# eligibilite.py — Règles d'ADMISSIBILITÉ par destination × type de projet
+# Gérées par l'ADMIN (expertise immigration — aucune API ne fournit cela).
+# regle : "TOUS" | "CM,GA,SN" (liste ouverte) | "SAUF:DZ,MA" (tous sauf)
+# type  : 'stage' | 'emploi' | 'metier' | '*' (tous les types)
+# note  : explication visa affichée au visiteur
+# =============================================================================
+import streamlit as st
+import sqlite3
+
+DB = "data/mobilite.db"
+TYPES = ["stage", "emploi", "metier", "*"]
+
+
+def _init():
+    con = sqlite3.connect(DB)
+    con.execute("""CREATE TABLE IF NOT EXISTS eligibilite(
+        destination TEXT, type TEXT, regle TEXT DEFAULT 'TOUS',
+        note TEXT DEFAULT '', statut TEXT DEFAULT 'a_verifier',
+        PRIMARY KEY(destination, type))""")
+    con.commit(); con.close()
+
+
+def autorise(dest_code, type_p, code_orig):
+    """(ok, note). Sans règle définie : ouvert par défaut (l'admin restreint)."""
+    _init()
+    con = sqlite3.connect(DB); con.row_factory = sqlite3.Row
+    row = con.execute("SELECT * FROM eligibilite WHERE destination=? AND type=?",
+                      (dest_code.upper(), type_p)).fetchone()
+    if not row:
+        row = con.execute("SELECT * FROM eligibilite WHERE destination=? AND type='*'",
+                          (dest_code.upper(),)).fetchone()
+    con.close()
+    if not row:
+        return True, ""
+    regle = (row["regle"] or "TOUS").strip().upper()
+    note = row["note"] or ""
+    o = (code_orig or "").strip().upper()
+    if regle == "TOUS":
+        return True, note
+    if regle.startswith("SAUF:"):
+        exclus = [c.strip() for c in regle[5:].split(",") if c.strip()]
+        return (o not in exclus), note
+    inclus = [c.strip() for c in regle.split(",") if c.strip()]
+    return (o in inclus), note
+
+
+def definir(dest_code, type_p, regle, note=""):
+    _init()
+    con = sqlite3.connect(DB)
+    con.execute("INSERT OR REPLACE INTO eligibilite VALUES(?,?,?,?, 'a_verifier')",
+                (dest_code.upper(), type_p, regle.strip().upper() or "TOUS", note.strip()))
+    con.commit(); con.close()
+
+
+def supprimer(dest_code, type_p):
+    _init()
+    con = sqlite3.connect(DB)
+    con.execute("DELETE FROM eligibilite WHERE destination=? AND type=?",
+                (dest_code.upper(), type_p))
+    con.commit(); con.close()
+
+
+def _destinations():
+    con = sqlite3.connect(DB)
+    try:
+        rows = con.execute("SELECT code, nom FROM destinations ORDER BY nom").fetchall()
+    except sqlite3.Error:
+        rows = []
+    con.close()
+    return rows
+
+
+def ecran():
+    """Écran admin des règles d'admissibilité. True si affiché."""
+    if not st.session_state.get("show_eligibilite"):
+        return False
+    st.markdown("## 🛂 Règles d'admissibilité (par destination)")
+    st.caption("Qui peut candidater, selon le pays d'origine. « TOUS » = ouvert ; "
+               "« CM,GA,SN » = seulement ces pays ; « SAUF:DZ » = tous sauf ceux-là. "

@@ -1,0 +1,100 @@
+=== SONDE DIAGNOSTIC — Wed 15 Jul 2026 02:26:38 CEST ===
+--- refus_par_pays_v1.json (complet) ---
+{
+  "meta": {
+    "version": "1.0",
+    "maj": "2026-07-13",
+    "note": "Chiffres issus de l'étude de marché (data/etude_marche_afrique_yorbity_v1.md). Les taux par pays sont publiés ; la ventilation des CAUSES n'existe qu'au niveau agrégé Schengen — ne pas présenter les causes comme spécifiques à un pays."
+  },
+  "taux_schengen_zone_afrique": 45,
+  "taux_refus_canada_afr_fr": 75,
+  "taux_schengen_pays": {
+    "KM": 62.8,
+    "GW": 47.0,
+    "SN": 46.8,
+    "NG": 45.9,
+    "GH": 45.5,
+    "DZ": 35.0
+  },
+  "causes_principales": [
+    {
+      "cause": "Ressources financières mal présentées",
+      "part": 21,
+      "service": "FONDS",
+      "remede": "preuves stables, traçables et cohérentes (relevés, garant conforme, AVI/compte bloqué selon la destination)."
+    },
+    {
+      "cause": "Assurance non conforme",
+      "part": 15,
+      "service": "DOSSIER",
+      "remede": "attestation aux exigences exactes du consulat (montants, couverture, durée)."
+    },
+    {
+      "cause": "Doute sur l'intention de retour / projet flou",
+      "part": 12,
+      "service": "ENTRETIEN",
+      "remede": "plan d'études ou de projet convaincant + préparation de l'entretien (liens avec le pays, cohérence du parcours)."
+    }
+  ],
+  "specificites": {
+    "CA": "Le « plan d'études » peu convaincant est une cause majeure de refus IRCC — une page qui explique pourquoi CE programme, CE pays, et le projet de retour.",
+    "IT": "Nationalités à circuit d'avis renforcé (dont Maroc) : délais plus longs, dossier irréprochable exigé — voir la fiche Italie.",
+    "BE": "Équivalence FWB : 3-4 mois de délai, à lancer très tôt — c'est le goulot d'étranglement du calendrier belge."
+  },
+  "sources": {
+    "schengen": "Commission européenne, statistiques visas 2024-2025 (refus moyen demandeurs africains ~45 % vs 22 % Asie ; taux par pays publiés).",
+    "canada": "IRCC / Canada.ca, comité OLLO mai 2022 : approbation permis d'études Afrique francophone 21-27 % (2019-2021) vs 77-79 % francophones non africains.",
+    "note": "Commission UE 2024-2025 · IRCC 2019-2021 · détail complet dans data/etude_marche_afrique_yorbity_v1.md"
+  }
+}
+
+--- zone diagnostic dans la console ---
+73:def _zone_diagnostic(code_orig, pays_nom, dest):
+74-    R = _refus()
+75-    st.markdown(f"#### 🚦 Diagnostic {pays_nom} → destination")
+76-    taux_pays = R["taux_schengen_pays"].get(code_orig)
+77-    c1, c2 = st.columns(2)
+78-    with c1:
+79-        if taux_pays is not None:
+80-            st.metric("Refus visas Schengen — " + pays_nom,
+81-                      f"~{taux_pays:.0f} %",
+82-                      help=R["sources"]["schengen"])
+83-        else:
+84-            st.metric("Refus Schengen (moy. demandeurs africains)",
+85-                      f"~{R['taux_schengen_zone_afrique']:.0f} %",
+86-                      help=R["sources"]["schengen"])
+87-    with c2:
+88-        st.metric("Permis d'études Canada — Afrique francophone",
+89-                  f"~{R['taux_refus_canada_afr_fr']:.0f} % refusés",
+90-                  help=R["sources"]["canada"])
+91-    st.markdown("**Les causes principales — et comment on les répare :**")
+92-    for c in R["causes_principales"]:
+93-        st.markdown(f"- 🔴 **{c['cause']}** ({c['part']} % des refus) "
+94-                    f"→ 🟢 service **{c['service']}** : {c['remede']}")
+95-    spec = R["specificites"].get(dest)
+96-    if spec:
+97-        st.markdown(f"- ⚠️ **Spécifique {dest}** : {spec}")
+98-    st.caption("Trois causes sur quatre se réparent dans le dossier. "
+99-               "Sources : " + R["sources"]["note"])
+100-
+101-# ── Zone 3 : offres réelles (jobs_api, non modifié) ─────────────────────────
+102-
+103-def _zone_offres(type_c, dest, code_orig, poste, domaine):
+104-    st.markdown("#### 📋 Offres (sources officielles, à jour)")
+105-    if not jobs_api.disponible():
+106-        st.caption("⚙️ Job board inactif : clés ADZUNA manquantes dans .env.")
+107-        return
+108-    if not jobs_api.couvre(dest):
+109-        st.info("Pas de source d'offres en direct pour cette destination — "
+110-                "le plan d'accompagnement reste disponible ci-dessous.")
+111-        return
+112-    types_live = ("metier",) if type_c == "Métier spécialisé" else ("stage", "emploi")
+113-    jobs_api.afficher(dest, _tr, admin=True, code_orig=code_orig,
+--
+197:    _zone_diagnostic(code_orig, pays_nom, dest)
+198-    st.divider()
+199-    if type_c != "Bourse / Études":
+200-        _zone_offres(type_c, dest, code_orig, q, domaine)
+201-        st.divider()
+202-    _zone_plan(type_c, code_orig, pays_nom, dest, ORIGINES, q)
+203-    return True

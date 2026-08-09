@@ -1,0 +1,57 @@
+=== SONDE ETAPES ITALIE (bloc complet) — Wed 15 Jul 2026 04:02:46 CEST ===
+ services=["ORIENT","ADMIS","DOSSIER","BOURSE","VISA","TRAD","PACK"],
+ etapes=[
+  ("Pré-inscription sur Universitaly", "La plateforme officielle reliée à ton consulat — l'équivalent italien de Campus France.", "https://www.universitaly.it", "ADMIS"),
+  ("Demander la bourse régionale DSU", "Sur critères sociaux : logement + cantine + ~5 200 €/an. Peu de candidats étrangers la connaissent.", None, "BOURSE"),
+  ("Visa D études", "Admission + fonds + logement + assurance.", None, "VISA"),
+  # ── Decreto Flussi (Métier / Saisonnier) ──────────────────────────────────
+  ("🛂 Decreto Flussi — trouver un emploi en Italie",
+   "DPCM 02/10/2025 : 497 550 entrées sur 2026-2028 (164 850/an). "
+   "L'employeur fait TOUT : il dépose la demande de nulla osta sur le Portale ALI, "
+   "tu n'as qu'à être prêt avec les documents. "
+   "Trois groupes selon ton pays d'origine — voir ci-dessous.", None, None),
+  ("Groupe 1 — 14 pays africains à quota réservé (click day 16 fév)",
+   "Algérie, Côte d'Ivoire, Égypte, Éthiopie, Gambie, Ghana, Mali, Maroc, Maurice, "
+   "Niger, Nigeria, Sénégal, Soudan, Tunisie. "
+   "25 000 places/an rien que pour ces pays. "
+   "⚠️ Maroc : circuit d'avis renforcé Questura + Inspectorat — délais plus longs, "
+   "dossier irréprochable requis. "
+   "Précompilation ALI : oct–déc 2026 (fenêtre annuelle). "
+   "Secteurs : transport CQC, bâtiment, mécanique, télécoms, hôtellerie, "
+   "électriciens, plombiers, alimentaire, naval.",
+   "https://portaleservizi.dlci.interno.it/AliSportello/ali/home.htm", None),
+  ("Groupe 2 — tous les autres pays (Cameroun, RDC, Guinée…) — click day 18 fév",
+   "Quote générale — compétition plus large mais deux canaux stratégiques sous-utilisés : "
+   "(1) SAISONNIER (agricole 12 jan, tourisme 9 fév) : la concurrence s'est effondrée "
+   "(72 000 demandes en 2025 vs 337 000 en 2024 pour ~82 000 quotas). "
+   "(2) BADANTI hors quota (DL 146/2025) : 10 000 places supplémentaires pour l'assistance "
+   "aux handicapés et aux 80+ ans, ouverts dès le 1er janvier via agences pour l'emploi — "
+   "utilisés à seulement 13 % en 2025. Aucune restriction de nationalité.",
+   "https://portaleservizi.dlci.interno.it/AliSportello/ali/home.htm", None),
+  ("Groupe 3 — colf/badanti (aide domestique) — click day 18 fév",
+   "13 600 places A-bis exclusif domestique + ~19 300 hors quota. "
+   "AUCUNE restriction de nationalité. Condition côté employeur : revenu ≥ 20 000 €/an. "
+   "Canal le plus accessible pour qui a une expérience dans l'aide à la personne.",
+   None, None),
+  ("Préparer MAINTENANT pour 2027",
+   "Les click days 2026 sont passés. Les dates 2027 sont déjà connues (même calendrier annuel). "
+   "Action immédiate : trouver un employeur italien intéressé (offres Yorbity + candidature à distance), "
+   "rassembler les documents (casier judiciaire international, diplômes traduits, CV en italien). "
+   "La précompilation ALI ouvre en octobre 2026 — l'employeur doit être prêt à ce moment-là.",
+   "https://www.interno.gov.it/it/servizi/servizi-line/procedure-flussi", None),
+ ],
+ bourses=[
+  ("DSU régional", "Logement + repas + allocation sur critères sociaux (études).", None),
+  ("Invest Your Talent in Italy", "Masters ciblés + stage en entreprise italienne.", "https://investyourtalentapplication.esteri.it"),
+ ])
+
+D["ES"] = dict(nom="Espagne", flag="🇪🇸",
+ resume="Frais publics 1 000–3 500 €/an, qualité de vie, espagnol = 2e langue mondiale.",
+ ressources="≈600 €/mois à justifier",
+ travail="30 h/semaine", post="Séjour de recherche d'emploi 12 mois",
+ portail="https://www.universidades.gob.es",
+ services=["ORIENT","ADMIS","DOSSIER","VISA","TRAD","PACK"],
+ etapes=[
+  ("Homologuer ton bac (UNEDasiss)", "Obligatoire pour entrer en licence.", "https://unedasiss.uned.es", "TRAD"),
+  ("Candidater aux universités", "Directement ou via les préinscriptions régionales.", None, "ADMIS"),
+  ("Visa D études", "Admission + fonds + assurance.", None, "VISA"),

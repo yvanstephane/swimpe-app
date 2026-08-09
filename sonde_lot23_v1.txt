@@ -1,0 +1,732 @@
+=== SONDE LOT 2+3 — Tue 14 Jul 2026 22:33:00 CEST ===
+--- 1. plans_pays_v1.json (complet) ---
+{
+ "meta": {
+  "version": "1.1",
+  "maj": "2026-07-14",
+  "source_principale": "data/feuille_route_italie_belgique_mcf_v1.md",
+  "afrique_iso": [
+   "DZ",
+   "AO",
+   "BJ",
+   "BW",
+   "BF",
+   "BI",
+   "CV",
+   "CM",
+   "CF",
+   "TD",
+   "KM",
+   "CG",
+   "CD",
+   "CI",
+   "DJ",
+   "EG",
+   "GQ",
+   "ER",
+   "SZ",
+   "ET",
+   "GA",
+   "GM",
+   "GH",
+   "GN",
+   "GW",
+   "KE",
+   "LS",
+   "LR",
+   "LY",
+   "MG",
+   "MW",
+   "ML",
+   "MR",
+   "MU",
+   "MA",
+   "MZ",
+   "NA",
+   "NE",
+   "NG",
+   "RW",
+   "ST",
+   "SN",
+   "SC",
+   "SL",
+   "SO",
+   "ZA",
+   "SS",
+   "SD",
+   "TZ",
+   "TG",
+   "TN",
+   "UG",
+   "ZM",
+   "ZW"
+  ],
+  "sources_etape_employeur": "lavoro.gov.it (associations autorisées) · Il Sole 24 Ore 26/01/2026 (30k/40k via associations, quotas satisfaits jour même) · Coldiretti Verona 02/2025 (no-show 70 %/33 %, formation Maroc) · decretoflussiitalia.it · presse italienne 2025-2026 (arnaques : BolognaToday, Corriere del Giorno/DDA Lecce, CGIL Naples) · Il Sole 24 Ore 06/2024 (visa 120+ j)"
+ },
+ "destinations": {
+  "IT": {
+   "nom": "Italie — Decreto Flussi 2026-2028",
+   "groupe1": {
+    "pays": [
+     "AL",
+     "DZ",
+     "BD",
+     "BA",
+     "KR",
+     "CI",
+     "EG",
+     "SV",
+     "EC",
+     "ET",
+     "GM",
+     "GE",
+     "GH",
+     "GT",
+     "IN",
+     "JP",
+     "JO",
+     "KG",
+     "XK",
+     "MK",
+     "ML",
+     "MA",
+     "MU",
+     "MD",
+     "ME",
+     "NE",
+     "NG",
+     "UZ",
+     "PK",
+     "PE",
+     "PH",
+     "SN",
+     "RS",
+     "LK",
+     "SD",
+     "TH",
+     "TN",
+     "UA"
+    ],
+    "libelle_client": "Bonne nouvelle : ton pays fait partie des 38 pays à QUOTA RÉSERVÉ (25 000 places/an rien que pour ces pays). Click day : {cd_groupe1} à 9h00."
+   },
+   "groupe2": {
+    "libelle_client": "Ton pays passe par la quote générale (click day : {cd_groupe2} à 9h00) — la compétition y est plus large, MAIS deux portes moins connues s'ouvrent à toi (voir plus bas)."
+   },
+   "etapes_communes": [
+    {
+     "titre": "Trouver l'employeur italien AVANT tout",
+     "detail": "Sans employeur, aucune démarche n'est possible : c'est LUI qui dépose la demande. Piste n°1 : les offres Yorbity + candidature à distance (CV en italien, lettre ciblée — services DOSSIER/TRAD). Argument décisif à mettre dans ta candidature : en 2024, 30 % des travailleurs attendus ne sont jamais arrivés (2/3 en 2023) — présente-toi comme le candidat FIABLE et DOCUMENTÉ que les employeurs cherchent (documents prêts, joignable, sérieux prouvé).",
+     "lien": null,
+     "ressources": [
+      {
+       "nom": "Offres Yorbity (sources officielles, mises à jour)",
+       "url": ""
+      },
+      {
+       "nom": "DecretoFlussiItalia — portail de mise en relation travailleurs ↔ employeurs",
+       "url": "https://decretoflussiitalia.it"
+      },
+      {
+       "nom": "Job in Country (Coldiretti) — intermédiation agricole autorisée par le ministère",
+       "url": "https://lavoro.coldiretti.it"
+      },
+      {
+       "nom": "Associations d'employeurs autorisées (Coldiretti, Confagricoltura, CIA, CNA…) — liste officielle",
+       "url": "https://www.lavoro.gov.it/temi-e-priorita/immigrazione/focus-on/ingresso-e-soggiorno-per-lavoro-in-italia/pagine/semplificazione-procedure-per-le-organizzazioni-datoriali"
+      },
+      {
+       "nom": "Portails d'emploi italiens : Indeed.it, InfoJobs.it, Subito.it (rubrique lavoro)",
+       "url": "https://it.indeed.com"
+      },
+      {
+       "nom": "Profils qualifiés : Carte Bleue UE — demande possible TOUTE L'ANNÉE, sans click day",
+       "url": "https://www.cliclavoro.gov.it/focus-on/stranieri-in-italia/assunzione-lavoratori-extra-ue"
+      }
+     ]
+    },
+    {
+     "titre": "Préparer tes documents pendant la recherche",
+     "detail": "Passeport valide, casier judiciaire international, diplômes traduits, certificats de travail. Un dossier prêt = un employeur rassuré (service DOSSIER).",
+     "lien": null,
+     "ressources": [
+      {
+       "nom": "Casier judiciaire de ton pays (extrait récent) + traduction assermentée",
+       "url": ""
+      },
+      {
+       "nom": "CV format italien/Europass",
+       "url": "https://europa.eu/europass/fr"
+      }
+     ]
+    },
+    {
+     "titre": "L'employeur précompile sur le Portale ALI (octobre–décembre)",
+     "detail": "Fenêtre annuelle d'automne (2026 : 23 oct → 7 déc). L'employeur a besoin d'une PEC, de la vérification au Centro per l'Impiego et du document d'asseveration. Max 3 demandes par employeur privé.",
+     "lien": "https://portaleservizi.dlci.interno.it/AliSportello/ali/home.htm",
+     "ressources": [
+      {
+       "nom": "Portale ALI (l'employeur y précompile — SPID/CIE requis)",
+       "url": "https://portaleservizi.dlci.interno.it/AliSportello/ali/home.htm"
+      },
+      {
+       "nom": "Vérification Centro per l'Impiego : NON requise pour saisonniers et travailleurs formés à l'étranger",
+       "url": "https://www.cliclavoro.gov.it/focus-on/stranieri-in-italia/assunzione-lavoratori-extra-ue"
+      }
+     ]
+    },
+    {
+     "titre": "Le click day, puis le nulla osta",
+     "detail": "Les quotas partent dans les premières minutes — la précompilation doit être parfaite. Ensuite : nulla osta via le Sportello Unico (cible 20 j saisonnier / 60 j non-saisonnier).",
+     "lien": null,
+     "ressources": [
+      {
+       "nom": "Le nulla osta est valable 6 mois — l'entrée en Italie et la signature doivent se faire dans ce délai",
+       "url": ""
+      }
+     ]
+    },
+    {
+     "titre": "Visa D au consulat, puis contrat de séjour",
+     "detail": "Visa D au consulat italien de ton pays de résidence, puis à l'arrivée : contrat de séjour sous 8 jours. ⏳ Prévois LARGE : le visa consulaire prend en moyenne plus de 120 jours dans plusieurs pays (contre 20 prévus par la loi) — ne prends aucun engagement (démission, billet) avant de l'avoir en main.",
+     "lien": "https://www.interno.gov.it/it/servizi/servizi-line/procedure-flussi",
+     "ressources": [
+      {
+       "nom": "Procédures flussi — Ministère de l'Intérieur",
+       "url": "https://www.interno.gov.it/it/servizi/servizi-line/procedure-flussi"
+      },
+      {
+       "nom": "Consulat d'Italie de ton pays (rendez-vous visa D)",
+       "url": ""
+      }
+     ]
+    }
+   ],
+   "canaux_groupe2": [
+    {
+     "titre": "🌾 Le saisonnier — la concurrence s'est effondrée",
+     "detail": "72 000 demandes en 2025 contre 337 000 en 2024, pour ~82 000 quotas. Click days : agricole {cd_agricole}, tourisme {cd_tourisme}. 🔑 30 000 des ~40 000 places agricoles sont RÉSERVÉES aux demandes déposées via les associations d'employeurs (Coldiretti, Confagricoltura, CIA…) — et en 2026 toutes ont été satisfaites le jour même. Vise un employeur ADHÉRENT d'une association : c'est la voie la plus sûre. Un premier contrat saisonnier ouvre le nulla osta PLURIANNUEL et la priorité « récurrents »."
+    },
+    {
+     "titre": "🏠 Badanti HORS QUOTA (DL 146/2025) — utilisé à 13 % seulement",
+     "detail": "10 000 entrées supplémentaires par an pour l'assistance aux personnes handicapées et aux plus de 80 ans, demandes dès le 1er janvier via les Agences pour l'emploi (APL) — sans click day. Contrainte : 12 premiers mois liés à l'employeur d'embauche."
+    }
+   ],
+   "badanti": {
+    "titre": "🧓 Canal colf/badanti (aide domestique) — AUCUNE restriction de nationalité",
+    "detail": "13 600 places A-bis exclusives domestique + ~19 300 hors quota (click day {cd_groupe2}). Condition côté employeur : revenu ≥ 20 000 €/an. Le canal le plus accessible si tu as une expérience d'aide à la personne."
+   },
+   "alertes_pays": {
+    "MA": "Le Maroc fait partie des nationalités à circuit d'avis renforcé (Questura + Inspectorat, pas de silence-accord) : délais plus longs, dossier irréprochable indispensable.",
+    "BD": "Circuit d'avis renforcé (Questura + Inspectorat), pas de silence-accord : délais plus longs.",
+    "PK": "Circuit d'avis renforcé (Questura + Inspectorat), pas de silence-accord : délais plus longs.",
+    "LK": "Circuit d'avis renforcé (Questura + Inspectorat), pas de silence-accord : délais plus longs."
+   },
+   "notes_admin": [
+    "Mapping click day 18 fév = quote générale + A-bis : à re-confirmer dans la circolare 8047/2025 avant tout engagement ferme.",
+    "Fenêtre précompilation cycle 2027 : circulaire attendue ~sept-oct 2026, vérifier avant d'annoncer les dates exactes.",
+    "Priorité de traitement : saisonnier d'abord (20 j), puis non-saisonnier (60 j)."
+   ],
+   "bouclier": "## 🛡️ Bouclier anti-arnaque — À LIRE ABSOLUMENT\nDes réseaux criminels vendent de FAUX contrats et nulla osta entre 3 000 et 10 000 € (réseaux démantelés à Bologne, Lecce/Taranto — 30 arrestations —, milliers de victimes à Naples arrivées en Italie pour découvrir que l'employeur n'existait pas). Les règles d'or :\n- ❌ Tu ne paies JAMAIS pour un contrat, un nulla osta ou une « place dans le quota » — la procédure est à la charge de l'EMPLOYEUR.\n- ❌ Quelqu'un qui te « vend » un employeur est un escroc — et tu risques d'arriver sans travail réel, donc sans permis de séjour.\n- ✅ Vérifie que l'entreprise existe : registroimprese.it (registre officiel des entreprises italiennes).\n- ✅ Un vrai employeur te demande des documents et un entretien, jamais de l'argent."
+  },
+  "BE": {
+   "nom": "Belgique — Bourses ARES",
+   "pays_eligibles": [
+    "ZA",
+    "BJ",
+    "BF",
+    "BI",
+    "CM",
+    "ET",
+    "GN",
+    "KE",
+    "MG",
+    "ML",
+    "MA",
+    "MZ",
+    "NE",
+    "UG",
+    "CD",
+    "RW",
+    "SN",
+    "TZ",
+    "TN",
+    "ZW",
+    "BO",
+    "KH",
+    "CU",
+    "EC",
+    "HT",
+    "ID",
+    "NP",
+    "PS",
+    "PE",
+    "PH",
+    "VN"
+   ],
+   "resume_client": "~200 bourses ENTIÈREMENT financées chaque année : inscription + 1 150 €/mois × 12 + billet aller-retour + assurance + visa remboursé. Bachelier/Master de spécialisation (1 an) ou formation continue (2-6 mois) dans les universités belges francophones. Prochain appel : ~{ares_ouverture} → clôture ~{ares_cloture}.",
+   "etapes": [
+    {
+     "titre": "Vérifier tes 4 conditions (2 minutes)",
+     "detail": "① Résider ET travailler dans ton pays · ② Bac+3 minimum (Bac+5 pour master de spécialisation/formation continue) · ③ Au moins 2 ans d'expérience APRÈS le diplôme · ④ Diplôme obtenu il y a 20 ans maximum. Il n'y a PAS de limite d'âge — le « 40 ans max » qui circule est faux.",
+     "lien": null
+    },
+    {
+     "titre": "Monter le dossier MAINTENANT (avant l'ouverture)",
+     "detail": "Diplômes + relevés, preuves de résidence et d'emploi, et surtout une lettre de motivation ORIENTÉE DÉVELOPPEMENT de ton pays — c'est le critère central du jury (services DOSSIER + ORIENT).",
+     "lien": null,
+     "ressources": [
+      {
+       "nom": "Page officielle des bourses ARES (appel + document de référence)",
+       "url": "https://www.ares-ac.be/fr/bourses"
+      }
+     ]
+    },
+    {
+     "titre": "Créer ton compte GIRAF tôt",
+     "detail": "La validation du compte est manuelle (quelques heures à quelques jours) — ne pas attendre la dernière semaine.",
+     "lien": "https://www.ares-ac.be/fr/bourses",
+     "ressources": [
+      {
+       "nom": "Plateforme GIRAF (candidature — lien depuis la page ARES)",
+       "url": "https://www.ares-ac.be/fr/bourses"
+      }
+     ]
+    },
+    {
+     "titre": "Candidater (UNE seule candidature possible)",
+     "detail": "Formulaire via l'onglet « Appels concurrentiels », brouillons possibles, soumission = définitif. Clôture ~{ares_cloture} à 12h00 heure belge. Résultats en juin, rentrée en septembre.",
+     "lien": null
+    }
+   ],
+   "anti_arnaque": "🛡️ **La candidature ARES est GRATUITE à toutes les étapes.** Personne ne doit te demander d'argent pour candidater. Fraude à signaler : bourses-cooperation@ares-ac.be.",
+   "message_non_eligible": "Ton pays ne figure pas dans les 31 pays partenaires de l'appel ARES actuel (liste vérifiée 2026-2027). Inutile de candidater : la condition de résidence + nationalité est stricte.",
+   "notes_admin": [
+    "Liste des 31 pays valable pour l'appel 2026-27 (quinquennal 2022-2027) — RE-VÉRIFIER à l'appel d'août 2026, la liste peut changer avec le nouveau quinquennal.",
+    "Clause d'extension du délai « diplôme ≤ 20 ans » : existe dans le doc officiel, libellé exact à lire avant de la détailler au client.",
+    "Effet cascade genre + report grossesse garantis : argument à valoriser pour les clientes."
+   ]
+  },
+  "MCF": {
+   "nom": "MasterCard Foundation Scholars Program",
+   "resume_client": "L'un des plus grands programmes de bourses au monde : plus de 50 000 boursiers, 71 % de femmes, entièrement financé (scolarité + logement + matériel + transport + assurance + mentorat). Niveaux : Bachelor (jusqu'à 29 ans) et Master (jusqu'à 35 ans). Réservé aux citoyens africains — réfugiés et déplacés inclus et encouragés.",
+   "etapes": [
+    {
+     "titre": "Vérifier ton éligibilité de base",
+     "detail": "Citoyen d'un pays africain · ≤ 29 ans (Bachelor) ou ≤ 35 ans (Master) au moment de candidater · PAS de double nationalité ni résidence permanente US/Canada/UK/UE · besoin financier réel (c'est le cœur du programme, pas un frein).",
+     "lien": null
+    },
+    {
+     "titre": "Choisir 2-3 universités partenaires (candidatures multiples autorisées)",
+     "detail": "Il n'y a PAS de candidature centrale : chaque université gère la sienne. Francophones : Sciences Po (Paris), McGill (Montréal), 2iE (Burkina), Abomey-Calavi (Bénin). Anglophones : Toronto, Cambridge, Berkeley, CMU-Africa (Kigali), Univ. Rwanda (ouverte à toute l'Afrique)…",
+     "lien": "https://mastercardfdn.org/en/what-we-do/our-programs/mastercard-foundation-scholars-program/where-to-apply/",
+     "ressources": [
+      {
+       "nom": "Annuaire officiel des universités partenaires (Where to Apply)",
+       "url": "https://mastercardfdn.org/en/what-we-do/our-programs/mastercard-foundation-scholars-program/where-to-apply/"
+      },
+      {
+       "nom": "Guide officiel « Becoming a Scholar » (critères, âges)",
+       "url": "https://mastercardfdn.org/en/articles/becoming-a-mastercard-foundation-scholar/"
+      }
+     ]
+    },
+    {
+     "titre": "Préparer un dossier où ton HISTOIRE compte autant que tes notes",
+     "detail": "Relevés + preuves de barrières financières + essais sur ton leadership et ton engagement communautaire + références. Le programme cherche des transformateurs, pas seulement des premiers de classe (services DOSSIER + ORIENT).",
+     "lien": null
+    },
+    {
+     "titre": "Respecter les deadlines de CHAQUE université (sept → janv)",
+     "detail": "La plupart des partenaires clôturent entre septembre et janvier pour la rentrée suivante. Cas particulier McGill : il faut candidater au Scholars Program AVANT de candidater à l'université (sessions d'info obligatoires).",
+     "lien": null
+    }
+   ],
+   "anti_arnaque": "🛡️ **Alerte officielle de la Fondation** : des posts Facebook frauduleux « recrutent » pour ce programme en demandant des frais. Le programme ne demande JAMAIS d'argent — les frais de dossier des universités sont remboursés si tu es sélectionné. Signalement : privacy@mastercardfdn.org.",
+   "notes_admin": [
+    "Âges officiels 29/35 (source mastercardfdn.org) — des sites tiers disent 28/32 : ne pas reprendre.",
+    "Chaque université ajoute ses propres critères (ex. Toronto/McGill = Afrique subsaharienne seulement, filières santé/agro) — vérifier la page officielle de l'université visée au moment de la candidature.",
+    "Deadline Toronto 2026-27 était le 3 nov 2025 → cycle 2027-28 attendu ~automne 2026."
+   ]
+  }
+ }
+}
+--- 2. moteur_plans.py (complet) ---
+# =============================================================================
+# moteur_plans.py — Moteur de plans d'accompagnement (écran admin)
+# Principe : AUCUN fait inventé. Tout vient de data/plans_pays_v1.json
+# (base vérifiée le 2026-07-13, sources dans le JSON).
+# Le LLM local (optionnel) ne fait que reformuler — prompt verrouillé.
+# Accès : ?page=plans (admin uniquement, gating fait par ui.py).
+# =============================================================================
+import json
+import os
+from datetime import date
+from pathlib import Path
+
+import streamlit as st
+
+# ── Base de connaissances ────────────────────────────────────────────────────
+
+def _kb_path():
+    p = Path("data/plans_pays_v1.json")
+    if p.exists():
+        return p
+    return Path(__file__).resolve().parents[2] / "data" / "plans_pays_v1.json"
+
+@st.cache_data(show_spinner=False)
+def _kb():
+    with open(_kb_path(), encoding="utf-8") as f:
+        return json.load(f)
+
+# ── Dates dynamiques (déterministes) ────────────────────────────────────────
+
+def _prochaine(jour, mois):
+    """Prochaine occurrence annuelle d'une date (ex. click day)."""
+    auj = date.today()
+    annee = auj.year if (auj.month, auj.day) <= (mois, jour) else auj.year + 1
+    return date(annee, mois, jour)
+
+def _fmt(d):
+    MOIS = ["", "janvier", "février", "mars", "avril", "mai", "juin",
+            "juillet", "août", "septembre", "octobre", "novembre", "décembre"]
+    return f"{d.day} {MOIS[d.month]} {d.year}"
+
+def _dates_ctx():
+    """Toutes les dates récurrentes, calculées depuis aujourd'hui."""
+    return {
+        "cd_agricole":  _fmt(_prochaine(12, 1)),
+        "cd_tourisme":  _fmt(_prochaine(9, 2)),
+        "cd_groupe1":   _fmt(_prochaine(16, 2)),
+        "cd_groupe2":   _fmt(_prochaine(18, 2)),
+        "ares_ouverture": _fmt(_prochaine(4, 8)),
+        "ares_cloture":   _fmt(_prochaine(19, 9)),
+        "annee":        str(date.today().year),
+        "annee_p1":     str(date.today().year + 1),
+    }
+
+# ── Génération du plan (100 % déterministe) ─────────────────────────────────
+
+def _nom_pays(code, ORIGINES):
+    for nom, (c, _) in ORIGINES.items():
+        if c == code:
+            return nom
+    return code
+
+def _rendre_etape(i, et, dts):
+    txt = (f"**Étape {i} — {et['titre']}**  \n"
+           f"{et['detail'].format(**dts)}"
+           + (f"  \n🔗 {et['lien']}" if et.get("lien") else ""))
+    for r in et.get("ressources", []):
+        txt += (f"\n  - 📚 {r['nom']}" + (f" → {r['url']}" if r.get("url") else ""))
+    return txt
+
+def generer_plan(dest, code_orig, ORIGINES, offre_txt=""):
+    """Retourne (plan_client_md, notes_admin_md). Zéro invention."""
+    kb = _kb()
+    dts = _dates_ctx()
+    pays = _nom_pays(code_orig, ORIGINES)
+    afrique = code_orig in kb["meta"]["afrique_iso"]
+
+    lignes, notes = [], []
+    ref = f" — offre : {offre_txt[:80].strip()}" if offre_txt.strip() else ""
+
+    if dest == "IT":
+        it = kb["destinations"]["IT"]
+        g1 = code_orig in it["groupe1"]["pays"]
+        groupe = it["groupe1"] if g1 else it["groupe2"]
+        lignes.append(f"# 🇮🇹 Plan d'accompagnement — {pays} → Italie{ref}\n")
+        lignes.append(f"**Ta situation** : {groupe['libelle_client'].format(**dts)}\n")
+        for i, et in enumerate(it["etapes_communes"], 1):
+            lignes.append(_rendre_etape(i, et, dts))
+        # Canaux stratégiques pour le groupe 2 (faits vérifiés)
+        if not g1:
+            lignes.append("\n## 💡 Deux portes moins connues (ouvertes à ta nationalité)\n")
+            for canal in it["canaux_groupe2"]:
+                lignes.append(f"**{canal['titre']}**  \n{canal['detail'].format(**dts)}")
+        # Badanti : toujours (aucune restriction)
+        lignes.append(f"\n**{it['badanti']['titre']}**  \n"
+                      + it["badanti"]["detail"].format(**dts))
+        if it.get("bouclier"):
+            lignes.append("\n" + it["bouclier"])
+        if code_orig in it["alertes_pays"]:
+            lignes.append(f"\n⚠️ **Spécifique {pays}** : "
+                          + it["alertes_pays"][code_orig])
+        notes.extend(it["notes_admin"])
+
+    elif dest == "BE":
+        be = kb["destinations"]["BE"]
+        if code_orig in be["pays_eligibles"]:
+            lignes.append(f"# 🇧🇪 Plan d'accompagnement — {pays} → Belgique (bourse ARES){ref}\n")
+            lignes.append(be["resume_client"].format(**dts) + "\n")
+            for i, et in enumerate(be["etapes"], 1):
+                lignes.append(_rendre_etape(i, et, dts))
+            lignes.append("\n" + be["anti_arnaque"])
+        else:
+            lignes.append(f"# 🇧🇪 {pays} → Belgique — ARES non disponible\n")
+            lignes.append(be["message_non_eligible"])
+            if afrique:
+                lignes.append("\n👉 **Alternative recommandée : la bourse "
+                              "MasterCard Foundation** (ouverte à toute l'Afrique) — "
+                              "voir le plan MCF.")
+        notes.extend(be["notes_admin"])
+
+    elif dest == "MCF":
+        m = kb["destinations"]["MCF"]
+        lignes.append(f"# 🎓 Plan d'accompagnement — {pays} → MasterCard Foundation{ref}\n")
+        if not afrique:
+            lignes.append("⚠️ Ce programme est réservé aux citoyens africains.")
+        else:
+            lignes.append(m["resume_client"] + "\n")
+            for i, et in enumerate(m["etapes"], 1):
+                lignes.append(_rendre_etape(i, et, dts))
+            lignes.append("\n" + m["anti_arnaque"])
+        notes.extend(m["notes_admin"])
+
+    else:
+        lignes.append(f"Destination `{dest}` non couverte par le moteur v1 "
+                      "(couvre : IT, BE, MCF).")
+
+    plan = "\n\n".join(lignes)
+    plan += ("\n\n---\n*Plan généré le " + _fmt(date.today())
+             + " à partir de sources officielles vérifiées (voir fiche pays). "
+               "Les services Yorbity mentionnés sont optionnels — les candidatures "
+               "aux programmes officiels sont GRATUITES.*")
+    notes_md = ("### 📋 Notes internes (NE PAS copier au client)\n- "
+                + "\n- ".join(notes)) if notes else ""
+    return plan, notes_md
+
+# ── Reformulation LLM optionnelle (verrouillée, dégradation propre) ─────────
+
+def _personnaliser_ollama(plan_md, offre_txt, pays):
+    import requests  # dispo dans le venv streamlit
+    modele = os.environ.get("PLANS_MODEL", "llama3.3:70b")
+    prompt = (
+        "Reformule le plan ci-dessous pour t'adresser chaleureusement à un "
+        f"client de {pays}" + (f" intéressé par cette offre : {offre_txt[:200]}"
+        if offre_txt.strip() else "") + ".\n"
+        "RÈGLES ABSOLUES : n'ajoute, ne modifie et ne supprime AUCUN fait, "
+        "date, montant, liste de pays, condition ou lien. Ne donne aucun "
+        "conseil juridique nouveau. Conserve tous les titres et la structure. "
+        "Réponds uniquement avec le plan reformulé, en français.\n\n" + plan_md
+    )
+    r = requests.post("http://localhost:11434/api/generate",
+                      json={"model": modele, "prompt": prompt, "stream": False},
+                      timeout=180)
+    r.raise_for_status()
+    return r.json().get("response", "").strip() or plan_md
+
+# ── Écran admin ──────────────────────────────────────────────────────────────
+
+def ecran(ORIGINES=None):
+    """Écran ?page=plans. True si affiché (l'appelant gère est_admin)."""
+    try:
+        page = st.query_params.get("page")
+    except Exception:  # anciennes versions Streamlit
+        page = (st.experimental_get_query_params().get("page") or [None])[0]
+    if page != "plans":
+        return False
+
+    if ORIGINES is None:
+        from pays_monde import ORIGINES_MONDE as ORIGINES
+
+    st.title("🧭 Moteur de plans d'accompagnement")
+    st.caption("Faits 100 % issus de la base vérifiée `data/plans_pays_v1.json` "
+               f"(màj {_kb()['meta']['maj']}). Le moteur n'invente rien.")
+
+    col1, col2 = st.columns(2)
+    with col1:
+        noms = sorted(ORIGINES.keys())
+        pays_nom = st.selectbox("🌍 Pays d'origine du client", noms)
+        code_orig = ORIGINES[pays_nom][0]
+    with col2:
+        dest = st.selectbox("🎯 Programme / destination",
+                            ["IT", "BE", "MCF"],
+                            format_func={"IT": "🇮🇹 Italie — travail (Decreto Flussi)",
+                                         "BE": "🇧🇪 Belgique — bourse ARES",
+                                         "MCF": "🎓 MasterCard Foundation — bourse"}.get)
+
+    offre = st.text_area("📋 Offre d'emploi ou référence (optionnel)",
+                         placeholder="Colle ici le titre/texte de l'offre ou sa référence…",
+                         height=100)
+    ia = st.checkbox("🤖 Reformuler pour ce client (Ollama local — "
+                     "n'ajoute aucun fait)", value=False)
+
+    if st.button("⚙️ Générer le plan", type="primary"):
+        plan, notes = generer_plan(dest, code_orig, ORIGINES, offre)
+        if ia:
+            with st.spinner("Reformulation locale en cours…"):
+                try:
+                    plan = _personnaliser_ollama(plan, offre, pays_nom)
+                except Exception as e:
+                    st.warning(f"Ollama indisponible ({e}) — plan standard affiché.")
+        st.subheader("Plan client (copier-coller)")
+        st.code(plan, language="markdown")
+        with st.expander("👁️ Aperçu mis en forme"):
+            st.markdown(plan)
+        if notes:
+            st.divider()
+            st.markdown(notes)
+    return True
+
+# _maj_ressources_etapes_v1
+
+--- 3. feuille de route IT/BE/MCF (faits verifies) ---
+# FEUILLE DE ROUTE EXÉCUTABLE — Projet « Loyale » (nom de travail)
+## Document maître pour LLM copilote local — v1.0
+
+Document autonome : spécification + plan + état du projet (cases et journal). Marché : **États-Unis + Canada anglophone**. Fondateur solo, Mac M5 Max 128 Go, Ollama.
+
+---
+
+## 0. MODE D'EMPLOI POUR LE LLM COPILOTE
+Modèles et rôles : gpt-oss:120b (raisonnement, rédaction, outreach créateurs), llama3.3:70b (second avis), llama3.2:3b (analyse de pages marchandes, extraction JSON), qwen3-coder:30b (code de l'extension et des outils), nomic-embed-text (si recherche sémantique utile).
+Procédure de session : 1) lire JOURNAL + cases ; 2) annoncer la prochaine étape non cochée, vérifier les GATES ; 3) guider concrètement (code, commandes, textes) ; 4) proposer la ligne de journal et rappeler de cocher.
+Interdits absolus : ne jamais sauter un GATE ; ne jamais proposer de simuler des clics ni d'écraser une attribution d'affiliation existante ; ne jamais afficher un code promo non testé comme fiable ; ne jamais collecter plus de données de navigation que le strict nécessaire au checkout des marchands partenaires.
+
+---
+
+## 1. LE PRODUIT
+**Vision :** l'extension qui économise de l'argent à l'utilisateur ET lui montre ce qu'elle gagne — la moitié de chaque commission d'affiliation lui est reversée, l'attribution des créateurs est sacrée, et le code d'attribution est auditable.
+**Parcours v1 :** au checkout d'un marchand partenaire → l'extension teste les codes connus, applique le meilleur → affiche « commission estimée : X $, ta part : X/2 » → cagnotte visible → module baisse de prix post-achat (alerte + guide de réclamation d'ajustement).
+**Ne fait PAS en v1 :** Amazon (trop verrouillé), mobile, comparaison de prix générale, offres sponsorisées.
+**Concurrence (résumé) :** Honey/PayPal — confiance brûlée (perte massive d'utilisateurs, exclusion du réseau Rakuten en janvier 2026, recours collectifs en cours) ; Capital One Shopping et Rakuten — solides mais opaques sur la commission ; en Europe, iGraal et Joko partagent la commission avec leurs membres depuis des années : le modèle est prouvé commercialement, le vide est nord-américain.
+**Différenciateurs :** partage de commission affiché à l'achat ; attribution des créateurs respectée et vérifiable ; remboursements post-achat ; conformité irréprochable comme fossé (les règles du Chrome Web Store durcies en 2025 éliminent les tricheurs).
+
+## 2. GATES
+- G1. Attribution sacrée : si un paramètre d'affiliation existe déjà (créateur ou autre source), l'extension NE LE TOUCHE JAMAIS ; elle n'attache le sien que lorsqu'aucun affilié n'est présent. Comportement testé automatiquement à chaque build et documenté publiquement.
+- G2. Transparence totale : commission estimée et part utilisateur affichées au moment de l'achat ; jamais de « meilleur code » caché pour arranger un marchand.
+- G3. Conformité : règles Chrome Web Store et conditions des réseaux d'affiliation relues avant chaque release ; jamais de clic simulé, jamais d'injection hors checkout.
+- G4. Données minimales : activité lue uniquement sur les domaines partenaires au moment du checkout ; jamais d'historique global ; jamais de vente de données.
+- G5. Codes : seuls les codes testés avec succès récemment sont annoncés comme fiables ; les autres sont marqués « à essayer ».
+- G6. Pas de dark patterns : désinstallation propre, notifications sobres.
+
+## 3. ARCHITECTURE
+Extension Chrome Manifest V3 : content script (détection du checkout et des champs coupon), service worker, interface cagnotte. Backend léger (Node + SQLite puis Postgres) : tables merchants, codes(code, marchand, dernier_test, statut, source), earnings (ledger en double entrée). Collecte de codes : sources publiques + soumissions communautaires + **test automatisé nocturne** (Playwright sur paniers de test) — c'est le test qui fait la qualité, pas la collecte. Affiliation : un sous-réseau (type Skimlinks/Sovrn) pour couvrir des centaines de marchands sans négociation individuelle. Harnais d'évaluation : 10 pages de checkout archivées, assertions : bon code appliqué, attribution préexistante intacte (le test G1), commission calculée juste.
+
+## 4. PROMPTS DE PRODUCTION
+- 4.1 Détecteur de checkout (llama3.2:3b) : « On te donne le HTML simplifié d'une page. Réponds UNIQUEMENT en JSON : {"est_checkout": bool, "selecteur_champ_code": str|null, "selecteur_bouton_appliquer": str|null, "confiance": 0-1}. N'invente pas de sélecteur : null si incertain. »
+- 4.2 Auditeur d'attribution (llama3.2:3b) : « On te donne l'URL courante et ses paramètres. Réponds en JSON : {"affilie_present": bool, "type_probable": str|null}. Règle produit : si affilie_present est vrai, l'extension ne modifie RIEN. »
+- 4.3 Outreach créateurs (gpt-oss:120b) : « Rédige un message court et honnête à un créateur YouTube/Twitch : nous partageons la commission avec ses viewers ET nous ne touchons jamais à son attribution — comportement vérifiable dans notre code publié. Ton direct, zéro survente, une seule demande claire. »
+
+## 5. LE PLAN — 12 SEMAINES
+### PHASE 0 — Fondations (S1)
+- [ ] D1 — Périmètre v1 : 20 marchands US/CA à fort volume (liste proposée par le copilote, validée par l'humain).
+- [ ] D2 — Confirmer ou remplacer le nom « Loyale ».
+- [ ] Structure projet + git ; inscription sandbox à un sous-réseau d'affiliation.
+- [ ] Harnais v0 : 10 pages de checkout archivées + assertions (dont le test G1).
+### PHASE 1 — Le moteur (S2-4)
+- [ ] Extension MV3 : détection checkout + application/test de codes sur 10 marchands.
+- [ ] Ledger « argent récupéré » + affichage commission/part (G2).
+- [ ] Test automatisé nocturne des codes + statuts fiable / à essayer (G5).
+- [ ] G1 codé, testé, documenté dans une page publique « comment nous traitons l'attribution ».
+- [ ] TEST FONDATEUR : un achat réel via le sandbox, commission tracée, part créditée. Consigner au journal.
+### PHASE 2 — Le produit (S5-7)
+- [ ] Étendre à 50 marchands ; soumissions communautaires de codes (testées avant publication).
+- [ ] Module baisse de prix v0 : suivi du prix post-achat + alerte + guide de réclamation par marchand.
+- [ ] Tableau de bord (cagnotte, historique, retrait à seuil bas).
+### PHASE 3 — La preuve (S8-9)
+- [ ] Soumission au Chrome Web Store (anticiper le délai de review ; G3 relu avant).
+- [ ] Bêta 30 utilisateurs ; publication du code du module d'attribution (transparence vérifiable).
+- [ ] Pilote créateurs : 3 micro-créateurs (10-100k abonnés) avec le message 4.3 ; mesurer installations et retours.
+### PHASE 4 — Le lancement (S10-12)
+- [ ] Page « preuves » : paiements réels, cagnottes réelles (avec accord).
+- [ ] Programme créateurs v1 : part reversée au créateur référent, affichée.
+- [ ] Lancement : Reddit (r/Frugal, r/PersonalFinanceCanada), vidéos créateurs, angle presse « l'anti-Honey ».
+
+## 6. JOURNAL DE BORD
+| Date | Fait | Décision / apprentissage | Prochaine étape |
+|---|---|---|---|
+| | | | |
+
+## 7. RÉFÉRENCE
+Structure : `~/Loyale/{data,eval,app}`. Hygiène : identifiants d'affiliation hors git ; test G1 exécuté à chaque build ; conditions des réseaux relues à chaque ajout de marchand.
+
+--- 4. corridors et faits Canada/Allemagne (etude de marche) ---
+10:d'encaissement (CinetPay × mobile money), (3) corridors réels vers les
+11-destinations Yorbity, (4) douleur client (refus de visa), (5) accès
+12-numérique. Sources en fin de document.
+13-
+--
+24:  le type « Métier » de Yorbity est le cœur de la demande, devant Études.
+25-- Les jeunes et les instruits sont les plus enclins à partir = exactement
+26-  la cible solvable et numérique.
+27-- Population Afrique : +70 % d'ici 2050 (2,4 Mds) → pression structurelle
+--
+45:→ Le paiement 16 € (~10 500 FCFA) est réaliste en tier 1. Prévoir
+46-pricing adapté (plus bas ou paliers) pour RDC/Guinée — les taux GNF/CDF
+47-surchargeables de paiement.py anticipent déjà ce besoin.
+48-→ NOTE : la FRANCE est dans CinetPay → la diaspora peut payer pour la
+--
+52:## PILIER 3 — LES CORRIDORS RÉELS
+53-
+54-Études (UNESCO/Campus France) :
+55-- 463 000 étudiants subsahariens à l'étranger (2021, +13 % vs 2016) ;
+--
+60:  destinations préférées ALLEMAGNE et France → valide mig_de et le
+61-  positionnement DE de l'app.
+62-- Croissances 5 ans : Sénégal +40-48 %, Côte d'Ivoire +41 %, Ghana +66 %.
+63-- France = 1re destination des subsahariens (+40 % malgré le Covid).
+--
+72:- Sénégal→Italie : diaspora historique massive → notoriété du corridor,
+73-  demande latente très forte.
+74-- ARES (Belgique) : 20 pays africains éligibles dont CM, CD, GN, SN, BJ,
+75-  BF, ML, NE ; ⚠️ Côte d'Ivoire et Togo NON éligibles → router vers MCF.
+--
+80:- Canada (IRCC, chiffres officiels 2019-2021) : taux d'APPROBATION des
+81-  permis d'études Afrique francophone : 21-27 %, contre 77-79 % pour les
+82-  francophones NON africains. Soit ~3 refus sur 4.
+83-- Schengen : refus moyen demandeurs africains ~45 % (vs 22 % Asie) ;
+--
+106:### TIER 1 — Lancement (focus marketing + contenu)
+107-| Pays | Pop. | Atouts décisifs |
+108-|---|---|---|
+109:| 🇨🇲 Cameroun | ~29 M | CinetPay ✓ XAF · intentions +15 pts · 2e origine étudiante subsaharienne (31 k, +24 %) · corridors DE (mig_de câblé) + FR + IT groupe 2 (angle badanti/saisonnier) · ARES ✓ · MCF ✓. Marché ANCRE — l'app y est déjà orientée. |
+110-| 🇨🇮 Côte d'Ivoire | ~29 M | Siège CinetPay · mobile money 70-80 % · IT GROUPE 1 (quota réservé, click day 16 fév) · 18,5 k étudiants (+41 %) · économie la plus riche UEMOA. ⚠️ ARES ✗ → router Bourse vers MCF. |
+111-| 🇸🇳 Sénégal | ~18 M | IT GROUPE 1 + diaspora italienne historique · ARES ✓ · refus Schengen 46,8 % = douleur max · mobile money ultra-mature · 17,5 k étudiants (+48 %). |
+112-
+113:### TIER 2 — Vague 2 (activer dès que tier 1 tourne)
+114-| Pays | Pop. | Notes |
+115-|---|---|---|
+116-| 🇨🇩 RDC | ~105 M | Volume énorme · CDF déjà codé · gros bénéficiaire ARES · groupe 2 → badanti/saisonnier · pouvoir d'achat plus faible → pricing adapté. |
+--
+123:### TIER 3 — Extension (hors rail CinetPay)
+124-Maroc, Tunisie (IT groupe 1, ARES ✓, cartes bancaires/autres agrégateurs) ;
+125-Nigeria, Ghana (demande massive +20/+21 pts mais anglophone + hors rail —
+126-bascule EN de l'app déjà prête le jour venu).
+--
+159:  francophones sur 4 refusés au Canada ; ~1 sur 2 au Schengen pour
+160-  plusieurs pays — les 3 causes principales se corrigent dans le
+161-  dossier. » (sources officielles IRCC/Commission UE).
+162:- Tier 1 : offre d'appel 16 € OK ; Premium accompagnement au-dessus.
+163:- Tier 2 : paliers ou prix ajustés GNF/CDF (definir_param déjà prévu).
+164-- Anti-arnaque = positionnement : GRATUIT pour les bourses (ARES/MCF ne
+165-  demandent jamais d'argent), transparent pour les services Yorbity.
+166:- Langue : go-to-market FR ; EN dormant jusqu'au tier 3.
+167-
+168-## SOURCES PRINCIPALES
+169-Afrobarometer (migrants day 2024 + AD288 + PP98 2025) · Africa Center
+--
+175:Agence Ecofin · IRCC/Canada.ca (OLLO mai 2022, taux officiels par langue)
+176-· Commission UE via HelloSafe/Workvisa/ireturnticket (Schengen 2024-2025)
+177-· AllAfrica (classement refus par pays africains) · Affaires
+178-universitaires (nov. 2024).
+
+--- 5. appels du moteur par la console ---
+6:# AUCUNE modification), plan via moteur_plans (base vérifiée, sans IA).
+16:import moteur_plans
+110:                "le plan d'accompagnement reste disponible ci-dessous.")
+119:# ── Zone 4 : plan daté (moteur vérifié, sans IA) ────────────────────────────
+123:    st.markdown(f"`{libelle} : {moteur_plans._fmt(d)} · J−{j}`")
+125:def _zone_plan(type_c, code_orig, pays_nom, dest, ORIGINES, q):
+146:                                       moteur_plans._prochaine(23, 10))
+149:                                       moteur_plans._prochaine(16, 2))
+152:                                       moteur_plans._prochaine(18, 2))
+153:    offre_txt = st.text_input("Offre ou référence pour personnaliser le plan "
+156:    if st.button("⚙️ Générer le plan", type="primary", key="acc_go"):
+160:                    "s'ajoutent dans data/plans_pays_v1.json.")
+162:        plan, notes = moteur_plans.generer_plan(cible, code_orig,
+165:        st.code(plan, language="markdown")
+167:            st.markdown(plan)
+185:               "direct · plan 100 % déterministe (base vérifiée "
+186:               f"{moteur_plans._kb()['meta']['maj']}).")
+197:    _zone_plan(type_c, code_orig, pays_nom, dest, ORIGINES, q)

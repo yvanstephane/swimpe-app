@@ -6,3 +6,25 @@ __pycache__/
 data/*.db
 data/*.db.bak-*
 *.bak-*
+*.bak_*
+.streamlit/secrets.toml
+
+# --- Renfort securite Swimpe ---
+.env
+.env.*
+*.db
+*.sqlite
+data/
+_backups/
+backups/
+*.bak
+*.bak_*
+*.old
+*.pre_*
+__pycache__/
+*.pyc
+.venv/
+venv/
+.DS_Store
+*.avant_couche
+*.avant_tableau

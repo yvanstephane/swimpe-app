@@ -1,0 +1,86 @@
+=== SONDE ECRAN BOURSES (Lot D) — Wed 15 Jul 2026 05:45:37 CEST ===
+--- A. le rendu 'Les bourses pour toi' + ce qui l'entoure ---
+201: "BOURSE":  ("💰 Chasse aux bourses ciblée",
+202:             "Identification des bourses auxquelles TON profil est éligible et aide "
+288: bourses=[("Bourse Eiffel", "Master/doctorat d'excellence, ~1 000–1 700 €/mois, déposée par l'établissement.", "https://www.campusfrance.org/fr/le-programme-de-bourses-eiffel"),
+289:          ("Bourses bilatérales", "Selon accords entre ton gouvernement et la France.", "https://www.campusfrance.org/fr/les-bourses")])
+319: bourses=[("Vanier CGS", "50 000 CAD/an ×3 ans (master/doctorat), nomination par l'université.", "https://vanier.gc.ca"),
+325: ressources="40 000 à 90 000+ USD/an selon l'I-20 de l'école (bourses complètes possibles)",
+345: bourses=[("Fulbright", "Bourse complète master/doctorat, via l'ambassade US de ton pays.", "https://foreign.fulbrightonline.org"),
+359: bourses=[("Chevening", "Master complet pour futurs leaders (2 ans d'expérience).", "https://www.chevening.org"),
+374: bourses=[("DAAD", "~934 €/mois en master, programmes dédiés Afrique/Asie.", "https://www.daad.de/en/")])
+378:        "Deux bourses entièrement financées s'adressent directement aux Africains : ARES (Belgique, "
+389: bourses=[
+392:   "200 bourses entièrement financées/an : Bachelier ou Master de spécialisation (1 an) "
+398:   "1 seule candidature · GRATUIT (fraude → bourses-cooperation@ares-ac.be). "
+406:   "https://www.ares-ac.be/fr/bourses"),
+409:   "L'un des plus grands programmes de bourses au monde (50 000+ boursiers, objectif 100 000 "
+425:        "avec les bourses régionales DSU. Inscription via la plateforme officielle Universitaly. "
+472: bourses=[
+488: bourses=[("Fundación Carolina / MAEC-AECID", "Coopération espagnole (Amérique latine, Afrique).", "https://www.fundacioncarolina.es")])
+499: bourses=[("Bourses des universités + Camões", "Selon accords (pays lusophones surtout).", None)])
+511: bourses=[("Orange Knowledge / Orange Tulip", "Pays ciblés + bourses d'universités.", "https://www.studyinnl.org")])
+522: bourses=[("Bourses IKY", "Fondation d'État, selon accords bilatéraux.", "https://www.iky.gr")])
+535: bourses=[("Bourses du gouvernement tchèque", "Pays en développement, via l'ambassade.", "https://www.mzv.cz")])
+538: resume="Frais 2 000–5 000 €/an, coût de vie bas, programme national de bourses NAWA très actif.",
+546: bourses=[("NAWA — Banach / Poland My First Choice", "Bourses complètes pour pays en développement.", "https://nawa.gov.pl/en")])
+550:        "et des bourses d'État accessibles via les ambassades.",
+561: bourses=[("Bourses de l'État roumain", "Tous cycles, année de roumain incluse — via l'ambassade.", "https://www.mae.ro/en/node/10251")])
+564: resume="Stipendium Hungaricum : 5 000 bourses COMPLÈTES par an (scolarité + logement + allocation), 90+ pays éligibles.",
+573: bourses=[("Stipendium Hungaricum", "Bourse complète, tous cycles.", "https://stipendiumhungaricum.hu")])
+587: bourses=[("Türkiye Bursları", "Complète, tous cycles, tous pays.", "https://www.turkiyeburslari.gov.tr")])
+600: bourses=[("MEXT", "Complète, tous cycles, 2 voies (ambassade/université).", "https://www.studyinjapan.go.jp"),
+
+--- B. la zone de rendu des bourses (contexte large) ---
+1204:        for nom_b, det, lien in d["bourses"]:
+
+--- C. comment le type de projet 'Bourse' declenche cet ecran ---
+4:# - Procédure adaptée au pays d'ORIGINE (ex : Gabon → France = Études en France)
+43:    "Bourse": "Bourses accessibles selon ton pays d'origine — sélection mise à jour en continu.",
+164:# Pays soumis à la procédure Études en France (EEF / Campus France)
+183: "EEF":     ("🗂 Prise en charge du dossier Études en France",
+218:    "ORIENT":   {"Formation (admission)", "Bourse"},
+219:    "BOURSE":   {"Formation (admission)", "Bourse"},
+241: resume="Études quasi gratuites à l'université publique (exonérations fréquentes des "
+248:  ("Créer ton dossier Études en France (Campus France)",
+280:   "Ton pays n'est pas soumis à la procédure Études en France : tu candidates via "
+288: bourses=[("Bourse Eiffel", "Master/doctorat d'excellence, ~1 000–1 700 €/mois, déposée par l'établissement.", "https://www.campusfrance.org/fr/le-programme-de-bourses-eiffel"),
+289:          ("Bourses bilatérales", "Selon accords entre ton gouvernement et la France.", "https://www.campusfrance.org/fr/les-bourses")])
+292: resume="Études + travail + immigration possible après le diplôme (PGWP → résidence). "
+320:          ("Bourses d'entrée des universités", "Automatiques ou sur dossier selon l'établissement.", None)])
+345: bourses=[("Fulbright", "Bourse complète master/doctorat, via l'ambassade US de ton pays.", "https://foreign.fulbrightonline.org"),
+391:  ("🇧🇪 Bourses ARES — coopération belge",
+424: resume="Études en Italie : frais calculés sur tes revenus, souvent 500–3 000 €/an, "  # _lot7_desc_italie_v1
+499: bourses=[("Bourses des universités + Camões", "Selon accords (pays lusophones surtout).", None)])
+522: bourses=[("Bourses IKY", "Fondation d'État, selon accords bilatéraux.", "https://www.iky.gr")])
+526:        "Bourses d'État pour les pays en développement.",
+535: bourses=[("Bourses du gouvernement tchèque", "Pays en développement, via l'ambassade.", "https://www.mzv.cz")])
+546: bourses=[("NAWA — Banach / Poland My First Choice", "Bourses complètes pour pays en développement.", "https://nawa.gov.pl/en")])
+561: bourses=[("Bourses de l'État roumain", "Tous cycles, année de roumain incluse — via l'ambassade.", "https://www.mae.ro/en/node/10251")])
+573: bourses=[("Stipendium Hungaricum", "Bourse complète, tous cycles.", "https://stipendiumhungaricum.hu")])
+616: resume="Bourse CSC dans 289 universités : scolarité + logement + allocation mensuelle. "
+630:        "coût de vie imbattable. Bourses ICCR complètes via les ambassades.",
+
+--- D. le .env est-il charge au demarrage de l'app ? ---
+/Users/yvannkoo/mobilite-ia/app/api/console_accompagnement.py:120:        st.caption("⚙️ Job board inactif : clés ADZUNA manquantes dans .env.")
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:3:# Source : API Adzuna (gratuite — clés dans .env : ADZUNA_APP_ID, ADZUNA_APP_KEY).
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:83:    v = os.environ.get(cle)
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:86:    for chemin in (".env", "app/.env", "app/api/.env"):
+/Users/yvannkoo/mobilite-ia/app/api/mdp_oublie.py:21:    v = os.environ.get(cle)
+/Users/yvannkoo/mobilite-ia/app/api/mdp_oublie.py:24:    for chemin in (".env", "app/.env", "app/api/.env"):
+/Users/yvannkoo/mobilite-ia/app/api/mdp_oublie.py:49:                       "(mot de passe d'application Gmail) dans le fichier .env.")
+/Users/yvannkoo/mobilite-ia/app/api/moteur_plans.py:181:    modele = os.environ.get("PLANS_MODEL", "llama3.3:70b")
+/Users/yvannkoo/mobilite-ia/app/api/opportunites_ui.py:118:                       "ADZUNA_APP_KEY dans le fichier .env (compte gratuit sur "
+/Users/yvannkoo/mobilite-ia/app/api/paiement.py:7:# CINETPAY_API_KEY + CINETPAY_SITE_ID dans .env et CINETPAY_MODE=reel.
+
+--- E. est_admin / gating admin (pour placer le voyant) ---
+83:        if espace.est_admin():
+1015:if espace.est_admin() and dossiers.ecran_admin():
+1024:if espace.est_admin() and admin_projets.ecran(D, ORIGINES):
+1026:if espace.est_admin() and admin_comptes.ecran():
+1028:if espace.est_admin() and offres_cfg.ecran():
+1030:if espace.est_admin() and devises_cfg.ecran_admin(TAUX):
+1032:if espace.est_admin() and eligibilite.ecran():
+1034:if espace.est_admin() and offres_sync.ecran():
+1036:if espace.est_admin() and moteur_plans.ecran(ORIGINES):
+1038:if espace.est_admin() and console_accompagnement.ecran(D, ORIGINES):

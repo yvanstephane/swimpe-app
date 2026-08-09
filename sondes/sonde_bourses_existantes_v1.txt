@@ -1,0 +1,362 @@
+=== SONDE BOURSES EXISTANTES — Wed 15 Jul 2026 04:39:14 CEST ===
+--- A. tous les blocs 'bourses=' des fiches pays ---
+288: bourses=[("Bourse Eiffel", "Master/doctorat d'excellence, ~1 000–1 700 €/mois, déposée par l'établissement.", "https://www.campusfrance.org/fr/le-programme-de-bourses-eiffel"),
+289-          ("Bourses bilatérales", "Selon accords entre ton gouvernement et la France.", "https://www.campusfrance.org/fr/les-bourses")])
+290-
+291-D["CA"] = dict(nom="Canada", flag="🇨🇦",
+292- resume="Études + travail + immigration possible après le diplôme (PGWP → résidence). "
+293-        "Attention : quotas 2026 et preuves financières élevées — un dossier solide fait la différence.",
+294- ressources="≈22 895 CAD/an + frais de scolarité (hors Québec) · Québec : 24 617 CAD + CAQ",
+--
+319: bourses=[("Vanier CGS", "50 000 CAD/an ×3 ans (master/doctorat), nomination par l'université.", "https://vanier.gc.ca"),
+320-          ("Bourses d'entrée des universités", "Automatiques ou sur dossier selon l'établissement.", None)])
+321-
+322-D["US"] = dict(nom="États-Unis", flag="🇺🇸",
+323- resume="Le système universitaire le plus puissant du monde — et le plus cher. La clé : "
+324-        "viser les universités qui financent les internationaux, et réussir un entretien de 3 minutes.",
+325- ressources="40 000 à 90 000+ USD/an selon l'I-20 de l'école (bourses complètes possibles)",
+--
+345: bourses=[("Fulbright", "Bourse complète master/doctorat, via l'ambassade US de ton pays.", "https://foreign.fulbrightonline.org"),
+346-          ("Universités need-blind / full-need", "Certaines financent à 100 % les internationaux admis.", None)])
+347-
+348-D["GB"] = dict(nom="Royaume-Uni", flag="🇬🇧",
+349- resume="Diplômes prestigieux en 3 ans (licence) ou 1 an (master). Procédure visa claire à points.",
+350- ressources="1 334 £/mois (Londres) ou 1 023 £/mois (ailleurs) ×9 + scolarité · IHS ~776 £/an",
+351- travail="20 h/semaine", post="Graduate Route : 2 ans (3 ans doctorat) pour travailler",
+--
+359: bourses=[("Chevening", "Master complet pour futurs leaders (2 ans d'expérience).", "https://www.chevening.org"),
+360-          ("Commonwealth", "Pays du Commonwealth en développement.", "https://cscuk.fcdo.gov.uk")])
+361-
+362-D["DE"] = dict(nom="Allemagne", flag="🇩🇪",
+363- resume="Universités publiques quasi GRATUITES (~350 €/semestre) et forte demande d'ingénieurs. "
+364-        "Beaucoup de masters en anglais.",
+365- ressources="Compte bloqué (Sperrkonto) ≈11 904 €/an",
+--
+374: bourses=[("DAAD", "~934 €/mois en master, programmes dédiés Afrique/Asie.", "https://www.daad.de/en/")])
+375-
+376-D["BE"] = dict(nom="Belgique", flag="🇧🇪",
+377- resume="Le choix naturel des francophones : frais modérés (835–4 175 €/an), universités réputées. "
+378-        "Deux bourses entièrement financées s'adressent directement aux Africains : ARES (Belgique, "
+379-        "Bac+3/Bac+5, 20 pays partenaires) et MasterCard Foundation Scholars (mondial, jusqu'à 35 ans).",
+380- ressources="≈650 €/mois à justifier",
+--
+389: bourses=[
+390-  # ── ARES ──────────────────────────────────────────────────────────────────
+391-  ("🇧🇪 Bourses ARES — coopération belge",
+392-   "200 bourses entièrement financées/an : Bachelier ou Master de spécialisation (1 an) "
+393-   "ou Formation continue (2–6 mois) dans les universités FWB (ULB, UCLouvain, ULiège, "
+394-   "UNamur, HE Vinci…). Couverture : inscription + 1 150 €/mois × 12 + billet A/R + visa "
+395-   "+ assurance. "
+--
+472: bourses=[
+473-  ("DSU régional", "Logement + repas + allocation sur critères sociaux (études).", None),
+474-  ("Invest Your Talent in Italy", "Masters ciblés + stage en entreprise italienne.", "https://investyourtalentapplication.esteri.it"),
+475- ])
+476-
+477-D["ES"] = dict(nom="Espagne", flag="🇪🇸",
+478- resume="Frais publics 1 000–3 500 €/an, qualité de vie, espagnol = 2e langue mondiale.",
+--
+488: bourses=[("Fundación Carolina / MAEC-AECID", "Coopération espagnole (Amérique latine, Afrique).", "https://www.fundacioncarolina.es")])
+489-
+490-D["PT"] = dict(nom="Portugal", flag="🇵🇹",
+491- resume="Coût de vie parmi les plus bas d'Europe de l'Ouest, concours dédiés aux étudiants internationaux.",
+492- ressources="≈7 000 €/an", travail="Autorisé (déclaration)", post="Séjour de recherche d'emploi",
+493- portail="https://www.study-research.pt",
+494- services=["ORIENT","ADMIS","DOSSIER","VISA","TRAD","PACK"],
+--
+499: bourses=[("Bourses des universités + Camões", "Selon accords (pays lusophones surtout).", None)])
+500-
+501-D["NL"] = dict(nom="Pays-Bas", flag="🇳🇱",
+502- resume="Énorme offre en anglais, l'université dépose elle-même ta demande de séjour : zéro stress visa.",
+503- ressources="≈13 500 €/an (norme IND) + scolarité 8 000–20 000 €/an",
+504- travail="16 h/semaine", post="Orientation year : 12 mois pour trouver un emploi",
+505- portail="https://www.studyinnl.org",
+--
+511: bourses=[("Orange Knowledge / Orange Tulip", "Pays ciblés + bourses d'universités.", "https://www.studyinnl.org")])
+512-
+513-D["GR"] = dict(nom="Grèce", flag="🇬🇷",
+514- resume="Frais très bas (licence publique quasi gratuite en grec ; 1 500–3 000 €/an en anglais).",
+515- ressources="≈6 000 €/an", travail="Partiel autorisé", post="Selon titre de séjour",
+516- portail="https://studyingreece.edu.gr",
+517- services=["ORIENT","ADMIS","DOSSIER","VISA","TRAD","PACK"],
+--
+522: bourses=[("Bourses IKY", "Fondation d'État, selon accords bilatéraux.", "https://www.iky.gr")])
+523-
+524-D["CZ"] = dict(nom="République tchèque", flag="🇨🇿",
+525- resume="GRATUIT si tu étudies en tchèque (année de langue possible) ; 2 000–6 000 €/an en anglais. "
+526-        "Bourses d'État pour les pays en développement.",
+527- ressources="≈4 400 €/an à justifier",
+528- travail="Autorisé avec les études", post="9 mois de recherche d'emploi",
+--
+535: bourses=[("Bourses du gouvernement tchèque", "Pays en développement, via l'ambassade.", "https://www.mzv.cz")])
+536-
+537-D["PL"] = dict(nom="Pologne", flag="🇵🇱",
+538- resume="Frais 2 000–5 000 €/an, coût de vie bas, programme national de bourses NAWA très actif.",
+539- ressources="≈7 000 €/an", travail="Libre pour les étudiants", post="9 mois de recherche d'emploi",
+540- portail="https://study.gov.pl",
+541- services=["ORIENT","ADMIS","DOSSIER","BOURSE","VISA","TRAD","PACK"],
+--
+546: bourses=[("NAWA — Banach / Poland My First Choice", "Bourses complètes pour pays en développement.", "https://nawa.gov.pl/en")])
+547-
+548-D["RO"] = dict(nom="Roumanie", flag="🇷🇴",
+549- resume="LA destination montante pour médecine et pharmacie en français (5 000–7 500 €/an) — "
+550-        "et des bourses d'État accessibles via les ambassades.",
+551- ressources="≈5 000 €/an hors scolarité",
+552- travail="4 h/jour", post="Selon titre",
+--
+561: bourses=[("Bourses de l'État roumain", "Tous cycles, année de roumain incluse — via l'ambassade.", "https://www.mae.ro/en/node/10251")])
+562-
+563-D["HU"] = dict(nom="Hongrie", flag="🇭🇺",
+564- resume="Stipendium Hungaricum : 5 000 bourses COMPLÈTES par an (scolarité + logement + allocation), 90+ pays éligibles.",
+565- ressources="Couvert si boursier · sinon ≈6 000 €/an",
+566- travail="24 h/semaine", post="9 mois de recherche d'emploi",
+567- portail="https://studyinhungary.hu",
+--
+573: bourses=[("Stipendium Hungaricum", "Bourse complète, tous cycles.", "https://stipendiumhungaricum.hu")])
+574-
+575-D["TR"] = dict(nom="Turquie", flag="🇹🇷",
+576- resume="Türkiye Bursları : bourse 100 % complète (scolarité + logement + allocation + billets + année de turc). "
+577-        "Candidature GRATUITE janvier–février.",
+578- ressources="Couvert si boursier · sinon ≈4 000 €/an",
+579- travail="Limité pendant les études", post="Permis de travail selon secteur",
+--
+587: bourses=[("Türkiye Bursları", "Complète, tous cycles, tous pays.", "https://www.turkiyeburslari.gov.tr")])
+588-
+589-D["JP"] = dict(nom="Japon", flag="🇯🇵",
+590- resume="MEXT : LA bourse de référence (scolarité + ≈145 000 ¥/mois + billets). "
+591-        "Pour l'Afrique : JICA ABE = master + stage en entreprise japonaise.",
+592- ressources="Couvert si MEXT · sinon ≈1 200 000 ¥/an",
+593- travail="28 h/semaine (avec permis)", post="Visa recherche d'emploi 6 mois",
+--
+600: bourses=[("MEXT", "Complète, tous cycles, 2 voies (ambassade/université).", "https://www.studyinjapan.go.jp"),
+601-          ("JICA ABE (Afrique)", "Master + stage en entreprise (~300/an).", "https://www.jica.go.jp")])
+602-
+603-D["KR"] = dict(nom="Corée du Sud", flag="🇰🇷",
+604- resume="GKS : 2 000 bourses complètes en 2026 (scolarité + ₩900 000–1 000 000/mois + billets + année de coréen).",
+605- ressources="Couvert si GKS · sinon ≈10 000 000 ₩/an",
+606- travail="20 h/semaine", post="Visa D-10 de recherche d'emploi",
+--
+613: bourses=[("GKS", "Complète, licence à doctorat.", "https://www.studyinkorea.go.kr")])
+614-
+615-D["CN"] = dict(nom="Chine", flag="🇨🇳",
+616- resume="Bourse CSC dans 289 universités : scolarité + logement + allocation mensuelle. "
+617-        "Cursus en anglais nombreux.",
+618- ressources="Couvert si CSC · sinon ≈30 000 ¥/an",
+619- travail="Interdit (visa X)", post="Visa Z si employeur trouvé",
+--
+626: bourses=[("CSC", "Complète.", "https://www.campuschina.org")])
+627-
+628-D["IN"] = dict(nom="Inde", flag="🇮🇳",
+629- resume="600+ établissements sur le portail national Study in India, cours en anglais, "
+630-        "coût de vie imbattable. Bourses ICCR complètes via les ambassades.",
+631- ressources="≈2 500 €/an suffisent (hors bourse)",
+632- travail="Non autorisé en principe", post="Limité",
+--
+640: bourses=[("ICCR", "Complète (Afrique, Asie, Caraïbes).", "https://www.iccr.gov.in")])
+641-
+642-D["PK"] = dict(nom="Pakistan", flag="🇵🇰",
+643- resume="Universités anglophones à frais très bas ; accueil organisé par la HEC et accords bilatéraux.",
+644- ressources="≈2 000 €/an suffisent",
+645- travail="Limité", post="Selon visa",
+646- portail="https://www.hec.gov.pk",
+--
+652: bourses=[("Bourses HEC / accords bilatéraux", "Selon conventions avec ton pays.", "https://www.hec.gov.pk")])
+653-
+654-D["ID"] = dict(nom="Indonésie", flag="🇮🇩",
+655- resume="Bourse KNB dédiée aux pays en développement : scolarité + allocation + billets. "
+656-        "Darmasiswa : 1 an de langue et culture, sans condition de diplôme.",
+657- ressources="Couvert si KNB · sinon ≈2 500 €/an",
+658- travail="Non autorisé", post="Limité",
+--
+665: bourses=[("KNB Scholarship", "Complète, licence/master/doctorat.", "https://knb.kemdikbud.go.id"),
+666-          ("Darmasiswa", "1 an langue & culture.", "https://darmasiswa.kemdikbud.go.id")])
+667-
+668-D["MY"] = dict(nom="Malaisie", flag="🇲🇾",
+669- resume="Hub anglophone : campus de Monash, Nottingham… à 1 500–8 000 €/an. Visa 100 % en ligne (EMGS).",
+670- ressources="≈5 000 €/an",
+671- travail="20 h/sem (vacances surtout)", post="Limité",
+--
+677: bourses=[("Malaysia International Scholarship", "Master/doctorat.", "https://biasiswa.mohe.gov.my")])
+678-
+679-D["TH"] = dict(nom="Thaïlande", flag="🇹🇭",
+680- resume="Programmes internationaux en anglais à frais modérés, cadre de vie exceptionnel.",
+681- ressources="≈5 000 €/an", travail="Restreint", post="Limité",
+682- portail="https://www.studyinthailand.org",
+683- services=["ORIENT","ADMIS","DOSSIER","VISA","TRAD"],
+--
+688: bourses=[("Bourses d'universités (AIT, Chula…)", "Selon programmes.", None)])
+689-
+690-D["AU"] = dict(nom="Australie", flag="🇦🇺",
+691- resume="Salaires étudiants élevés (48 h/quinzaine autorisées) et visa post-études généreux.",
+692- ressources="≈24 505 AUD/an + scolarité (20 000–45 000 AUD/an)",
+693- travail="48 h/quinzaine", post="Temporary Graduate Visa 2–6 ans",
+694- portail="https://www.studyaustralia.gov.au",
+--
+700: bourses=[("Australia Awards", "Complète (Afrique, Asie, Pacifique).", "https://www.australiaawards.gov.au")])
+701-
+702-D["BR"] = dict(nom="Brésil", flag="🇧🇷",
+703- resume="PEC-G / PEC-PG : places GRATUITES dans les universités publiques pour les pays "
+704-        "en développement partenaires (Afrique, Caraïbes dont Haïti, Amérique latine).",
+705- ressources="Scolarité gratuite (PEC-G) — prévoir ≈1 500 BRL/mois pour vivre",
+706- travail="Non autorisé (PEC-G)", post="Retour prévu par le programme",
+--
+714: bourses=[("PEC-G / PEC-PG", "Scolarité gratuite + bourses complémentaires possibles (Milton Santos).", "https://www.gov.br/mre")])
+715-
+716-D["MA"] = dict(nom="Maroc", flag="🇲🇦",
+717- resume="Bourses AMCI pour l'Afrique subsaharienne : scolarité gratuite + allocation + campus. "
+718-        "Filières en français, proximité culturelle.",
+719- ressources="Couvert si AMCI · sinon ≈2 800 €/an",
+720- travail="Limité", post="Selon convention",
+--
+727: bourses=[("AMCI", "Scolarité + allocation + logement campus.", "https://www.amci.ma")])
+728-
+729-D["TN"] = dict(nom="Tunisie", flag="🇹🇳",
+730- resume="Filières santé et ingénierie en français à coût très bas ; places subventionnées "
+731-        "pour l'Afrique subsaharienne via la coopération.",
+732- ressources="≈2 500 €/an",
+733- travail="Limité", post="Selon convention",
+--
+740: bourses=[("Bourses de coopération tunisienne", "Selon accords bilatéraux.", None)])
+741-
+742-D["SN"] = dict(nom="Sénégal", flag="🇸🇳",
+743- resume="Hub universitaire francophone de la région (UCAD, UGB, grandes écoles privées reconnues).",
+744- ressources="≈1 500 000 FCFA/an",
+745- travail="Possible", post="Marché régional dynamique",
+746- portail="https://www.campusen.sn",
+--
+752: bourses=[("Bourses de coopération + établissements", "Selon accords.", None)])
+753-
+754-D["RW"] = dict(nom="Rwanda", flag="🇷🇼",
+755- resume="La destination tech montante d'Afrique : ALU, Carnegie Mellon Africa, University of Rwanda. "
+756-        "Visa ultra simplifié pour les Africains.",
+757- ressources="≈2 000 000 RWF/an",
+758- travail="Possible", post="Hub technologique régional",
+--
+765: bourses=[("MasterCard Foundation / ALU", "Bourses complètes pour Africains sur critères.", "https://mastercardfdn.org/all/scholars/")])
+766-
+767-D["GH"] = dict(nom="Ghana", flag="🇬🇭",
+768- resume="Universités anglophones réputées (Legon, KNUST, Ashesi) — le bon plan pour étudier en anglais en Afrique.",
+769- ressources="≈2 000 €/an",
+770- travail="Limité", post="Marché régional",
+771- portail="https://www.ug.edu.gh",
+--
+777: bourses=[("MasterCard Foundation (Ashesi…)", "Bourses complètes sur critères.", "https://mastercardfdn.org/all/scholars/")])
+778-
+779-D["ZA"] = dict(nom="Afrique du Sud", flag="🇿🇦",
+780- resume="Les meilleures universités du continent (UCT, Wits, Stellenbosch) à frais internationaux modérés.",
+781- ressources="≈120 000 ZAR/an + scolarité",
+782- travail="20 h/semaine", post="Critical skills visa possible",
+783- portail="https://www.universitiessa.ac.za",
+--
+789: bourses=[("Bourses d'universités + MasterCard Foundation", "Selon campus.", None)])
+790-
+791-D["EG"] = dict(nom="Égypte", flag="🇪🇬",
+792- resume="Portail national unifié + bourses Al-Azhar complètes ; frais publics très bas.",
+793- ressources="≈2 000 €/an",
+794- travail="Limité", post="Selon titre",
+795- portail="https://admission.study-in-egypt.gov.eg",
+--
+801: bourses=[("Bourses Al-Azhar", "Complètes, via les ambassades.", None)])
+802-
+803-D["SA"] = dict(nom="Arabie Saoudite", flag="🇸🇦",
+804- resume="Bourses complètes fréquentes (logement + allocation + billets). KAUST : 20–30 000 $/an pour la recherche.",
+805- ressources="Souvent couvert par la bourse",
+806- travail="Restreint", post="Selon secteur",
+807- portail="https://studyinsaudi.moe.gov.sa",
+--
+813: bourses=[("KAUST Fellowship", "Master/PhD : scolarité + 20–30 k$/an + logement.", "https://www.kaust.edu.sa"),
+814-          ("Université islamique de Médine", "Complète + billets.", None)])
+815-
+816-D["AE"] = dict(nom="Émirats Arabes Unis", flag="🇦🇪",
+817- resume="NYU Abu Dhabi finance à 100 % les admis qui en ont besoin. Visa sponsorisé par l'université.",
+818- ressources="Couvert si bourse · sinon élevé",
+819- travail="Autorisé avec NOC", post="Golden visa possible pour l'excellence",
+--
+826: bourses=[("NYU Abu Dhabi full-need", "Couvre tout — ultra sélective.", "https://nyuad.nyu.edu")])
+827-
+828-D["QA"] = dict(nom="Qatar", flag="🇶🇦",
+829- resume="Education City : Georgetown, Carnegie Mellon, HEC Paris… avec bourses HBKU complètes.",
+830- ressources="Couvert si bourse · sinon élevé",
+831- travail="Restreint", post="Selon secteur",
+832- portail="https://www.edu.gov.qa",
+--
+838: bourses=[("HBKU / Qatar Foundation", "Complètes selon programmes.", "https://www.hbku.edu.qa")])
+839-
+840-D["CH"] = dict(nom="Suisse", flag="🇨🇭",
+841- resume="EPFL/ETH parmi les meilleures du monde pour 1 500 CHF/an de frais — mais coût de vie très élevé.",
+842- ressources="21 000 CHF/an à justifier",
+843- travail="15 h/sem (après 6 mois)", post="6 mois de recherche d'emploi",
+844- portail="https://www.swissuniversities.ch",
+--
+850: bourses=[("Bourses d'excellence de la Confédération", "Master/PhD chercheurs.", "https://www.sbfi.admin.ch")])
+851-
+852-D["SE"] = dict(nom="Suède", flag="🇸🇪",
+853- resume="Tout en anglais, candidature centralisée, travail étudiant ILLIMITÉ, bourses SI très généreuses.",
+854- ressources="≈129 000 SEK/an (norme Migrationsverket)",
+855- travail="Illimité pour les étudiants", post="12 mois de recherche d'emploi",
+856- portail="https://studyinsweden.se",
+--
+862: bourses=[("SI Scholarships for Global Professionals", "Master complet, pays ciblés.", "https://si.se/en/apply/scholarships/")])
+863-
+864-D["IE"] = dict(nom="Irlande", flag="🇮🇪",
+865- resume="Anglophone, en zone euro, siège européen de Google/Meta/Apple : le tremplin tech.",
+866- ressources="≈10 000 €/an + scolarité (10–25 000 €/an)",
+867- travail="20 h/semaine", post="Stamp 1G : 1–2 ans pour travailler",
+868- portail="https://www.educationinireland.com",
+--
+874: bourses=[("Government of Ireland Intl Scholarship", "10 000 € + frais offerts (60/an).", "https://hea.ie")])
+875-
+876-# =============================================================================
+877-# BASE (pays actifs + demandes)
+878-# =============================================================================
+879-# --- Toutes les destinations du monde (fiches générales pour les non-détaillées) ---
+880-try:
+
+--- B. codes + noms des destinations ---
+240:D["FR"] = dict(nom="France", flag="🇫🇷",
+291:D["CA"] = dict(nom="Canada", flag="🇨🇦",
+322:D["US"] = dict(nom="États-Unis", flag="🇺🇸",
+348:D["GB"] = dict(nom="Royaume-Uni", flag="🇬🇧",
+362:D["DE"] = dict(nom="Allemagne", flag="🇩🇪",
+376:D["BE"] = dict(nom="Belgique", flag="🇧🇪",
+423:D["IT"] = dict(nom="Italie", flag="🇮🇹",
+477:D["ES"] = dict(nom="Espagne", flag="🇪🇸",
+490:D["PT"] = dict(nom="Portugal", flag="🇵🇹",
+501:D["NL"] = dict(nom="Pays-Bas", flag="🇳🇱",
+513:D["GR"] = dict(nom="Grèce", flag="🇬🇷",
+524:D["CZ"] = dict(nom="République tchèque", flag="🇨🇿",
+537:D["PL"] = dict(nom="Pologne", flag="🇵🇱",
+548:D["RO"] = dict(nom="Roumanie", flag="🇷🇴",
+563:D["HU"] = dict(nom="Hongrie", flag="🇭🇺",
+575:D["TR"] = dict(nom="Turquie", flag="🇹🇷",
+589:D["JP"] = dict(nom="Japon", flag="🇯🇵",
+603:D["KR"] = dict(nom="Corée du Sud", flag="🇰🇷",
+615:D["CN"] = dict(nom="Chine", flag="🇨🇳",
+628:D["IN"] = dict(nom="Inde", flag="🇮🇳",
+642:D["PK"] = dict(nom="Pakistan", flag="🇵🇰",
+654:D["ID"] = dict(nom="Indonésie", flag="🇮🇩",
+668:D["MY"] = dict(nom="Malaisie", flag="🇲🇾",
+679:D["TH"] = dict(nom="Thaïlande", flag="🇹🇭",
+690:D["AU"] = dict(nom="Australie", flag="🇦🇺",
+702:D["BR"] = dict(nom="Brésil", flag="🇧🇷",
+716:D["MA"] = dict(nom="Maroc", flag="🇲🇦",
+729:D["TN"] = dict(nom="Tunisie", flag="🇹🇳",
+742:D["SN"] = dict(nom="Sénégal", flag="🇸🇳",
+754:D["RW"] = dict(nom="Rwanda", flag="🇷🇼",
+767:D["GH"] = dict(nom="Ghana", flag="🇬🇭",
+779:D["ZA"] = dict(nom="Afrique du Sud", flag="🇿🇦",
+791:D["EG"] = dict(nom="Égypte", flag="🇪🇬",
+803:D["SA"] = dict(nom="Arabie Saoudite", flag="🇸🇦",
+816:D["AE"] = dict(nom="Émirats Arabes Unis", flag="🇦🇪",
+828:D["QA"] = dict(nom="Qatar", flag="🇶🇦",
+840:D["CH"] = dict(nom="Suisse", flag="🇨🇭",
+852:D["SE"] = dict(nom="Suède", flag="🇸🇪",
+864:D["IE"] = dict(nom="Irlande", flag="🇮🇪",
+
+--- C. d'ou vient la liste des pays d'origine ---
+/Users/yvannkoo/mobilite-ia/app/api/moteur_plans.py:199:def ecran(ORIGINES=None):
+/Users/yvannkoo/mobilite-ia/app/api/pays_monde.py:7:ORIGINES_MONDE = {
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:135:ORIGINES = {
+
+--- D. le fichier bourses_verifiees existe-t-il deja ? ---
+ls: /Users/yvannkoo/mobilite-ia/data/bourses_verifiees_v1.json: No such file or directory

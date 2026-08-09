@@ -1,0 +1,11 @@
+
+  = ui.py : deja patche
+  = espace.py : bouton deja en place
+  = devises.py : devises d'origine deja presentes
+
+FINI — pkill -f streamlit ; puis relance.
+
+=== vérifications ===
+1
+1
+paiement v2 en place: False | mode: test

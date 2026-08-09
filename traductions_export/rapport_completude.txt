@@ -1,0 +1,19 @@
+RAPPORT DE COMPLETUDE — catalogue i18n Yorbity
+84 cles · langues cibles : fr, en, es, pt, zh, ar, ja, ko, id
+
+── 3 cle(s) avec langues manquantes ──
+  disciplines.Art                            manque : ja, ko, id
+  disciplines.Sport                          manque : ja, ko, id
+  disciplines.Volontariat                    manque : ja, ko, id
+
+── 6 cle(s) en LISTE indexee (a convertir en cles nommees a la migration) ──
+  disciplines.Art                          tailles : {'fr': 9, 'en': 9, 'es': 9, 'pt': 9, 'zh': 9, 'ar': 9}
+  disciplines.Sport                        tailles : {'fr': 10, 'en': 10, 'es': 10, 'pt': 10, 'zh': 10, 'ar': 10}
+  disciplines.Volontariat                  tailles : {'fr': 9, 'en': 9, 'es': 9, 'pt': 9, 'zh': 9, 'ar': 9}
+  domaines                                 tailles : {'fr': 12, 'en': 12, 'es': 12, 'pt': 12, 'zh': 12, 'ar': 12, 'de': 12, 'it': 12, 'ja': 12, 'ko': 12, 'id': 12}
+  niveaux                                  tailles : {'fr': 5, 'en': 5, 'es': 5, 'pt': 5, 'zh': 5, 'ar': 5, 'de': 5, 'it': 5, 'ja': 5, 'ko': 5, 'id': 5}
+  ⚠ TAILLES INEGALES types                                    tailles : {'fr': 7, 'en': 7, 'es': 7, 'pt': 7, 'zh': 7, 'ar': 7, 'de': 4, 'it': 4, 'ja': 7, 'ko': 7, 'id': 7}
+
+── Langues hors perimetre trouvees ──
+  'de' dans : accompagne, accompagne_desc, aide_etape, apres, aucun_projet, aucune_demarche, bienvenue, bourses_pour_toi …
+  'it' dans : accompagne, accompagne_desc, aide_etape, apres, aucun_projet, aucune_demarche, bienvenue, bourses_pour_toi …

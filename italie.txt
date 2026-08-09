@@ -1,0 +1,36 @@
+=== Italie dans pays_monde.py ? ===
+15: "Islande":("IS","EUR"),"Italie":("IT","EUR"),"Kosovo":("XK","EUR"),
+
+=== ORIGINES_MONDE : taille et codes ===
+196 pays
+['AD', 'AE', 'AF', 'AG', 'AL', 'AM', 'AO', 'AR', 'AT', 'AU', 'AZ', 'BA', 'BB', 'BD', 'BE', 'BF', 'BG', 'BH', 'BI', 'BJ', 'BN', 'BO', 'BR', 'BS', 'BT', 'BW', 'BY', 'BZ', 'CA', 'CD', 'CF', 'CG', 'CH', 'CI', 'CL', 'CM', 'CN', 'CO', 'CR', 'CU', 'CV', 'CY', 'CZ', 'DE', 'DJ', 'DK', 'DM', 'DO', 'DZ', 'EC', 'EE', 'EG', 'ER', 'ES', 'ET', 'FI', 'FJ', 'FM', 'FR', 'GA', 'GB', 'GD', 'GE', 'GH', 'GM', 'GN', 'GQ', 'GR', 'GT', 'GW', 'GY', 'HN', 'HR', 'HT', 'HU', 'ID', 'IE', 'IL', 'IN', 'IQ', 'IR', 'IS', 'IT', 'JM', 'JO', 'JP', 'KE', 'KG', 'KH', 'KI', 'KM', 'KN', 'KP', 'KR', 'KW', 'KZ', 'LA', 'LB', 'LC', 'LI', 'LK', 'LR', 'LS', 'LT', 'LU', 'LV', 'LY', 'MA', 'MC', 'MD', 'ME', 'MG', 'MH', 'MK', 'ML', 'MM', 'MN', 'MR', 'MT', 'MU', 'MV', 'MW', 'MX', 'MY', 'MZ', 'NA', 'NE', 'NG', 'NI', 'NL', 'NO', 'NP', 'NR', 'NZ', 'OM', 'PA', 'PE', 'PG', 'PH', 'PK', 'PL', 'PS', 'PT', 'PW', 'PY', 'QA', 'RO', 'RS', 'RU', 'RW', 'SA', 'SB', 'SC', 'SD', 'SE', 'SG', 'SI', 'SK', 'SL', 'SM', 'SN', 'SO', 'SR', 'SS', 'ST', 'SV', 'SY', 'SZ', 'TD', 'TG', 'TH', 'TJ', 'TL', 'TM', 'TN', 'TO', 'TR', 'TT', 'TV', 'TW', 'TZ', 'UA', 'UG', 'US', 'UY', 'UZ', 'VC', 'VE', 'VN', 'VU', 'WS', 'XK', 'YE', 'ZA', 'ZM', 'ZW']
+
+=== config_pays (actifs ?) ===
+[('AT', 1), ('BE', 1), ('CH', 1), ('ES', 1), ('GB', 1), ('IE', 1), ('IT', 1), ('LU', 1), ('NL', 1), ('PT', 1), ('SE', 1)]
+
+=== fin du dict (format exact) ===
+ "Azerbaïdjan":("AZ","USD"),"Bahreïn":("BH","USD"),"Bangladesh":("BD","USD"),
+ "Bhoutan":("BT","INR"),"Birmanie (Myanmar)":("MM","USD"),"Brunei":("BN","USD"),
+ "Cambodge":("KH","USD"),"Chine":("CN","USD"),"Corée du Nord":("KP","USD"),
+ "Corée du Sud":("KR","USD"),"Émirats Arabes Unis":("AE","USD"),
+ "Géorgie":("GE","USD"),"Inde":("IN","INR"),"Indonésie":("ID","IDR"),
+ "Irak":("IQ","USD"),"Iran":("IR","USD"),"Israël":("IL","USD"),
+ "Japon":("JP","USD"),"Jordanie":("JO","USD"),"Kazakhstan":("KZ","USD"),
+ "Kirghizistan":("KG","USD"),"Koweït":("KW","USD"),"Laos":("LA","USD"),
+ "Liban":("LB","USD"),"Malaisie":("MY","USD"),"Maldives":("MV","USD"),
+ "Mongolie":("MN","USD"),"Népal":("NP","USD"),"Oman":("OM","USD"),
+ "Ouzbékistan":("UZ","USD"),"Pakistan":("PK","PKR"),"Palestine":("PS","USD"),
+ "Philippines":("PH","USD"),"Qatar":("QA","USD"),"Singapour":("SG","USD"),
+ "Sri Lanka":("LK","USD"),"Syrie":("SY","USD"),"Tadjikistan":("TJ","USD"),
+ "Taïwan":("TW","USD"),"Thaïlande":("TH","USD"),"Timor oriental":("TL","USD"),
+ "Turkménistan":("TM","USD"),"Turquie":("TR","USD"),"Vietnam":("VN","USD"),
+ "Yémen":("YE","USD"),
+
+ # ---------------- Océanie ----------------
+ "Australie":("AU","USD"),"Fidji":("FJ","USD"),"Kiribati":("KI","USD"),
+ "Îles Marshall":("MH","USD"),"Micronésie":("FM","USD"),"Nauru":("NR","USD"),
+ "Nouvelle-Zélande":("NZ","USD"),"Palaos":("PW","USD"),
+ "Papouasie-Nouvelle-Guinée":("PG","USD"),"Îles Salomon":("SB","USD"),
+ "Samoa":("WS","USD"),"Tonga":("TO","USD"),"Tuvalu":("TV","USD"),
+ "Vanuatu":("VU","USD"),
+}

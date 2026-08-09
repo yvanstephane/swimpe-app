@@ -14,7 +14,7 @@ LANGUES_PLUS = {
 # (mêmes clés que i18n.T ; complète ce qui manque)
 T_PLUS = {
  "tagline": {"ja":"世界へのあなたの軌道","ko":"세계로 향한 당신의 궤도","id":"Lintasanmu menuju dunia"},
- "q_origine": {"ja":"🌍 出身国","ko":"🌍 출신 국가","id":"🌍 Negara asalmu"},
+ "q_origine": {"ja":"🛂 あなたの国籍（パスポート）","ko":"🛂 국적 (여권)","id":"🛂 Kewarganegaraanmu (paspor)"},
  "q_dest": {"ja":"🎯 留学先の国","ko":"🎯 목적지 국가","id":"🎯 Negara tujuan"},
  "q_type": {"ja":"📌 プロジェクトの種類","ko":"📌 프로젝트 유형","id":"📌 Jenis proyek"},
  "q_niveau": {"ja":"🎓 目標レベル","ko":"🎓 목표 수준","id":"🎓 Tingkat yang dituju"},
@@ -35,7 +35,7 @@ T_PLUS = {
                 "id":"🤝 Butuh bantuan untuk langkah ini? Kami urus"},
  "portail": {"ja":"🌐 公式ポータル —","ko":"🌐 공식 포털 —","id":"🌐 Portal resmi —"},
  "bourses_pour_toi": {"ja":"💰 あなた向けの奨学金","ko":"💰 당신을 위한 장학금","id":"💰 Beasiswa untukmu"},
- "accompagne": {"ja":"🤝 最後までサポートします：","ko":"🤝 끝까지 함께합니다：","id":"🤝 Kami dampingi kamu hingga"},
+ "accompagne": {"ja":"🤝 あなたのプロジェクトに寄り添います —","ko":"🤝 당신의 프로젝트를 함께합니다 —","id":"🤝 Kami dampingi proyekmu —"},
  "accompagne_desc": {"ja":"任せたい手続きを選んでください。私たちのチームが対応し、あなたは各段階で主導権を保てます。",
                      "ko":"위임하고 싶은 절차를 선택하세요. 저희 팀이 처리하며, 각 단계에서 당신이 주도권을 유지합니다.",
                      "id":"Pilih langkah yang ingin kamu delegasikan — tim kami menanganinya, kamu tetap memegang kendali di setiap tahap."},
@@ -55,9 +55,9 @@ T_PLUS = {
                 "ko":"저희는 당신과 함께 절차를 준비하고 정리합니다. 입학이나 비자를 보장할 수 있는 사람은 없습니다. 보장을 약속하는 사람을 조심하세요.",
                 "id":"Kami menyiapkan dan mengatur langkah-langkahmu bersamamu. Tidak ada yang bisa menjamin penerimaan atau visa — waspadai mereka yang menjanjikannya."},
  "langue_label": {"ja":"言語","ko":"언어","id":"Bahasa"},
- "types": {"ja":["課程（入学）","奨学金","インターン／学生アルバイト"],
-           "ko":["과정 (입학)","장학금","인턴십 / 학생 아르바이트"],
-           "id":["Program (penerimaan)","Beasiswa","Magang / Kerja mahasiswa"]},
+ "types": {"ja":["課程（入学）","奨学金","インターン／学生アルバイト","専門技能職","スポーツ","芸術","ボランティア"],
+           "ko":["과정 (입학)","장학금","인턴십 / 학생 아르바이트","전문 기능직","스포츠","예술","자원봉사"],
+           "id":["Program (penerimaan)","Beasiswa","Magang / Kerja mahasiswa","Pekerjaan terampil","Olahraga","Seni","Relawan"]},
  "niveaux": {"ja":["学士","修士","博士","職業訓練","高校生です"],
              "ko":["학사","석사","박사","직업 교육","고등학생입니다"],
              "id":["Sarjana","Magister","Doktor","Pelatihan vokasi","Saya siswa SMA"]},
@@ -143,8 +143,34 @@ PAYS = {
  "Ukraine": {"en":"Ukraine","es":"Ucrania","pt":"Ucrânia","zh":"乌克兰","ar":"أوكرانيا","ja":"ウクライナ","ko":"우크라이나","id":"Ukraina"},
 }
 
+# --- Surcouche CLDR (patch_pays) ---------------------------------------------
+# data/i18n/pays.json, genere par scripts/traduire_pays.py depuis le CLDR
+# d'Unicode : noms officiels, aucune hallucination. Les traductions ecrites
+# a la main dans PAYS gardent la priorite.
+_SURCOUCHE_PAYS = {}
+
+
+def _charger_surcouche_pays():
+    import json
+    from pathlib import Path as _P
+    for base in (_P("data") / "i18n" / "pays.json",
+                 _P(__file__).resolve().parents[2] / "data" / "i18n" / "pays.json"):
+        try:
+            if base.exists():
+                _SURCOUCHE_PAYS.update(json.loads(base.read_text(encoding="utf-8")))
+                return
+        except Exception:
+            pass
+
+
+_charger_surcouche_pays()
+
+
 def nom_pays(nom_fr, lang):
-    """Traduit un nom de pays. Repli sur le nom FR si absent."""
+    """Traduit un nom de pays. Priorite : PAYS (humain) > surcouche CLDR > FR."""
     if lang == "fr":
         return nom_fr
-    return PAYS.get(nom_fr, {}).get(lang, nom_fr)
+    humain = PAYS.get(nom_fr, {}).get(lang)
+    if humain:
+        return humain
+    return _SURCOUCHE_PAYS.get(nom_fr, {}).get(lang, nom_fr)

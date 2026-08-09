@@ -1,0 +1,8 @@
+streamlit
+requests
+beautifulsoup4
+fpdf2
+Babel
+pycountry
+python-dotenv
+psycopg2-binary

@@ -1,0 +1,104 @@
+=== SONDE PARCOURS ITALIE — Wed 15 Jul 2026 03:44:56 CEST ===
+--- A. bloc etapes Italie (contexte complet) ---
+ ])
+
+D["IT"] = dict(nom="Italie", flag="🇮🇹",
+ resume="Deux voies complémentaires pour l'Italie : les ÉTUDES (frais calculés sur tes revenus, "
+        "souvent 500–3 000 €/an, bourses DSU) et le TRAVAIL via le Decreto Flussi "
+        "(497 550 entrées 2026-2028 — quota réservé pour 14 pays africains, voie générale pour tous).",
+ ressources="≈6 500 €/an à justifier (hors bourse DSU) pour les études · "
+            "Travail : employeur requis avant toute démarche",
+ travail="20 h/semaine (études) · Temps plein (Decreto Flussi)",
+ post="Permesso de recherche d'emploi 12 mois (études) · Renouvellement contrat (travail)",
+ portail="https://studyinitaly.esteri.it",
+ services=["ORIENT","ADMIS","DOSSIER","BOURSE","VISA","TRAD","PACK"],
+ etapes=[
+  ("Pré-inscription sur Universitaly", "La plateforme officielle reliée à ton consulat — l'équivalent italien de Campus France.", "https://www.universitaly.it", "ADMIS"),
+  ("Demander la bourse régionale DSU", "Sur critères sociaux : logement + cantine + ~5 200 €/an. Peu de candidats étrangers la connaissent.", None, "BOURSE"),
+  ("Visa D études", "Admission + fonds + logement + assurance.", None, "VISA"),
+  # ── Decreto Flussi (Métier / Saisonnier) ──────────────────────────────────
+  ("🛂 Decreto Flussi — trouver un emploi en Italie",
+   "DPCM 02/10/2025 : 497 550 entrées sur 2026-2028 (164 850/an). "
+   "L'employeur fait TOUT : il dépose la demande de nulla osta sur le Portale ALI, "
+   "tu n'as qu'à être prêt avec les documents. "
+   "Trois groupes selon ton pays d'origine — voir ci-dessous.", None, None),
+  ("Groupe 1 — 14 pays africains à quota réservé (click day 16 fév)",
+   "Algérie, Côte d'Ivoire, Égypte, Éthiopie, Gambie, Ghana, Mali, Maroc, Maurice, "
+   "Niger, Nigeria, Sénégal, Soudan, Tunisie. "
+   "25 000 places/an rien que pour ces pays. "
+   "⚠️ Maroc : circuit d'avis renforcé Questura + Inspectorat — délais plus longs, "
+   "dossier irréprochable requis. "
+   "Précompilation ALI : oct–déc 2026 (fenêtre annuelle). "
+   "Secteurs : transport CQC, bâtiment, mécanique, télécoms, hôtellerie, "
+   "électriciens, plombiers, alimentaire, naval.",
+   "https://portaleservizi.dlci.interno.it/AliSportello/ali/home.htm", None),
+  ("Groupe 2 — tous les autres pays (Cameroun, RDC, Guinée…) — click day 18 fév",
+   "Quote générale — compétition plus large mais deux canaux stratégiques sous-utilisés : "
+   "(1) SAISONNIER (agricole 12 jan, tourisme 9 fév) : la concurrence s'est effondrée "
+   "(72 000 demandes en 2025 vs 337 000 en 2024 pour ~82 000 quotas). "
+   "(2) BADANTI hors quota (DL 146/2025) : 10 000 places supplémentaires pour l'assistance "
+   "aux handicapés et aux 80+ ans, ouverts dès le 1er janvier via agences pour l'emploi — "
+   "utilisés à seulement 13 % en 2025. Aucune restriction de nationalité.",
+   "https://portaleservizi.dlci.interno.it/AliSportello/ali/home.htm", None),
+  ("Groupe 3 — colf/badanti (aide domestique) — click day 18 fév",
+   "13 600 places A-bis exclusif domestique + ~19 300 hors quota. "
+   "AUCUNE restriction de nationalité. Condition côté employeur : revenu ≥ 20 000 €/an. "
+   "Canal le plus accessible pour qui a une expérience dans l'aide à la personne.",
+   None, None),
+  ("Préparer MAINTENANT pour 2027",
+   "Les click days 2026 sont passés. Les dates 2027 sont déjà connues (même calendrier annuel). "
+   "Action immédiate : trouver un employeur italien intéressé (offres Yorbity + candidature à distance), "
+   "rassembler les documents (casier judiciaire international, diplômes traduits, CV en italien). "
+   "La précompilation ALI ouvre en octobre 2026 — l'employeur doit être prêt à ce moment-là.",
+   "https://www.interno.gov.it/it/servizi/servizi-line/procedure-flussi", None),
+--- B. ou et comment ce bloc est-il affiche ? ---
+179: "ADMIS":   ("🎓 Admission directe auprès des écoles",
+201: "BOURSE":  ("💰 Chasse aux bourses ciblée",
+215:    "ADMIS":    {"Formation (admission)"},
+219:    "BOURSE":   {"Formation (admission)", "Bourse"},
+226:def _services_pour_type(codes, type_projet):
+245: services=["ORIENT","EEF","ADMIS","DOSSIER","ENTRETIEN","FONDS","VISA","LOGEMENT","BOURSE","TRAD","PACK"],
+246: etapes_eef=[
+256:   None, "ADMIS"),
+277: etapes_std=[
+281:   "https://www.parcoursup.gouv.fr", "ADMIS"),
+297: services=["ORIENT","ADMIS","DOSSIER","FONDS","VISA","BOURSE","TRAD","PACK"],
+298: etapes=[
+302:   "https://www.canada.ca/fr/immigration-refugies-citoyennete/services/etudier-canada/etablissements-designes.html", "ADMIS"),
+328: services=["ORIENT","ADMIS","DOSSIER","ENTRETIEN","FONDS","BOURSE","TRAD","PACK"],
+329: etapes=[
+332:   "https://studyinthestates.dhs.gov", "ADMIS"),
+352: services=["ORIENT","ADMIS","DOSSIER","FONDS","VISA","BOURSE","TRAD","PACK"],
+353: etapes=[
+354:  ("Être admis et recevoir le CAS", "L'université émet le Confirmation of Acceptance for Studies.", None, "ADMIS"),
+367: services=["ORIENT","ADMIS","DOSSIER","FONDS","VISA","BOURSE","TRAD","PACK"],
+368: etapes=[
+369:  ("Vérifier l'équivalence de ton diplôme", "Via anabin/uni-assist (~75 €). Certains bacs exigent une année préparatoire (Studienkolleg).", "https://www.uni-assist.de", "ADMIS"),
+382: services=["ORIENT","ADMIS","DOSSIER","FONDS","VISA","BOURSE","TRAD","PACK"],
+383: etapes=[
+385:  ("S'inscrire à l'université", "Candidatures juin–septembre pour la rentrée d'octobre.", None, "ADMIS"),
+431: services=["ORIENT","ADMIS","DOSSIER","BOURSE","VISA","TRAD","PACK"],
+432: etapes=[
+433:  ("Pré-inscription sur Universitaly", "La plateforme officielle reliée à ton consulat — l'équivalent italien de Campus France.", "https://www.universitaly.it", "ADMIS"),
+434:  ("Demander la bourse régionale DSU", "Sur critères sociaux : logement + cantine + ~5 200 €/an. Peu de candidats étrangers la connaissent.", None, "BOURSE"),
+482: services=["ORIENT","ADMIS","DOSSIER","VISA","TRAD","PACK"],
+483: etapes=[
+485:  ("Candidater aux universités", "Directement ou via les préinscriptions régionales.", None, "ADMIS"),
+494: services=["ORIENT","ADMIS","DOSSIER","VISA","TRAD","PACK"],
+495: etapes=[
+496:  ("Concours « estudante internacional »", "Candidature directe auprès des universités.", None, "ADMIS"),
+506: services=["ORIENT","ADMIS","DOSSIER","FONDS","BOURSE","PACK"],
+507: etapes=[
+508:  ("Candidater via Studielink", "Plateforme nationale unique.", "https://www.studielink.nl", "ADMIS"),
+517: services=["ORIENT","ADMIS","DOSSIER","VISA","TRAD","PACK"],
+518: etapes=[
+519:  ("Candidater via Study in Greece", "Plateforme nationale des programmes internationaux.", "https://studyingreece.edu.gr", "ADMIS"),
+530: services=["ORIENT","ADMIS","DOSSIER","VISA","TRAD","BOURSE","PACK"],
+531: etapes=[
+532:  ("Candidater + nostrifier ton diplôme", "Reconnaissance du diplôme (nostrification) + candidature directe.", "https://www.studyin.cz", "ADMIS"),
+541: services=["ORIENT","ADMIS","DOSSIER","BOURSE","VISA","TRAD","PACK"],
+542: etapes=[
+543:  ("Candidater (universités / NAWA)", "", "https://nawa.gov.pl/en", "ADMIS"),
+554: services=["ORIENT","ADMIS","DOSSIER","BOURSE","VISA","TRAD","PACK"],
+555: etapes=[
+558:   None, "ADMIS"),

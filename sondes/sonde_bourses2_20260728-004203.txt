@@ -1,0 +1,31 @@
+SONDE BOURSES 2 (v2, blocs 3+4) — 2026-07-28 00:42:03
+Projet : /Users/yvannkoo/mobilite-ia
+================================================================
+
+[1] TIROIR A
+    total          : 51 bourses
+    actives        : 51   · désactivées : 0
+    sans URL       : 12
+
+[2] CONTRÔLE DOUBLON des 14 bourses des blocs 3 et 4
+    à ajouter : 11   · déjà installées : 0   · doublons à trancher : 3
+    ⚠ « Stipendium Hungaricum (gouvernement hongrois) »
+        pointe la MÊME URL que l'entrée existante « Stipendium Hungaricum »
+        → l'installeur l'ignorera : à fusionner ou renommer à la main.
+    ⚠ « Global Korea Scholarship (GKS, gouvernement coréen) »
+        pointe la MÊME URL que l'entrée existante « GKS (Global Korea Scholarship) »
+        → l'installeur l'ignorera : à fusionner ou renommer à la main.
+    ⚠ « Türkiye Bursları (bourses du gouvernement turc) »
+        pointe la MÊME URL que l'entrée existante « Türkiye Bursları »
+        → l'installeur l'ignorera : à fusionner ou renommer à la main.
+
+[3] FICHES PAYS (dictionnaire D de ui.py)
+    codes destination trouvés dans ui.py : 39
+    destinations utilisées par le tiroir A : 43
+    → SANS fiche pays (bourses invisibles) : DZ, MU, RS, RU
+    → rappel lot en attente : RU, RS, DZ, MU
+    → à prévoir pour le bloc 3 (23/07) : aucune ✓ (toutes existent déjà)
+    → à prévoir pour le bloc 4 (26/07) : BN, MX
+
+[4] STRUCTURE DE LA FICHE MODÈLE D["TR"]
+    ⚠ D["TR"] n'est pas un dictionnaire littéral (Call) — voir le rapport complet.

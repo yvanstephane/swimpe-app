@@ -1,0 +1,159 @@
+=== paiement.py ===
+     1	# =============================================================================
+     2	# paiement.py — Paiements Yorbity via CinetPay (Mobile Money + cartes)
+     3	# MODE TEST par défaut : aucun argent ne circule, le Premium s'active directement
+     4	# pour valider tout le parcours. Passage en RÉEL = renseigner les clés dans .env
+     5	# (CINETPAY_API_KEY, CINETPAY_SITE_ID) et mettre CINETPAY_MODE=reel.
+     6	# =============================================================================
+     7	import os, sqlite3, datetime, secrets, json
+     8	
+     9	DB = "data/mobilite.db"
+    10	
+    11	# Clés lues depuis l'environnement (.env). Absentes = mode test forcé.
+    12	MODE      = os.environ.get("CINETPAY_MODE", "test")      # "test" ou "reel"
+    13	API_KEY   = os.environ.get("CINETPAY_API_KEY", "")
+    14	SITE_ID   = os.environ.get("CINETPAY_SITE_ID", "")
+    15	BASE_URL  = os.environ.get("YORBITY_URL", "http://localhost:8501")
+    16	
+    17	# Offres d'abonnement (prix en FCFA, durée en jours)
+    18	OFFRES = {
+    19	    "premium_mensuel":   ("⭐ Premium — 1 mois",   5000,   30),
+    20	    "premium_trimestre": ("⭐ Premium — 3 mois",  12000,   90),
+    21	    "premium_annuel":    ("⭐ Premium — 1 an",    40000,  365),
+    22	}
+    23	
+    24	# ----------------------------------------------------------------------------
+    25	# Table des transactions
+    26	# ----------------------------------------------------------------------------
+    27	def init_db():
+    28	    con = sqlite3.connect(DB)
+    29	    con.execute("""CREATE TABLE IF NOT EXISTS paiements(
+    30	        id INTEGER PRIMARY KEY AUTOINCREMENT,
+    31	        transaction_id TEXT UNIQUE,
+    32	        user_id INTEGER,
+    33	        offre TEXT,
+    34	        montant INTEGER,
+    35	        devise TEXT DEFAULT 'XOF',
+    36	        statut TEXT DEFAULT 'en_attente',   -- en_attente / paye / echec
+    37	        mode TEXT,
+    38	        date TEXT,
+    39	        detail TEXT
+    40	    )""")
+    41	    con.commit(); con.close()
+    42	
+    43	def _nouvelle_transaction(user_id, offre_code, montant):
+    44	    init_db()
+    45	    tid = "YORBITY-" + secrets.token_hex(8).upper()
+    46	    con = sqlite3.connect(DB)
+    47	    con.execute("INSERT INTO paiements(transaction_id,user_id,offre,montant,statut,mode,date) "
+    48	                "VALUES(?,?,?,?,?,?,?)",
+    49	                (tid, user_id, offre_code, montant, "en_attente", MODE,
+    50	                 datetime.datetime.now().isoformat(timespec="seconds")))
+    51	    con.commit(); con.close()
+    52	    return tid
+    53	
+    54	def _marquer(transaction_id, statut, detail=""):
+    55	    con = sqlite3.connect(DB)
+    56	    con.execute("UPDATE paiements SET statut=?, detail=? WHERE transaction_id=?",
+    57	                (statut, detail, transaction_id))
+    58	    con.commit(); con.close()
+    59	
+    60	# ----------------------------------------------------------------------------
+    61	# Lancer un paiement
+    62	#   - En mode TEST : renvoie un lien fictif + marque payé immédiatement (simulation)
+    63	#   - En mode RÉEL : appelle l'API CinetPay pour obtenir l'URL de paiement
+    64	# Retour : dict {ok, mode, transaction_id, url, message}
+    65	# ----------------------------------------------------------------------------
+    66	def lancer_paiement(user, offre_code):
+    67	    if offre_code not in OFFRES:
+    68	        return {"ok": False, "message": "Offre inconnue."}
+    69	    label, montant, jours = OFFRES[offre_code]
+    70	    tid = _nouvelle_transaction(user["id"], offre_code, montant)
+    71	
+    72	    # ---------- MODE TEST ----------
+    73	    if MODE != "reel" or not (API_KEY and SITE_ID):
+    74	        # Simulation : on considère le paiement réussi tout de suite
+    75	        _marquer(tid, "paye", "SIMULATION (mode test)")
+    76	        return {"ok": True, "mode": "test", "transaction_id": tid,
+    77	                "url": None, "jours": jours, "montant": montant, "label": label,
+    78	                "message": "Mode test : abonnement activé sans paiement réel."}
+    79	
+    80	    # ---------- MODE RÉEL (CinetPay) ----------
+    81	    try:
+    82	        import urllib.request
+    83	        payload = {
+    84	            "apikey": API_KEY,
+    85	            "site_id": SITE_ID,
+    86	            "transaction_id": tid,
+    87	            "amount": montant,
+    88	            "currency": "XOF",
+    89	            "description": f"Yorbity {label}",
+    90	            "customer_name": user.get("nom", ""),
+    91	            "customer_email": user.get("email", ""),
+    92	            "notify_url": f"{BASE_URL}/?cinetpay_notify=1",
+    93	            "return_url": f"{BASE_URL}/?paiement_retour={tid}",
+    94	            "channels": "ALL",   # Mobile Money + carte
+    95	        }
+    96	        req = urllib.request.Request(
+    97	            "https://api-checkout.cinetpay.com/v2/payment",
+    98	            data=json.dumps(payload).encode(),
+    99	            headers={"Content-Type": "application/json"})
+   100	        rep = json.loads(urllib.request.urlopen(req, timeout=15).read())
+   101	        if rep.get("code") == "201":
+   102	            url = rep["data"]["payment_url"]
+   103	            return {"ok": True, "mode": "reel", "transaction_id": tid,
+   104	                    "url": url, "jours": jours, "montant": montant, "label": label,
+   105	                    "message": "Redirection vers le paiement sécurisé."}
+   106	        _marquer(tid, "echec", str(rep))
+   107	        return {"ok": False, "message": f"CinetPay: {rep.get('message','erreur')}"}
+   108	    except Exception as e:
+   109	        _marquer(tid, "echec", str(e))
+   110	        return {"ok": False, "message": f"Erreur technique: {e}"}
+   111	
+   112	# ----------------------------------------------------------------------------
+   113	# Vérifier le statut d'une transaction (au retour de CinetPay, mode réel)
+   114	# ----------------------------------------------------------------------------
+   115	def verifier_paiement(transaction_id):
+   116	    if MODE != "reel" or not (API_KEY and SITE_ID):
+   117	        return "paye"  # test
+   118	    try:
+   119	        import urllib.request
+   120	        payload = {"apikey": API_KEY, "site_id": SITE_ID, "transaction_id": transaction_id}
+   121	        req = urllib.request.Request(
+   122	            "https://api-checkout.cinetpay.com/v2/payment/check",
+   123	            data=json.dumps(payload).encode(),
+   124	            headers={"Content-Type": "application/json"})
+   125	        rep = json.loads(urllib.request.urlopen(req, timeout=15).read())
+   126	        if rep.get("code") == "00" and rep["data"]["status"] == "ACCEPTED":
+   127	            _marquer(transaction_id, "paye", "confirmé CinetPay")
+   128	            return "paye"
+   129	        return "echec"
+   130	    except Exception:
+   131	        return "echec"
+   132	
+   133	def offre_de_transaction(transaction_id):
+   134	    con = sqlite3.connect(DB); con.row_factory = sqlite3.Row
+   135	    row = con.execute("SELECT * FROM paiements WHERE transaction_id=?",
+   136	                      (transaction_id,)).fetchone()
+   137	    con.close()
+   138	    return dict(row) if row else None
+
+=== ui.py : lignes paiement/premium ===
+77:        if st.button(t("btn_premium", LG), use_container_width=True):
+78:            st.session_state.show_premium = True
+232:   "création du compte, saisie des vœux (souvent 3), paiement des frais de dossier "
+907:# ---------- Écran Premium ----------
+908:if espace.ecran_premium():
+936:# ---------- Retour de paiement CinetPay (mode réel) ----------
+938:if "paiement_retour" in _params:
+939:    import paiement
+940:    tid = _params["paiement_retour"]
+941:    statut = paiement.verifier_paiement(tid)
+943:        info = paiement.offre_de_transaction(tid)
+945:            jours = paiement.OFFRES.get(info["offre"], ("",0,30))[2]
+946:            nouveau = auth.activer_premium(espace.user_connecte()["id"], jours)
+947:            st.session_state.user["premium_jusqu"] = nouveau
+950:        st.error("Le paiement n'a pas abouti. Réessaie ou contacte-nous.")
+957:    if auth.est_premium(u):
+958:        st.success(t("premium_actif", LG))
+1192:        if st.button("💎 Offres Premium", key="btn_cfg_offres", use_container_width=True):

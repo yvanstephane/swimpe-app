@@ -1,0 +1,125 @@
+=== 1. patch seed applique ? ===
+0
+
+=== 2. registre UK ===
+-rw-r--r--  1 yvannkoo  staff    10M Jul 10 23:43 data/uk_sponsors.csv
+
+=== 3. adaptateur UK ===
+INFO:yorbity.sources:Source enregistree : <jobbank_ca ['CA'] ['stage', 'emploi', 'metier']>
+INFO:yorbity.sources:Source enregistree : <adzuna ['FR', 'GB', 'CA', 'DE', 'US', 'IT', 'ES', 'NL', 'AT', 'BE', 'CH', 'AU', 'NZ', 'BR', 'IN', 'MX', 'PL', 'SG', 'ZA'] ['stage', 'emploi', 'metier']>
+INFO:yorbity.sources:Source enregistree : <mig_de ['DE'] ['emploi', 'metier']>
+INFO:yorbity.sources:Source enregistree : <uk_sponsors ['GB'] ['emploi', 'metier']>
+INFO:yorbity.sources.uk:registre sponsors UK : 125846 employeurs charges
+INFO:yorbity.sources.uk:uk_sponsors : 68/100 offres chez des sponsors (was='electrician')
+charge: True
+disponible: True
+offres sponsors: 68
+ - BAE Systems | Electrician
+ - BAE Systems | Electrician
+ - BAE Systems | Electrician
+
+=== 4. traduction.py (entier) ===
+     1	# =============================================================================
+     2	# traduction.py — Traduction automatique du CONTENU (fiches pays, services)
+     3	# via le LLM local Ollama (llama3.3:70b). Résultats mis en cache dans SQLite
+     4	# pour ne traduire qu'une seule fois chaque texte.
+     5	# =============================================================================
+     6	import sqlite3, hashlib, os, json, urllib.request
+     7	
+     8	DB = "data/mobilite.db"
+     9	OLLAMA = os.environ.get("OLLAMA_HOST", "http://localhost:11434")
+    10	MODEL  = os.environ.get("MAIN_MODEL", "llama3.3:70b-instruct-q4_K_M")
+    11	
+    12	# Noms complets des langues pour le prompt
+    13	LANGUE_NOM = {
+    14	    "en":"anglais","es":"espagnol","pt":"portugais","zh":"chinois (simplifié)",
+    15	    "ar":"arabe","ja":"japonais","ko":"coréen","id":"indonésien",
+    16	}
+    17	
+    18	def _init():
+    19	    con = sqlite3.connect(DB)
+    20	    con.execute("""CREATE TABLE IF NOT EXISTS trad_cache(
+    21	        cle TEXT PRIMARY KEY, texte_fr TEXT, lang TEXT, traduction TEXT)""")
+    22	    con.commit(); con.close()
+    23	
+    24	def _cle(texte, lang):
+    25	    return hashlib.md5((lang + "::" + texte).encode()).hexdigest()
+    26	
+    27	def _du_cache(texte, lang):
+    28	    _init()
+    29	    con = sqlite3.connect(DB)
+    30	    row = con.execute("SELECT traduction FROM trad_cache WHERE cle=?",
+    31	                      (_cle(texte, lang),)).fetchone()
+    32	    con.close()
+    33	    return row[0] if row else None
+    34	
+    35	def _au_cache(texte, lang, trad):
+    36	    con = sqlite3.connect(DB)
+    37	    con.execute("INSERT OR REPLACE INTO trad_cache(cle,texte_fr,lang,traduction) VALUES(?,?,?,?)",
+    38	                (_cle(texte, lang), texte, lang, trad))
+    39	    con.commit(); con.close()
+    40	
+    41	def _appel_ollama(texte, lang):
+    42	    """Traduit un texte français via Ollama. Retourne None si Ollama indisponible."""
+    43	    langue = LANGUE_NOM.get(lang, lang)
+    44	    prompt = (f"Traduis le texte suivant du français vers le {langue}. "
+    45	              f"Garde exactement le même sens, le même ton, et les mêmes montants, "
+    46	              f"noms propres et sigles (ex : Campus France, AVI, FCFA, EEF restent tels quels). "
+    47	              f"Ne rajoute AUCUN commentaire, réponds UNIQUEMENT avec la traduction.\n\n"
+    48	              f"Texte : {texte}")
+    49	    try:
+    50	        payload = json.dumps({
+    51	            "model": MODEL, "prompt": prompt, "stream": False,
+    52	            "options": {"temperature": 0.2}
+    53	        }).encode()
+    54	        req = urllib.request.Request(f"{OLLAMA}/api/generate", data=payload,
+    55	                                     headers={"Content-Type": "application/json"})
+    56	        rep = json.loads(urllib.request.urlopen(req, timeout=120).read())
+    57	        return rep.get("response", "").strip()
+    58	    except Exception:
+    59	        return None
+    60	
+    61	def traduire(texte, lang):
+    62	    """Traduit un texte (avec cache). Si lang=fr ou texte vide, renvoie tel quel.
+    63	    Si Ollama est indisponible, renvoie le texte français (repli sûr)."""
+    64	    if not texte or lang == "fr":
+    65	        return texte
+    66	    cache = _du_cache(texte, lang)
+    67	    if cache is not None:
+    68	        return cache
+    69	    trad = _appel_ollama(texte, lang)
+    70	    if trad:
+    71	        _au_cache(texte, lang, trad)
+    72	        return trad
+    73	    return texte   # repli : français si le LLM local n'est pas dispo
+    74	
+    75	# ----------------------------------------------------------------------------
+    76	# Pré-traduction en masse (à lancer depuis le terminal pour tout traduire
+    77	# d'avance, une bonne fois, dans une langue donnée)
+    78	#   python app/api/traduction.py en
+    79	# ----------------------------------------------------------------------------
+    80	def pretraduire_tout(lang):
+    81	    """Traduit d'avance tous les textes des fiches pays + services dans une langue."""
+    82	    import sys
+    83	    sys.path.insert(0, os.path.dirname(__file__))
+    84	    # On importe D et SVC depuis ui.py serait lourd ; on relit les textes depuis
+    85	    # un export. Ici, approche simple : l'app traduit à la volée + met en cache.
+    86	    print(f"Pour pré-traduire, ouvre l'app et navigue dans les fiches en {lang} :")
+    87	    print("chaque fiche consultée est traduite puis mise en cache automatiquement.")
+    88	    print("Alternative : lance ce script avec la liste de textes à traduire.")
+    89	
+    90	if __name__ == "__main__":
+    91	    import sys
+    92	    if len(sys.argv) == 2:
+    93	        lang = sys.argv[1]
+    94	        # Test rapide de connexion à Ollama
+    95	        essai = _appel_ollama("Bonjour, ceci est un test.", lang)
+    96	        if essai:
+    97	            print(f"✓ Ollama répond. Exemple ({lang}) : {essai[:80]}")
+    98	        else:
+    99	            print("✗ Ollama ne répond pas. Vérifie qu'il tourne : ollama serve")
+   100	    else:
+   101	        print("Usage : python app/api/traduction.py <lang>  (en, es, pt, zh, ar, ja, ko, id)")
+
+=== 5. sonde Europe ===
+/Library/Frameworks/Python.framework/Versions/3.14/Resources/Python.app/Contents/MacOS/Python: can't open file '/Users/yvannkoo/mobilite-ia/scripts/sonde_europe.py': [Errno 2] No such file or directory

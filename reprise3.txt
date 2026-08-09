@@ -1,0 +1,31 @@
+=== REPRISE 3 — Tue 14 Jul 2026 22:01:12 CEST sur yvans-macbook-pro.home ===
+--- moteur & console ---
+-rw-r--r--  1 yvannkoo  staff   9220 Jul 14 03:52 /Users/yvannkoo/mobilite-ia/app/api/console_accompagnement.py
+-rw-r--r--  1 yvannkoo  staff  10056 Jul 14 04:39 /Users/yvannkoo/mobilite-ia/app/api/moteur_plans.py
+--- version base de faits ---
+  "version": "1.1",
+--- branchements dans ui.py ---
+1036:if espace.est_admin() and moteur_plans.ecran(ORIGINES):
+1038:if espace.est_admin() and console_accompagnement.ecran(D, ORIGINES):
+1362:# _patch_fiches_italie_belgique_mcf_v1
+--- docs de reference ---
+-rw-r--r--@ 1 yvannkoo  staff  9745 Jul 14 01:25 /Users/yvannkoo/mobilite-ia/data/etude_marche_afrique_yorbity_v1.md
+-rw-r--r--@ 1 yvannkoo  staff  7355 Jul 13 17:36 /Users/yvannkoo/mobilite-ia/data/feuille_route_italie_belgique_mcf_v1.md
+--- patchs appliques ---
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:17:if not getattr(sqlite3, "_yorbity_patience", False):
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:30:    sqlite3._yorbity_patience = True
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:105:/* --- Lisibilite (patch_lisibilite) : tailles + couleurs liees au theme --- */
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:892:    # Seed des pays UNIQUEMENT s'il en manque (patch_seed_v1) : plus
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:1362:# _patch_fiches_italie_belgique_mcf_v1
+/Users/yvannkoo/mobilite-ia/app/api/sources/adzuna.py:25:# GB retire (patch_uk_exclusif) : le Royaume-Uni est servi EXCLUSIVEMENT
+/Users/yvannkoo/mobilite-ia/app/api/sources/uk_sponsors.py:139:    PLAFOND = 500          # 10 pages Adzuna : balaye le job board (patch_fixpack2)
+/Users/yvannkoo/mobilite-ia/app/api/sources/uk_sponsors.py:155:                      # (le lien Adzuna direct etait geo-bloque — patch_uk_lien)
+/Users/yvannkoo/mobilite-ia/app/api/sources/uk_sponsors.py:195:        brutes = self._adzuna_gb(mots_cles, self.PLAFOND)
+/Users/yvannkoo/mobilite-ia/app/api/sources/uk_sponsors.py:228:        url = ("https://findajob.dwp.gov.uk/search?q="
+--- registre UK ---
+-rw-r--r--  1 yvannkoo  staff  10893251 Jul 10 23:43 /Users/yvannkoo/mobilite-ia/data/uk_sponsors.csv
+-rw-r--r--  1 yvannkoo  staff        10 Jul 10 23:43 /Users/yvannkoo/mobilite-ia/data/uk_sponsors.date
+--- config theme ---
+(pas de config.toml)
+--- cles .env presence ---
+9

@@ -1,0 +1,23 @@
+=== SONDE MODELES .ENV — Wed 15 Jul 2026 05:30:43 CEST ===
+--- lignes contenant MODEL (structure exacte) ---
+1:OLLAMA_HOST=http://localhost:11434 echo MAIN_MODEL=llama3.3:70b-instruct-q4_K_M echo FAST_MODEL=llama3.2:3b echo CODE_MODEL=qwen3-coder:30b echo EMBED_MODEL=nomic-embed-text
+2:OLLAMA_HOST=http://localhost:11434 echo MAIN_MODEL=llama3.3:70b-instruct-q4_K_M echo FAST_MODEL=llama3.2:3b echo CODE_MODEL=qwen3-coder:30b echo EMBED_MODEL=nomic-embed-text
+3:OLLAMA_HOST=http://localhost:11434 echo MAIN_MODEL=llama3.3:70b-instruct-q4_K_M echo FAST_MODEL=llama3.2:3b echo CODE_MODEL=qwen3-coder:30b echo EMBED_MODEL=nomic-embed-text
+4:OLLAMA_HOST=http://localhost:11434 echo MAIN_MODEL=llama3.3:70b-instruct-q4_K_M echo FAST_MODEL=llama3.2:3b echo CODE_MODEL=qwen3-coder:30b echo EMBED_MODEL=nomic-embed-text
+5:OLLAMA_HOST=http://localhost:11434 echo MAIN_MODEL=llama3.3:70b-instruct-q4_K_M echo FAST_MODEL=llama3.2:3b echo CODE_MODEL=qwen3-coder:30b echo EMBED_MODEL=nomic-embed-text
+--- nombre de lignes reellement distinctes ---
+5
+--- ce que Python lit vraiment pour MAIN_MODEL ---
+MAIN_MODEL=llama3.3:70b-instruct-q4_K_M echo FAST_MODEL=llama3.2:3b echo CODE_MODEL=qwen3-coder:30b echo EMBED_MODEL=nomic-embed-text
+MAIN_MODEL=llama3.3:70b-instruct-q4_K_M echo FAST_MODEL=llama3.2:3b echo CODE_MODEL=qwen3-coder:30b echo EMBED_MODEL=nomic-embed-text
+MAIN_MODEL=llama3.3:70b-instruct-q4_K_M echo FAST_MODEL=llama3.2:3b echo CODE_MODEL=qwen3-coder:30b echo EMBED_MODEL=nomic-embed-text
+MAIN_MODEL=llama3.3:70b-instruct-q4_K_M echo FAST_MODEL=llama3.2:3b echo CODE_MODEL=qwen3-coder:30b echo EMBED_MODEL=nomic-embed-text
+MAIN_MODEL=llama3.3:70b-instruct-q4_K_M echo FAST_MODEL=llama3.2:3b echo CODE_MODEL=qwen3-coder:30b echo EMBED_MODEL=nomic-embed-text
+None
+--- noms EXACTS des modeles installes ---
+compagnon:latest
+nomic-embed-text:latest
+qwen3-coder:30b
+gpt-oss:120b
+llama3.3:70b-instruct-q4_K_M
+llama3.2:3b

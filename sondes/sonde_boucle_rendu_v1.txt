@@ -1,0 +1,111 @@
+=== SONDE BOUCLE RENDU — Wed 15 Jul 2026 03:52:21 CEST ===
+--- A. boucle de rendu des etapes (1225-1270) ---
+    try:
+        import theme_pays
+        theme_pays.appliquer(destination, theme_pays.type_interne(type_c), tr)
+    except Exception as _e_theme:
+        print('theme_pays indisponible :', _e_theme)
+    # -----------------------------------------------
+    _mode_opp = opportunites_ui.afficher(type_c, destination, code_orig, tr, poste=_poste_rech, domaine=domaine_c)
+    etapes = []
+    if not _mode_opp:
+        # ---- Étapes (adaptées à l'origine pour la France)
+        st.markdown("### " + t("chemin", LG))
+        if destination == "FR":
+            etapes = d["etapes_eef"] if code_orig in EEF else d["etapes_std"]
+            if code_orig in EEF:
+                st.caption(tr(f"ℹ️ En tant que ressortissant·e du pays « {origine} », ta procédure "
+                           f"passe par **Campus France / Études en France**. Voici exactement comment ça se déroule :"))
+        else:
+            etapes = d["etapes"]
+
+    for i, etape in enumerate(etapes, 1):
+        titre, det, lien, svc_code = (etape + (None,))[:4] if len(etape) == 3 else etape
+        with st.expander(f"{t('etape', LG)} {i} — {tr(titre)}", expanded=(i == 1)):
+            st.write(tr(det))
+            if lien:
+                st.markdown(f"[{t('lien_officiel', LG)}]({lien})")
+            if svc_code and svc_code in services_dest:
+                if st.button(t("aide_etape", LG),
+                             key=f"btn_{i}_{svc_code}"):
+                    st.session_state.svc = svc_code
+                if st.session_state.get("svc") == svc_code:
+                    _sn, _sd, _sp = SVC[svc_code]
+                    st.success("✅ **" + tr(_sn) + "**\n\n" + tr(_sd))
+                    st.caption(tr("📩 Ce service est présélectionné dans le formulaire tout en bas de la page — remplis-le pour qu'on démarre."))
+
+    if d.get("portail"):
+        st.link_button(f"{t('portail', LG)} {nom_pays(d['nom'], LG)}", d["portail"])
+
+    # ---- Accompagnement : deplace sur sa page dediee (patch_accompagnement)
+    st.markdown("---")
+    _cA, _cB = st.columns(2)  # patch_jobboard3
+    _cA.link_button(t("accompagne", LG) + " " + nom_pays(d["nom"], LG) + " →",
+                    _url_acc, use_container_width=True, type="primary")
+    _cB.link_button(t("form_titre", LG).split("—")[0].strip() + " →",
+                    _url_contact, use_container_width=True, type="secondary")
+    # Le formulaire ci-dessous a besoin de la liste des services :
+    noms_services = [tr(SVC[s][0]) for s in services_dest]
+--- B. CANON_TYPES / T_TYPES / T_DOMAINES (valeurs exactes) ---
+40:_METIER_LBLS = {v[3] for v in T["types"].values() if len(v) > 3}
+985:T_TYPES    = T["types"][LG]
+986:T_NIVEAUX  = T["niveaux"][LG]
+987:T_DOMAINES = T["domaines"][LG]
+988:CANON_TYPES   = T["types"]["fr"]
+1090:_proj_canon = CANON_TYPES[T_TYPES.index(type_)] if type_ in T_TYPES else None
+1148:    type_c   = CANON_TYPES[T_TYPES.index(type_)]     if type_   in T_TYPES   else type_
+    sqlite3._yorbity_patience = True
+# ------------------------------------------------------------------------------
+import streamlit as st
+from i18n import t, T, detecter_langue, LANGUES, RTL
+from pays_i18n import nom_pays
+import espace, auth, dossiers, services_cfg, config_projets, admin_projets, admin_comptes, mdp_oublie, opportunites_ui, offres_cfg, devises_cfg, eligibilite, offres_sync, recherche_poste, moteur_plans, console_accompagnement
+from traduction import traduire
+import autotrad  # traduction automatique globale (la langue prime sur tout)
+
+# Libellés du projet « Métier spécialisé » dans toutes les langues (grise le niveau)
+_METIER_LBLS = {v[3] for v in T["types"].values() if len(v) > 3}
+# Accroche du bandeau selon le type de projet (le résumé études reste pour Formation)
+_PITCH_PROJET = {
+    "Bourse": "Bourses accessibles selon ton pays d'origine — sélection mise à jour en continu.",
+    "Stage / Emploi étudiant": "Offres de stage et d'emploi étudiant ouvertes à ton profil — mises à jour en continu.",
+    "Métier spécialisé": "Postes pour travailleurs qualifiés ouverts aux candidats internationaux — mis à jour en continu.",
+}
+
+APP_NAME = "Yorbity"
+TAGLINE = "Ta trajectoire vers le monde"
+DB = "data/mobilite.db"
+ADMIN_PWD = os.environ.get("ADMIN_PASSWORD", "yorbity2026")
+TODAY = datetime.date.today().isoformat()
+
+st.set_page_config(page_title=APP_NAME, page_icon="🚀", layout="centered")
+
+# ---------- Langue : détection auto (1re visite) + sélecteur ----------
+if "lang" not in st.session_state:
+    st.session_state.lang = detecter_langue("fr")
+_lcodes = list(LANGUES.keys())
+with st.sidebar:
+--- C. SVC_TYPES complet (210-225) ---
+}
+
+# --- Services applicables PAR TYPE DE PROJET (patch_jobboard2) ---------------
+# Cle absente = service propose pour tous les types de projet.
+SVC_TYPES = {
+    "ADMIS":    {"Formation (admission)"},
+    "EEF":      {"Formation (admission)"},
+    "PACK":     {"Formation (admission)"},
+    "ORIENT":   {"Formation (admission)", "Bourse"},
+    "BOURSE":   {"Formation (admission)", "Bourse"},
+    "FONDS":    {"Formation (admission)", "Stage / Emploi étudiant"},
+    "VISA":     {"Formation (admission)", "Stage / Emploi étudiant", "Métier spécialisé"},
+    "LOGEMENT": {"Formation (admission)", "Stage / Emploi étudiant", "Métier spécialisé"},
+}
+
+
+def _services_pour_type(codes, type_projet):
+    """Ne garde que les services pertinents pour CE type de projet.
+    Repli : si le filtre vide tout, on rend la liste d'origine."""
+    filt = [s for s in codes if type_projet in SVC_TYPES.get(s, {type_projet})]
+    return filt or list(codes)
+
+

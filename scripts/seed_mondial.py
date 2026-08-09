@@ -563,14 +563,14 @@ OPPORTUNITES = [
   # CANADA — Emploi
   # ============================================================
   ("emploi",
-   "Emploi étudiant au Canada — Job Bank gouvernement",
+   "Emplois ouverts aux candidats internationaux — Job Bank",
    "CA", "TOUS",
    "licence,master,doctorat",
    "tous secteurs",
    "20 h/semaine en session, temps plein vacances et congés. "
    "Pas de permis supplémentaire si permis d'études valide avec clause de travail hors campus (depuis 2024).",
    None,
-   "https://www.jobbank.gc.ca",
+   "https://www.jobbank.gc.ca/jobsearch/jobsearch?fglo=1&sort=M",
    TODAY),
 
   # ============================================================

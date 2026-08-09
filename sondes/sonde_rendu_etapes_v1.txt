@@ -1,0 +1,89 @@
+=== SONDE RENDU ETAPES — Wed 15 Jul 2026 03:51:03 CEST ===
+--- A. cle i18n 'Ton chemin' ---
+119:   "fr":"🗺️ Ton chemin, étape par étape", "en":"🗺️ Your path, step by step",
+--- B. selecteur type de projet (valeurs exactes) ---
+62:    choix_lang = st.selectbox(" ", _lcodes,
+954:        _svc_choisi = st.selectbox(t("service_interet", LG), _noms)
+1088:type_ = c1.selectbox(t("q_type", LG), [t("choisir", LG)] + T_TYPES)
+1104:origine = c2.selectbox(t("q_origine", LG), [t("choisir", LG)] + _orig_list, format_func=_lbl_o)
+1119:destination = c3.selectbox(t("q_dest", LG), [t("choisir", LG)] + dest_codes, format_func=_lbl_d)
+1126:    niveau = c4.selectbox(t("q_niveau", LG), [t("choisir", LG)] + T_NIVEAUX, disabled=(type_ in _METIER_LBLS))
+1127:domaine = st.selectbox(t("q_domaine", LG), T_DOMAINES)
+1331:        _dsel = st.selectbox(traduire("Destination", st.session_state.get("lang","fr")), sorted(D, key=lambda c: D[c]["nom"]),
+39:# Libellés du projet « Métier spécialisé » dans toutes les langues (grise le niveau)
+43:    "Bourse": "Bourses accessibles selon ton pays d'origine — sélection mise à jour en continu.",
+44:    "Stage / Emploi étudiant": "Offres de stage et d'emploi étudiant ouvertes à ton profil — mises à jour en continu.",
+45:    "Métier spécialisé": "Postes pour travailleurs qualifiés ouverts aux candidats internationaux — mis à jour en continu.",
+215:    "ADMIS":    {"Formation (admission)"},
+216:    "EEF":      {"Formation (admission)"},
+217:    "PACK":     {"Formation (admission)"},
+218:    "ORIENT":   {"Formation (admission)", "Bourse"},
+219:    "BOURSE":   {"Formation (admission)", "Bourse"},
+220:    "FONDS":    {"Formation (admission)", "Stage / Emploi étudiant"},
+221:    "VISA":     {"Formation (admission)", "Stage / Emploi étudiant", "Métier spécialisé"},
+222:    "LOGEMENT": {"Formation (admission)", "Stage / Emploi étudiant", "Métier spécialisé"},
+1183:  <p>{tr(d['resume']) if type_c == "Formation (admission)" else tr(_PITCH_PROJET.get(type_c, ''))}</p>
+1193:    # ---- Infos budget/travail/après : uniquement pour Formation (admission) ----
+1194:    if type_c == "Formation (admission)":
+1200:    # ---- Bourses d'abord si le projet est "Bourse"
+1201:    if type_c == "Bourse":
+1219:    if type_c == "Stage / Emploi étudiant":
+--- C. tous les usages de 'etapes' (definition ET rendu) ---
+246: etapes_eef=[
+277: etapes_std=[
+298: etapes=[
+329: etapes=[
+353: etapes=[
+368: etapes=[
+383: etapes=[
+432: etapes=[
+483: etapes=[
+495: etapes=[
+507: etapes=[
+518: etapes=[
+531: etapes=[
+542: etapes=[
+555: etapes=[
+569: etapes=[
+582: etapes=[
+596: etapes=[
+609: etapes=[
+622: etapes=[
+635: etapes=[
+648: etapes=[
+661: etapes=[
+674: etapes=[
+684: etapes=[
+696: etapes=[
+709: etapes=[
+723: etapes=[
+736: etapes=[
+748: etapes=[
+761: etapes=[
+773: etapes=[
+785: etapes=[
+797: etapes=[
+809: etapes=[
+822: etapes=[
+834: etapes=[
+846: etapes=[
+858: etapes=[
+870: etapes=[
+1232:    etapes = []
+1237:            etapes = d["etapes_eef"] if code_orig in EEF else d["etapes_std"]
+1242:            etapes = d["etapes"]
+1244:    for i, etape in enumerate(etapes, 1):
+--- D. boucle de rendu + nom de la variable de type ---
+226:def _services_pour_type(codes, type_projet):
+229:    filt = [s for s in codes if type_projet in SVC_TYPES.get(s, {type_projet})]
+934:        _svc_dest = _services_pour_type(_svc_dest, _type_qp)
+1148:    type_c   = CANON_TYPES[T_TYPES.index(type_)]     if type_   in T_TYPES   else type_
+1156:    services_dest = _services_pour_type(services_dest, type_c)  # patch_jobboard2
+1177:                + "&type=" + _up.quote(type_c or ""))
+1183:  <p>{tr(d['resume']) if type_c == "Formation (admission)" else tr(_PITCH_PROJET.get(type_c, ''))}</p>
+1194:    if type_c == "Formation (admission)":
+1201:    if type_c == "Bourse":
+1219:    if type_c == "Stage / Emploi étudiant":
+1227:        theme_pays.appliquer(destination, theme_pays.type_interne(type_c), tr)
+1231:    _mode_opp = opportunites_ui.afficher(type_c, destination, code_orig, tr, poste=_poste_rech, domaine=domaine_c)
+1244:    for i, etape in enumerate(etapes, 1):

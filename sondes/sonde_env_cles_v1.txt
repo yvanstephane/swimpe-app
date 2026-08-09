@@ -1,0 +1,32 @@
+=== SONDE .ENV (noms masqués) — Wed 15 Jul 2026 05:00:27 CEST ===
+--- noms des variables presentes (valeurs cachees) ---
+OLLAMA_HOST=***masqué***
+OLLAMA_HOST=***masqué***
+OLLAMA_HOST=***masqué***
+OLLAMA_HOST=***masqué***
+OLLAMA_HOST=***masqué***
+
+YORBITY_SMTP_USER=***masqué***
+YORBITY_SMTP_PASS=***masqué***
+
+ADZUNA_APP_ID=***masqué***
+ADZUNA_APP_KEY=***masqué***
+--- une cle TAVILY existe-t-elle deja ? ---
+0
+0
+--- comment le code lit-il les cles (ex. Adzuna) ? ---
+/Users/yvannkoo/mobilite-ia/app/api/console_accompagnement.py:120:        st.caption("⚙️ Job board inactif : clés ADZUNA manquantes dans .env.")
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:3:# Source : API Adzuna (gratuite — clés dans .env : ADZUNA_APP_ID, ADZUNA_APP_KEY).
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:48:PAYS_ADZUNA = {"FR": "fr", "GB": "gb", "CA": "ca", "DE": "de", "US": "us",
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:83:    v = os.environ.get(cle)
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:96:    a, b = _env("ADZUNA_APP_ID"), _env("ADZUNA_APP_KEY")
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:101:    return dest_code.upper() in PAYS_ADZUNA
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:113:    app_id, app_key = _env("ADZUNA_APP_ID"), _env("ADZUNA_APP_KEY")
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:147:    pays = PAYS_ADZUNA.get(dest_code.upper())
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:256:    if dest_code.upper() in PAYS_ADZUNA:
+/Users/yvannkoo/mobilite-ia/app/api/mdp_oublie.py:21:    v = os.environ.get(cle)
+/Users/yvannkoo/mobilite-ia/app/api/moteur_plans.py:181:    modele = os.environ.get("PLANS_MODEL", "llama3.3:70b")
+/Users/yvannkoo/mobilite-ia/app/api/opportunites_ui.py:117:            st.caption("⚙️ Job board en direct inactif : ajoute ADZUNA_APP_ID et "
+/Users/yvannkoo/mobilite-ia/app/api/opportunites_ui.py:118:                       "ADZUNA_APP_KEY dans le fichier .env (compte gratuit sur "
+/Users/yvannkoo/mobilite-ia/app/api/paiement.py:34:MODE = os.environ.get("CINETPAY_MODE", "test")        # "test" ou "reel"
+/Users/yvannkoo/mobilite-ia/app/api/paiement.py:35:API_KEY = os.environ.get("CINETPAY_API_KEY", "")

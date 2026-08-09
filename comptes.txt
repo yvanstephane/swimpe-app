@@ -1,0 +1,511 @@
+Glisse ce fichier (comptes.txt) dans la conversation.
+
+
+######################################################################
+# 1. Schemas SQL : users, dossiers
+######################################################################
+
+-- users:
+CREATE TABLE users(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        email TEXT UNIQUE NOT NULL,
+        nom TEXT,
+        pays_origine TEXT,
+        telephone TEXT,
+        pwd_hash TEXT NOT NULL,
+        pwd_salt TEXT NOT NULL,
+        role TEXT DEFAULT 'etudiant',
+        premium_jusqu TEXT,
+        cree_le TEXT
+    , pwd_temp INT DEFAULT 0, pwd_temp_expire TEXT)
+
+-- dossiers:
+CREATE TABLE dossiers(
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        service TEXT,
+        destination TEXT,
+        statut TEXT DEFAULT 'recu',
+        note_client TEXT DEFAULT '',
+        note_interne TEXT DEFAULT '',
+        cree_le TEXT,
+        maj_le TEXT)
+
+-- leads:
+CREATE TABLE leads(
+        id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, nom TEXT, contact TEXT,
+        origine TEXT, destination TEXT, service TEXT, message TEXT)
+
+
+######################################################################
+# 2. auth.py — inscription
+######################################################################
+
+--- auth.py : signatures ---
+   13| def init_db():
+   33| def _hash(pwd: str, salt: str) -> str:
+   37| def _valide_email(email: str) -> bool:
+   40| def _valide_pwd(pwd: str):
+   51| def inscrire(email, nom, pwd, pays_origine="", telephone=""):
+   80| def connecter(email, pwd):
+  116| def _init_reset():
+  127| def lister_utilisateurs():
+  136| def reinitialiser_mdp(user_id):
+  160| def changer_mdp(user_id, ancien, nouveau):
+  187| def definir_nouveau_mdp(user_id, nouveau):
+  212| def est_premium(user: dict) -> bool:
+  221| def activer_premium(user_id, jours=30):
+  242| def creer_admin(email, nom, pwd):
+
+--- auth.py : 'inscription' ---
+      1| # =============================================================================
+>>    2| # auth.py — Comptes utilisateurs Yorbity (inscription, connexion, sécurité)
+      3| # Mots de passe chiffrés (PBKDF2-SHA256, jamais stockés en clair).
+      4| # Rôles : "etudiant" (par défaut) ou "admin".
+      5| # =============================================================================
+      6| import sqlite3, hashlib, os, secrets, datetime, re
+      7| 
+      8| DB = "data/mobilite.db"
+      9| 
+     10| # ----------------------------------------------------------------------------
+     11| # Schéma de la table utilisateurs
+     12| # ----------------------------------------------------------------------------
+     13| def init_db():
+     14|     con = sqlite3.connect(DB)
+     15|     con.execute("""CREATE TABLE IF NOT EXISTS users(
+     16|         id INTEGER PRIMARY KEY AUTOINCREMENT,
+     17|         email TEXT UNIQUE NOT NULL,
+     18|         nom TEXT,
+     19|         pays_origine TEXT,
+     20|         telephone TEXT,
+     21|         pwd_hash TEXT NOT NULL,
+     22|         pwd_salt TEXT NOT NULL,
+     23|         role TEXT DEFAULT 'etudiant',
+     24|         premium_jusqu TEXT,
+
+--- auth.py : 'nom' ---
+     48| # ----------------------------------------------------------------------------
+     49| # Inscription
+     50| # ----------------------------------------------------------------------------
+>>   51| def inscrire(email, nom, pwd, pays_origine="", telephone=""):
+     52|     """Retourne (True, user_id) ou (False, message_erreur)."""
+     53|     email = (email or "").strip().lower()
+     54|     if not _valide_email(email):
+     55|         return False, "Adresse e-mail invalide."
+     56|     err = _valide_pwd(pwd)
+     57|     if err:
+     58|         return False, err
+     59|     con = sqlite3.connect(DB)
+     60|     try:
+     61|         existe = con.execute("SELECT 1 FROM users WHERE email=?", (email,)).fetchone()
+     62|         if existe:
+     63|             return False, "Un compte existe déjà avec cet e-mail. Connecte-toi."
+     64|         salt = secrets.token_hex(16)
+     65|         h = _hash(pwd, salt)
+     66|         con.execute(
+     67|             "INSERT INTO users(email,nom,pays_origine,telephone,pwd_hash,pwd_salt,role,cree_le) "
+     68|             "VALUES(?,?,?,?,?,?,?,?)",
+     69|             (email, nom.strip(), pays_origine, telephone.strip(), h, salt, "etudiant",
+     70|              datetime.date.today().isoformat()))
+     71|         con.commit()
+     72|         uid = con.execute("SELECT id FROM users WHERE email=?", (email,)).fetchone()[0]
+     73|         return True, uid
+
+--- auth.py : 'nom' ---
+     64|         salt = secrets.token_hex(16)
+     65|         h = _hash(pwd, salt)
+     66|         con.execute(
+>>   67|             "INSERT INTO users(email,nom,pays_origine,telephone,pwd_hash,pwd_salt,role,cree_le) "
+     68|             "VALUES(?,?,?,?,?,?,?,?)",
+     69|             (email, nom.strip(), pays_origine, telephone.strip(), h, salt, "etudiant",
+     70|              datetime.date.today().isoformat()))
+     71|         con.commit()
+     72|         uid = con.execute("SELECT id FROM users WHERE email=?", (email,)).fetchone()[0]
+     73|         return True, uid
+     74|     finally:
+     75|         con.close()
+     76| 
+     77| # ----------------------------------------------------------------------------
+     78| # Connexion
+     79| # ----------------------------------------------------------------------------
+     80| def connecter(email, pwd):
+     81|     """Retourne (True, dict_user) ou (False, message_erreur)."""
+     82|     email = (email or "").strip().lower()
+     83|     con = sqlite3.connect(DB)
+     84|     con.row_factory = sqlite3.Row
+     85|     try:
+     86|         row = con.execute("SELECT * FROM users WHERE email=?", (email,)).fetchone()
+     87|         if not row:
+     88|             return False, "Aucun compte avec cet e-mail."
+     89|         if _hash(pwd, row["pwd_salt"]) != row["pwd_hash"]:
+
+
+######################################################################
+# 3. espace.py — session / admin
+######################################################################
+
+--- espace.py : signatures ---
+   12| def _lg():
+   18| def user_connecte():
+   21| def est_admin():
+   25| def deconnexion():
+   31| def bloc_compte_sidebar():
+   55| def ecran_auth(origines_dict):
+  123| def init_projets():
+  131| def sauver_projet(user_id, origine, destination, type_, niveau, domaine):
+  140| def mes_projets(user_id):
+  153| def ecran_premium():
+
+--- espace.py : 'est_admin' ---
+     18| def user_connecte():
+     19|     return st.session_state.get("user")
+     20| 
+>>   21| def est_admin():
+     22|     u = user_connecte()
+     23|     return u and u.get("role") == "admin"
+     24| 
+     25| def deconnexion():
+     26|     st.session_state.pop("user", None)
+     27| 
+     28| # ----------------------------------------------------------------------------
+     29| # Barre latérale : bloc compte (connexion / infos / déconnexion)
+     30| # ----------------------------------------------------------------------------
+     31| def bloc_compte_sidebar():
+     32|     auth.init_db()
+     33|     with st.sidebar:
+
+--- espace.py : 'session_state' ---
+     10| DB = "data/mobilite.db"
+     11| 
+     12| def _lg():
+>>   13|     return st.session_state.get("lang", "fr")
+     14| 
+     15| # ----------------------------------------------------------------------------
+     16| # Helpers de session
+     17| # ----------------------------------------------------------------------------
+     18| def user_connecte():
+     19|     return st.session_state.get("user")
+     20| 
+     21| def est_admin():
+     22|     u = user_connecte()
+     23|     return u and u.get("role") == "admin"
+     24| 
+     25| def deconnexion():
+
+--- espace.py : 'session_state' ---
+     46|             st.markdown("### " + t("compte_titre", _lg()))
+     47|             st.caption(t("compte_invite", _lg()))
+     48|             if st.button(t("btn_connexion", _lg()), use_container_width=True, type="primary"):
+>>   49|                 st.session_state.show_auth = True
+     50|                 st.rerun()
+     51| 
+     52| # ----------------------------------------------------------------------------
+     53| # Écran connexion / inscription (modale simulée en haut de page)
+     54| # ----------------------------------------------------------------------------
+     55| def ecran_auth(origines_dict):
+     56|     """Affiche l'écran de connexion/inscription. Retourne True si affiché (pour stopper le reste)."""
+     57|     if not st.session_state.get("show_auth"):
+     58|         return False
+     59| 
+     60|     st.markdown("## " + t("bienvenue", _lg()))
+     61|     onglet_co, onglet_in = st.tabs([t("onglet_connexion", _lg()), t("onglet_inscription", _lg())])
+
+--- espace.py : 'user' ---
+     32|     auth.init_db()
+     33|     with st.sidebar:
+     34|         st.markdown("---")
+>>   35|         u = user_connecte()
+     36|         if u:
+     37|             st.markdown(f"👤 **{u['nom'] or u['email']}**")
+     38|             if auth.est_premium(u):
+     39|                 st.success(t("premium_actif", _lg()))
+     40|             else:
+     41|                 st.caption(t("compte_gratuit", _lg()))
+     42|             if st.button(t("btn_deconnexion", _lg()), use_container_width=True):
+     43|                 deconnexion()
+     44|                 st.rerun()
+     45|         else:
+     46|             st.markdown("### " + t("compte_titre", _lg()))
+     47|             st.caption(t("compte_invite", _lg()))
+
+--- espace.py : 'user' ---
+     70|             if ok:
+     71|                 reussi, res = auth.connecter(email, pwd)
+     72|                 if reussi:
+>>   73|                     st.session_state.user = res
+     74|                     st.session_state.show_auth = False
+     75|                     st.rerun()
+     76|                 else:
+     77|                     st.error(res)
+     78|             if annul:
+     79|                 st.session_state.show_auth = False
+     80|                 st.rerun()
+     81|         if st.button("🔑 Mot de passe oublié ?", key="btn_mdp_oublie"):
+     82|             st.session_state.show_auth = False
+     83|             st.session_state.show_mdp_oublie = True
+     84|             st.session_state.mdpo_etape = 1
+     85|             st.rerun()
+
+--- espace.py : 'email' ---
+     62| 
+     63|     with onglet_co:
+     64|         with st.form("form_connexion"):
+>>   65|             email = st.text_input(t("champ_email", _lg()))
+     66|             pwd = st.text_input(t("champ_pwd", _lg()), type="password")
+     67|             c1, c2 = st.columns(2)
+     68|             ok = c1.form_submit_button(t("btn_connecter", _lg()), type="primary", use_container_width=True)
+     69|             annul = c2.form_submit_button(t("btn_retour", _lg()), use_container_width=True)
+     70|             if ok:
+     71|                 reussi, res = auth.connecter(email, pwd)
+     72|                 if reussi:
+     73|                     st.session_state.user = res
+     74|                     st.session_state.show_auth = False
+     75|                     st.rerun()
+     76|                 else:
+     77|                     st.error(res)
+
+--- espace.py : 'email' ---
+     87|     with onglet_in:
+     88|         with st.form("form_inscription"):
+     89|             nom = st.text_input(t("champ_nom", _lg()))
+>>   90|             email = st.text_input(t("champ_email", _lg()) + " ")
+     91|             pays = st.selectbox(t("champ_pays", _lg()), ["—"] + sorted(origines_dict.keys()))
+     92|             tel = st.text_input(t("champ_tel", _lg()))
+     93|             pwd = st.text_input(t("pwd_hint", _lg()), type="password")
+     94|             pwd2 = st.text_input(t("champ_pwd2", _lg()), type="password")
+     95|             c1, c2 = st.columns(2)
+     96|             ok = c1.form_submit_button(t("btn_creer", _lg()), type="primary", use_container_width=True)
+     97|             annul = c2.form_submit_button(t("btn_retour", _lg()) + " ", use_container_width=True)
+     98|             if ok:
+     99|                 if pwd != pwd2:
+    100|                     st.error(t("pwd_diff", _lg()))
+    101|                 else:
+    102|                     reussi, res = auth.inscrire(email, nom, pwd,
+
+
+######################################################################
+# 4. dossiers.py — creation
+######################################################################
+
+--- dossiers.py : signatures ---
+   12| def _lg():
+   21| def statut_label(code):
+   27| def init_db():
+   41| def creer(user_id, service, destination):
+   49| def liste_user(user_id):
+   57| def liste_tous():
+   68| def maj(dossier_id, statut=None, note_client=None, note_interne=None):
+   84| def ecran_mes_demarches(user):
+  108| def ecran_admin():
+
+--- dossiers.py : 'INSERT INTO dossiers' ---
+     42|     init_db()
+     43|     auj = datetime.date.today().isoformat()
+     44|     con = sqlite3.connect(DB)
+>>   45|     con.execute("INSERT INTO dossiers(user_id,service,destination,cree_le,maj_le) "
+     46|                 "VALUES(?,?,?,?,?)", (user_id, service, destination, auj, auj))
+     47|     con.commit(); con.close()
+     48| 
+     49| def liste_user(user_id):
+     50|     init_db()
+     51|     con = sqlite3.connect(DB); con.row_factory = sqlite3.Row
+     52|     rows = con.execute("SELECT * FROM dossiers WHERE user_id=? ORDER BY id DESC",
+     53|                        (user_id,)).fetchall()
+     54|     con.close()
+     55|     return [dict(r) for r in rows]
+     56| 
+     57| def liste_tous():
+     58|     init_db()
+     59|     con = sqlite3.connect(DB); con.row_factory = sqlite3.Row
+     60|     rows = con.execute("""SELECT d.*, u.nom AS client_nom, u.email AS client_email,
+     61|                                  u.telephone AS client_tel
+     62|                           FROM dossiers d LEFT JOIN users u ON u.id = d.user_id
+     63|                           ORDER BY CASE d.statut WHEN 'termine' THEN 1 ELSE 0 END,
+     64|                                    d.maj_le DESC""").fetchall()
+     65|     con.close()
+     66|     return [dict(r) for r in rows]
+     67| 
+
+--- dossiers.py : 'creer' ---
+     38|         maj_le TEXT)""")
+     39|     con.commit(); con.close()
+     40| 
+>>   41| def creer(user_id, service, destination):
+     42|     init_db()
+     43|     auj = datetime.date.today().isoformat()
+     44|     con = sqlite3.connect(DB)
+     45|     con.execute("INSERT INTO dossiers(user_id,service,destination,cree_le,maj_le) "
+     46|                 "VALUES(?,?,?,?,?)", (user_id, service, destination, auj, auj))
+     47|     con.commit(); con.close()
+     48| 
+     49| def liste_user(user_id):
+     50|     init_db()
+     51|     con = sqlite3.connect(DB); con.row_factory = sqlite3.Row
+     52|     rows = con.execute("SELECT * FROM dossiers WHERE user_id=? ORDER BY id DESC",
+     53|                        (user_id,)).fetchall()
+     54|     con.close()
+     55|     return [dict(r) for r in rows]
+     56| 
+     57| def liste_tous():
+     58|     init_db()
+     59|     con = sqlite3.connect(DB); con.row_factory = sqlite3.Row
+     60|     rows = con.execute("""SELECT d.*, u.nom AS client_nom, u.email AS client_email,
+     61|                                  u.telephone AS client_tel
+     62|                           FROM dossiers d LEFT JOIN users u ON u.id = d.user_id
+     63|                           ORDER BY CASE d.statut WHEN 'termine' THEN 1 ELSE 0 END,
+
+--- dossiers.py : 'nouveau' ---
+    128|                         f"{d.get('client_tel') or ''}")
+    129|             c2.markdown(f"**Ouvert :** {d['cree_le']}  \n**Maj :** {d['maj_le']}")
+    130| 
+>>  131|             nouveau_statut = st.selectbox(
+    132|                 "Statut", codes,
+    133|                 index=codes.index(d["statut"]) if d["statut"] in codes else 0,
+    134|                 format_func=lambda c: statut_label(c),
+    135|                 key=f"st_{d['id']}")
+    136|             note_c = st.text_input("Message visible par le client",
+    137|                                    value=d["note_client"] or "", key=f"nc_{d['id']}")
+    138|             note_i = st.text_area("Note interne (jamais visible client)",
+    139|                                   value=d["note_interne"] or "", key=f"ni_{d['id']}",
+    140|                                   height=68)
+    141|             if st.button("💾 Enregistrer", key=f"sv_{d['id']}"):
+    142|                 maj(d["id"], statut=nouveau_statut,
+    143|                     note_client=note_c, note_interne=note_i)
+    144|                 st.success("Enregistré.")
+    145|                 st.rerun()
+    146|     if st.button("← Retour "):
+    147|         st.session_state.show_gestion = False
+    148|         st.rerun()
+    149|     return True
+
+--- dossiers.py : 'nouveau' ---
+    139|                                   value=d["note_interne"] or "", key=f"ni_{d['id']}",
+    140|                                   height=68)
+    141|             if st.button("💾 Enregistrer", key=f"sv_{d['id']}"):
+>>  142|                 maj(d["id"], statut=nouveau_statut,
+    143|                     note_client=note_c, note_interne=note_i)
+    144|                 st.success("Enregistré.")
+    145|                 st.rerun()
+    146|     if st.button("← Retour "):
+    147|         st.session_state.show_gestion = False
+    148|         st.rerun()
+    149|     return True
+
+--- dossiers.py : 'nom' ---
+    120|     for d in ds:
+    121|         label = statut_label(d["statut"])
+    122|         titre = (f"#{d['id']} · {d['service']} → {d['destination']} · "
+>>  123|                  f"{d.get('client_nom') or '?'} · {label}")
+    124|         with st.expander(titre, expanded=(d["statut"] == "recu")):
+    125|             c1, c2 = st.columns(2)
+    126|             c1.markdown(f"**Client :** {d.get('client_nom') or '—'}  \n"
+    127|                         f"**Contact :** {d.get('client_email') or '—'} · "
+    128|                         f"{d.get('client_tel') or ''}")
+    129|             c2.markdown(f"**Ouvert :** {d['cree_le']}  \n**Maj :** {d['maj_le']}")
+    130| 
+    131|             nouveau_statut = st.selectbox(
+    132|                 "Statut", codes,
+    133|                 index=codes.index(d["statut"]) if d["statut"] in codes else 0,
+    134|                 format_func=lambda c: statut_label(c),
+    135|                 key=f"st_{d['id']}")
+    136|             note_c = st.text_input("Message visible par le client",
+    137|                                    value=d["note_client"] or "", key=f"nc_{d['id']}")
+    138|             note_i = st.text_area("Note interne (jamais visible client)",
+    139|                                   value=d["note_interne"] or "", key=f"ni_{d['id']}",
+    140|                                   height=68)
+    141|             if st.button("💾 Enregistrer", key=f"sv_{d['id']}"):
+    142|                 maj(d["id"], statut=nouveau_statut,
+    143|                     note_client=note_c, note_interne=note_i)
+    144|                 st.success("Enregistré.")
+    145|                 st.rerun()
+
+--- dossiers.py : 'nom' ---
+    123|                  f"{d.get('client_nom') or '?'} · {label}")
+    124|         with st.expander(titre, expanded=(d["statut"] == "recu")):
+    125|             c1, c2 = st.columns(2)
+>>  126|             c1.markdown(f"**Client :** {d.get('client_nom') or '—'}  \n"
+    127|                         f"**Contact :** {d.get('client_email') or '—'} · "
+    128|                         f"{d.get('client_tel') or ''}")
+    129|             c2.markdown(f"**Ouvert :** {d['cree_le']}  \n**Maj :** {d['maj_le']}")
+    130| 
+    131|             nouveau_statut = st.selectbox(
+    132|                 "Statut", codes,
+    133|                 index=codes.index(d["statut"]) if d["statut"] in codes else 0,
+    134|                 format_func=lambda c: statut_label(c),
+    135|                 key=f"st_{d['id']}")
+    136|             note_c = st.text_input("Message visible par le client",
+    137|                                    value=d["note_client"] or "", key=f"nc_{d['id']}")
+    138|             note_i = st.text_area("Note interne (jamais visible client)",
+    139|                                   value=d["note_interne"] or "", key=f"ni_{d['id']}",
+    140|                                   height=68)
+    141|             if st.button("💾 Enregistrer", key=f"sv_{d['id']}"):
+    142|                 maj(d["id"], statut=nouveau_statut,
+    143|                     note_client=note_c, note_interne=note_i)
+    144|                 st.success("Enregistré.")
+    145|                 st.rerun()
+    146|     if st.button("← Retour "):
+    147|         st.session_state.show_gestion = False
+    148|         st.rerun()
+
+
+######################################################################
+# 5. ui.py — appels dossiers/espace
+######################################################################
+
+--- ui.py : signatures ---
+   89| def conv(m, de, vers):
+  188| def _services_pour_type(codes, type_projet):
+  774| def db():
+  969| def _lbl_o(p):
+  984| def _lbl_d(c):
+ 1009|     def tr(x): return traduire(x, LG)  # traduit le contenu dans la langue courante
+
+--- ui.py : 'dossiers.' ---
+    162|              "l'attestation d'hébergement exigée pour le visa.", 25000),
+    163|  "BOURSE":  ("💰 Chasse aux bourses ciblée",
+    164|              "Identification des bourses auxquelles TON profil est éligible et aide "
+>>  165|              "complète au montage de 2 dossiers.", 20000),
+    166|  "TRAD":    ("📑 Traductions certifiées & légalisations",
+    167|              "Coordination des traductions assermentées, apostilles et "
+    168|              "authentifications exigées par ta destination.", 10000),
+    169|  "PACK":    ("🚀 Pack complet « Décollage »",
+    170|              "On gère tout ton projet de bout en bout : orientation, admissions, "
+    171|              "dossier, fonds, visa, installation. Toi, tu prépares ta valise.", 89000),
+    172| }
+    173| 
+    174| # --- Services applicables PAR TYPE DE PROJET (patch_jobboard2) ---------------
+    175| # Cle absente = service propose pour tous les types de projet.
+
+--- ui.py : 'dossiers.' ---
+    888|     st.stop()
+    889| 
+    890| # ---------- Suivi des démarches ----------
+>>  891| if espace.user_connecte() and dossiers.ecran_mes_demarches(espace.user_connecte()):
+    892|     st.stop()
+    893| if espace.est_admin() and dossiers.ecran_admin():
+    894|     st.stop()
+    895| # --- Seed automatique des etoiles (une fois par session) ---
+    896| if "seed_etoiles_fait" not in st.session_state:
+    897|     try:
+    898|         admin_projets._seed_initial(D, ORIGINES)
+    899|         st.session_state.seed_etoiles_fait = True
+    900|     except Exception:
+    901|         pass
+
+--- ui.py : 'dossiers.' ---
+    890| # ---------- Suivi des démarches ----------
+    891| if espace.user_connecte() and dossiers.ecran_mes_demarches(espace.user_connecte()):
+    892|     st.stop()
+>>  893| if espace.est_admin() and dossiers.ecran_admin():
+    894|     st.stop()
+    895| # --- Seed automatique des etoiles (une fois par session) ---
+    896| if "seed_etoiles_fait" not in st.session_state:
+    897|     try:
+    898|         admin_projets._seed_initial(D, ORIGINES)
+    899|         st.session_state.seed_etoiles_fait = True
+    900|     except Exception:
+    901|         pass
+    902| if espace.est_admin() and admin_projets.ecran(D, ORIGINES):
+    903|     st.stop()
+
+===== FIN =====

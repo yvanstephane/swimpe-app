@@ -1,0 +1,528 @@
+Colle l'INTEGRALITE de cette sortie.
+
+######################################################################
+# PASSE 1 — i18n.py : ou vivent les textes, et sous quelles cles
+######################################################################
+
+----- "On t'accompagne" -> i18n.py -----
+    130|    "es":"💰 Becas para ti", "pt":"💰 Bolsas para você",
+    131|    "zh":"💰 适合你的奖学金", "ar":"💰 المنح الدراسية لك"},
+    132|  "accompagne": {
+>>  133|    "fr":"🤝 On t'accompagne jusqu'en", "en":"🤝 We support you all the way to",
+    134|    "es":"🤝 Te acompañamos hasta", "pt":"🤝 Acompanhamos você até",
+    135|    "zh":"🤝 我们全程陪伴你前往", "ar":"🤝 نرافقك حتى"},
+    136|  "accompagne_desc": {
+
+----- 'Parle-nous de ton projet' -> i18n.py -----
+    141|    "zh":"选择你想委托的步骤——我们的团队负责处理，你在每个阶段都掌握主动权。",
+    142|    "ar":"اختر الإجراءات التي تريد تفويضها — يتولى فريقنا الأمر، وتبقى أنت المتحكم في كل مرحلة."},
+    143|  "form_titre": {
+>>  144|    "fr":"📩 Parle-nous de ton projet — réponse sous 24 h",
+    145|    "en":"📩 Tell us about your project — reply within 24h",
+    146|    "es":"📩 Cuéntanos tu proyecto — respuesta en 24h",
+    147|    "pt":"📩 Fale sobre seu projeto — resposta em 24h",
+
+----- 'Commence ton projet' -> i18n.py -----
+     90|    "zh":"👆 回答这4个问题，你的详细路径将立即显示在这里。",
+     91|    "ar":"👆 أجب عن الأسئلة الأربعة: سيظهر مسارك المفصل هنا فورًا."},
+     92|  "start_from": {
+>>   93|    "fr":"✨ Commence ton projet à partir de", "en":"✨ Start your project from",
+     94|    "es":"✨ Comienza tu proyecto desde", "pt":"✨ Comece seu projeto a partir de",
+     95|    "zh":"✨ 开启你的项目，仅需", "ar":"✨ ابدأ مشروعك بدءًا من"},
+     96|  "budget": {
+
+----- 'à partir de' -> i18n.py -----
+     90|    "zh":"👆 回答这4个问题，你的详细路径将立即显示在这里。",
+     91|    "ar":"👆 أجب عن الأسئلة الأربعة: سيظهر مسارك المفصل هنا فورًا."},
+     92|  "start_from": {
+>>   93|    "fr":"✨ Commence ton projet à partir de", "en":"✨ Start your project from",
+     94|    "es":"✨ Comienza tu proyecto desde", "pt":"✨ Comece seu projeto a partir de",
+     95|    "zh":"✨ 开启你的项目，仅需", "ar":"✨ ابدأ مشروعك بدءًا من"},
+     96|  "budget": {
+
+Cles/candidats a traquer dans ui.py : ['accompagne', 'bandeau', 'banniere', 'commence', 'form_titre', 'parle', 'pitch', 'service', 'start_from', 'svc']
+
+######################################################################
+# PASSE 2 — ui.py : usages de ces cles + _PITCH_PROJET + modules
+######################################################################
+
+----- ui.py : 'accompagne' -----
+      2| # YORBITY — Ta trajectoire vers le monde (multilingue, détection auto)
+      3| # - Parcours guidé 4 questions → conditions d'admission déroulées (style Campus France)
+      4| # - Procédure adaptée au pays d'ORIGINE (ex : Gabon → France = Études en France)
+>>    5| # - Services d'accompagnement PAR DESTINATION, intégrés aux étapes, sans prix affichés
+      6| # - Bandeau marketing « Commence ton projet à partir de X » (service le moins cher)
+      7| # - Admin : activer/désactiver pays + voir les demandes (mot de passe .env)
+      8| # Lancement : streamlit run app/api/ui.py
+      9| # =============================================================================
+     10| import sqlite3, os, datetime
+     11| import streamlit as st
+     12| from i18n import t, T, detecter_langue, LANGUES, RTL
+     13| from pays_i18n import nom_pays
+     14| import espace, auth, dossiers, services_cfg, config_projets, admin_projets, admin_comptes, mdp_oublie, opportunites_ui, offres_cfg, devises_cfg, eligibilite, offres_sync, recherche_poste
+     15| from traduction import traduire
+     16| import autotrad  # traduction automatique globale (la langue prime sur tout)
+     17| 
+     18| # Libellés du projet « Métier spécialisé » dans toutes les langues (grise le niveau)
+     19| _METIER_LBLS = {v[3] for v in T["types"].values() if len(v) > 3}
+
+----- ui.py : 'accompagne' -----
+   1021|     if d.get("portail"):
+   1022|         st.link_button(f"{t('portail', LG)} {nom_pays(d['nom'], LG)}", d["portail"])
+   1023| 
+>> 1024|     # ---- Bloc accompagnement (services filtrés par destination, SANS prix)
+   1025|     st.markdown("---")
+   1026|     st.markdown(f"## {t('accompagne', LG)} {nom_pays(d['nom'], LG)}")
+   1027|     st.write(t("accompagne_desc", LG))
+   1028| 
+   1029|     noms_services = []
+   1030|     for s in services_dest:
+   1031|         nom_s, desc_s, _ = SVC[s]
+   1032|         nom_s = tr(nom_s)
+   1033|         desc_s = tr(desc_s)
+   1034|         noms_services.append(nom_s)
+   1035|         ouvert = (st.session_state.svc == s)
+   1036|         with st.expander(nom_s, expanded=ouvert):
+   1037|             st.write(desc_s)
+   1038| 
+
+----- ui.py : 'bandeau' -----
+     17| 
+     18| # Libellés du projet « Métier spécialisé » dans toutes les langues (grise le niveau)
+     19| _METIER_LBLS = {v[3] for v in T["types"].values() if len(v) > 3}
+>>   20| # Accroche du bandeau selon le type de projet (le résumé études reste pour Formation)
+     21| _PITCH_PROJET = {
+     22|     "Bourse": "Bourses accessibles selon ton pays d'origine — sélection mise à jour en continu.",
+     23|     "Stage / Emploi étudiant": "Offres de stage et d'emploi étudiant ouvertes à ton profil — mises à jour en continu.",
+     24|     "Métier spécialisé": "Postes pour travailleurs qualifiés ouverts aux candidats internationaux — mis à jour en continu.",
+     25| }
+     26| 
+     27| APP_NAME = "Yorbity"
+     28| TAGLINE = "Ta trajectoire vers le monde"
+     29| DB = "data/mobilite.db"
+     30| ADMIN_PWD = os.environ.get("ADMIN_PASSWORD", "yorbity2026")
+     31| TODAY = datetime.date.today().isoformat()
+     32| 
+     33| st.set_page_config(page_title=APP_NAME, page_icon="🚀", layout="centered")
+     34| 
+
+----- ui.py : 'bandeau' -----
+    131| 
+    132| # =============================================================================
+    133| # CATALOGUE DES SERVICES (les prix restent INTERNES : jamais affichés en liste,
+>>  134| # seuls le "à partir de" du bandeau et le back-office les utilisent)
+    135| # =============================================================================
+    136| SVC = {
+    137|  "ORIENT":  ("🧭 Orientation & choix des formations",
+    138|              "On analyse ton profil et on te propose les formations et établissements "
+    139|              "les plus cohérents avec ton niveau, ton budget et ton projet — comme le "
+    140|              "ferait un conseiller Parcoursup, mais dédié à toi.", 15000),
+    141|  "ADMIS":   ("🎓 Admission directe auprès des écoles",
+    142|              "Nous contactons les établissements pour toi, montons tes candidatures "
+    143|              "(y compris hors plateformes officielles) et t'obtenons des admissions "
+    144|              "que tu intègres ensuite à ta procédure officielle.", 45000),
+    145|  "EEF":     ("🗂 Prise en charge du dossier Études en France",
+    146|              "Création et remplissage complet de ton dossier EEF, choix stratégique "
+    147|              "des vœux, vérification des pièces, suivi des délais Campus France.", 30000),
+    148|  "DOSSIER": ("✍️ Lettre de motivation, CV & projet d'études",
+
+----- ui.py : 'form_titre' -----
+   1036|         with st.expander(nom_s, expanded=ouvert):
+   1037|             st.write(desc_s)
+   1038| 
+>> 1039|     st.markdown("#### " + t("form_titre", LG))
+   1040|     with st.form("lead"):
+   1041|         f1, f2 = st.columns(2)
+   1042|         nom_lead = f1.text_input(t("nom", LG))
+   1043|         contact = f2.text_input(t("contact", LG))
+   1044|         pre = 0
+   1045|         if st.session_state.svc and SVC[st.session_state.svc][0] in noms_services:
+   1046|             pre = noms_services.index(SVC[st.session_state.svc][0])
+   1047|         service_choisi = st.selectbox(t("service_interet", LG), noms_services, index=pre)
+   1048|         msg = st.text_area(t("projet_2lignes", LG))
+   1049|         ok = st.form_submit_button(t("lancer", LG))
+   1050|         if ok:
+   1051|             if nom_lead.strip() and contact.strip():
+   1052|                 con.execute("INSERT INTO leads(date,nom,contact,origine,destination,service,message) "
+   1053|                             "VALUES(?,?,?,?,?,?,?)",
+
+----- ui.py : 'service' -----
+    172| }
+    173| 
+    174| # =============================================================================
+>>  175| # DESTINATIONS — chaque étape : (titre, détail, lien, code_service_ou_None)
+    176| # `services` = codes pertinents pour CE pays (rien d'autre ne s'affiche)
+    177| # =============================================================================
+    178| D = {}
+    179| 
+    180| D["FR"] = dict(nom="France", flag="🇫🇷",
+    181|  resume="Études quasi gratuites à l'université publique (exonérations fréquentes des "
+    182|         "droits différenciés). Diplômes reconnus mondialement, vie étudiante riche.",
+    183|  ressources="7 380 € par an à justifier (615 €/mois) — l'AVI est la solution la plus simple",
+    184|  travail="964 h/an (~20 h/semaine)", post="APS 1 an : rester chercher un emploi ou créer ton entreprise",
+    185|  portail="https://www.campusfrance.org",
+    186|  services=["ORIENT","EEF","ADMIS","DOSSIER","ENTRETIEN","FONDS","VISA","LOGEMENT","BOURSE","TRAD","PACK"],
+    187|  etapes_eef=[
+    188|   ("Créer ton dossier Études en France (Campus France)",
+    189|    "Ta procédure passe obligatoirement par la plateforme EEF gérée par Campus France : "
+
+----- ui.py : 'service' -----
+    173| 
+    174| # =============================================================================
+    175| # DESTINATIONS — chaque étape : (titre, détail, lien, code_service_ou_None)
+>>  176| # `services` = codes pertinents pour CE pays (rien d'autre ne s'affiche)
+    177| # =============================================================================
+    178| D = {}
+    179| 
+    180| D["FR"] = dict(nom="France", flag="🇫🇷",
+    181|  resume="Études quasi gratuites à l'université publique (exonérations fréquentes des "
+    182|         "droits différenciés). Diplômes reconnus mondialement, vie étudiante riche.",
+    183|  ressources="7 380 € par an à justifier (615 €/mois) — l'AVI est la solution la plus simple",
+    184|  travail="964 h/an (~20 h/semaine)", post="APS 1 an : rester chercher un emploi ou créer ton entreprise",
+    185|  portail="https://www.campusfrance.org",
+    186|  services=["ORIENT","EEF","ADMIS","DOSSIER","ENTRETIEN","FONDS","VISA","LOGEMENT","BOURSE","TRAD","PACK"],
+    187|  etapes_eef=[
+    188|   ("Créer ton dossier Études en France (Campus France)",
+    189|    "Ta procédure passe obligatoirement par la plateforme EEF gérée par Campus France : "
+    190|    "création du compte, saisie des vœux (souvent 3), paiement des frais de dossier "
+
+----- ui.py : 'start_from' -----
+    944| <div class='hero'>
+    945|   <h2>{d['flag']} {nom_pays(origine, LG)} → {nom_pays(d['nom'], LG)}</h2>
+    946|   <p>{tr(d['resume']) if type_c == "Formation (admission)" else tr(_PITCH_PROJET.get(type_c, ''))}</p>
+>>  947|   <span class='prix'>{t("start_from", LG)} {devises_cfg.prix_affiche(prix_min_fcfa / 655.96, TAUX, avec_equivalent=True)}</span>
+    948| </div>""", unsafe_allow_html=True)
+    949| 
+    950|     st.markdown(
+    951|         f"<span class='badge'>{type_}</span><span class='badge'>{niveau}</span>"
+    952|         + (f"<span class='badge'>{domaine}</span>" if domaine_c != "Tous les domaines" else ""),
+    953|         unsafe_allow_html=True)
+    954| 
+    955|     # ---- Infos budget/travail/après : uniquement pour Formation (admission) ----
+    956|     if type_c == "Formation (admission)":
+    957|         colA, colB = st.columns(2)
+    958|         colA.markdown(f"**{t('budget', LG)}** {tr(d['ressources'])}")
+    959|         colB.markdown(f"**{t('travail', LG)}** {tr(d['travail'])}")
+    960|         st.markdown(f"**{t('apres', LG)}** {tr(d['post'])}")
+    961| 
+
+----- ui.py : 'svc' -----
+    764| con = db()
+    765| actifs = {r[0] for r in con.execute("SELECT code FROM config_pays WHERE actif=1")}
+    766| 
+>>  767| if "svc" not in st.session_state: st.session_state.svc = None
+    768| 
+    769| # =============================================================================
+    770| # EN-TÊTE
+    771| # =============================================================================
+    772| st.markdown(f"""
+    773| <div style='text-align:center; padding:.4rem 0 .8rem;'>
+    774|   <h1 style='margin-bottom:0; font-size:2.7rem;'>🚀 {APP_NAME}</h1>
+    775|   <p style='color:#6b7280; margin-top:.15rem; font-size:1.05rem;'>{t('tagline', LG)}</p>
+    776| </div>""", unsafe_allow_html=True)
+    777| 
+    778| # ---------- Listes traduites (affichage) + valeurs canoniques (logique) ----------
+    779| T_TYPES    = T["types"][LG]
+    780| T_NIVEAUX  = T["niveaux"][LG]
+    781| T_DOMAINES = T["domaines"][LG]
+
+----- ui.py : 'svc' -----
+   1004|             etapes = d["etapes"]
+   1005| 
+   1006|     for i, etape in enumerate(etapes, 1):
+>> 1007|         titre, det, lien, svc_code = (etape + (None,))[:4] if len(etape) == 3 else etape
+   1008|         with st.expander(f"{t('etape', LG)} {i} — {tr(titre)}", expanded=(i == 1)):
+   1009|             st.write(tr(det))
+   1010|             if lien:
+   1011|                 st.markdown(f"[{t('lien_officiel', LG)}]({lien})")
+   1012|             if svc_code and svc_code in services_dest:
+   1013|                 if st.button(t("aide_etape", LG),
+   1014|                              key=f"btn_{i}_{svc_code}"):
+   1015|                     st.session_state.svc = svc_code
+   1016|                 if st.session_state.get("svc") == svc_code:
+   1017|                     _sn, _sd, _sp = SVC[svc_code]
+   1018|                     st.success("✅ **" + tr(_sn) + "**\n\n" + tr(_sd))
+   1019|                     st.caption(tr("📩 Ce service est présélectionné dans le formulaire tout en bas de la page — remplis-le pour qu'on démarre."))
+   1020| 
+   1021|     if d.get("portail"):
+
+----- ui.py : 'devises_cfg.' -----
+     91|     return None
+     92| 
+     93| with st.sidebar:
+>>   94|     devises_cfg.selecteur_sidebar(TAUX)
+     95| 
+     96| # ---------- Pays d'origine (nom → code, devise locale) ----------
+     97| ORIGINES = {
+     98|  "Afghanistan":("AF","USD"),"Afrique du Sud":("ZA","ZAR"),"Algérie":("DZ","EUR"),
+     99|  "Angola":("AO","USD"),"Bangladesh":("BD","USD"),"Bénin":("BJ","XOF"),
+    100|  "Brésil":("BR","BRL"),"Burkina Faso":("BF","XOF"),"Burundi":("BI","USD"),
+    101|  "Cameroun":("CM","XAF"),"Chine":("CN","USD"),"Colombie":("CO","USD"),
+    102|  "Comores":("KM","EUR"),"Congo (Brazzaville)":("CG","XAF"),"Congo (RDC)":("CD","CDF"),
+    103|  "Côte d'Ivoire":("CI","XOF"),"Djibouti":("DJ","USD"),"Égypte":("EG","EGP"),
+    104|  "Éthiopie":("ET","USD"),"Gabon":("GA","XAF"),"Gambie":("GM","USD"),
+
+----- ui.py : 'devises_cfg.' -----
+    815|     st.stop()
+    816| if espace.est_admin() and offres_cfg.ecran():
+    817|     st.stop()
+>>  818| if espace.est_admin() and devises_cfg.ecran_admin(TAUX):
+    819|     st.stop()
+    820| if espace.est_admin() and eligibilite.ecran():
+    821|     st.stop()
+    822| if espace.est_admin() and offres_sync.ecran():
+    823|     st.stop()
+    824| 
+    825| # ---------- Retour de paiement CinetPay (mode réel) ----------
+    826| _params = st.query_params
+    827| if "paiement_retour" in _params:
+    828|     import paiement
+
+----- ui.py : 'services_cfg.' -----
+    868| _proj_canon = CANON_TYPES[T_TYPES.index(type_)] if type_ in T_TYPES else None
+    869| 
+    870| # 2) Origine — filtrée par projet (étoile OU activée) + masquage global admin
+>>  871| _orig_off = services_cfg.origines_desactivees()
+    872| if _proj_canon:
+    873|     _vis_o = set(config_projets.pays_visibles(_proj_canon, "origine"))
+    874|     _orig_list = [p for p in sorted(ORIGINES.keys()) if p not in _orig_off and (not _vis_o or p in _vis_o)]
+    875|     _etoiles_o = dict(config_projets.etat(_proj_canon, "origine"))
+    876| else:
+    877|     _orig_list = [p for p in sorted(ORIGINES.keys()) if p not in _orig_off]
+    878|     _etoiles_o = {}
+    879| def _lbl_o(p):
+    880|     if p == t("choisir", LG): return p
+    881|     return nom_pays(p, LG)
+    882| origine = c2.selectbox(t("q_origine", LG), [t("choisir", LG)] + _orig_list, format_func=_lbl_o)
+    883| 
+    884| c3, c4 = st.columns(2)
+    885| # 3) Destination — filtrée par projet
+
+----- ui.py : 'services_cfg.' -----
+    928|     domaine_c= CANON_DOM[T_DOMAINES.index(domaine)]   if domaine in T_DOMAINES else domaine
+    929| 
+    930|     # ---- Prix d'appel = service le moins cher proposé pour cette destination
+>>  931|     services_dest = services_cfg.effectifs(destination, d["services"], list(SVC.keys()))
+    932|     if not services_dest:
+    933|         services_dest = d["services"]
+    934|     _prix = services_cfg.tarifs_tous({k: v[2] for k, v in SVC.items()})
+    935|     prix_min_fcfa = min(_prix[s] for s in services_dest)
+    936|     prix_local = conv(prix_min_fcfa, "XOF", dev_orig)
+    937|     if dev_orig in ("XOF", "XAF") or prix_local is None:
+    938|         prix_txt = f"{prix_min_fcfa:,} FCFA".replace(",", " ")
+    939|     else:
+    940|         prix_txt = f"{prix_local:,.0f} {dev_orig}".replace(",", " ")
+    941| 
+    942|     # ---- Bandeau héro marketing
+    943|     st.markdown(f"""
+    944| <div class='hero'>
+    945|   <h2>{d['flag']} {nom_pays(origine, LG)} → {nom_pays(d['nom'], LG)}</h2>
+
+----- ui.py : 'services_cfg.' -----
+    931|     services_dest = services_cfg.effectifs(destination, d["services"], list(SVC.keys()))
+    932|     if not services_dest:
+    933|         services_dest = d["services"]
+>>  934|     _prix = services_cfg.tarifs_tous({k: v[2] for k, v in SVC.items()})
+    935|     prix_min_fcfa = min(_prix[s] for s in services_dest)
+    936|     prix_local = conv(prix_min_fcfa, "XOF", dev_orig)
+    937|     if dev_orig in ("XOF", "XAF") or prix_local is None:
+    938|         prix_txt = f"{prix_min_fcfa:,} FCFA".replace(",", " ")
+    939|     else:
+    940|         prix_txt = f"{prix_local:,.0f} {dev_orig}".replace(",", " ")
+    941| 
+    942|     # ---- Bandeau héro marketing
+    943|     st.markdown(f"""
+    944| <div class='hero'>
+    945|   <h2>{d['flag']} {nom_pays(origine, LG)} → {nom_pays(d['nom'], LG)}</h2>
+    946|   <p>{tr(d['resume']) if type_c == "Formation (admission)" else tr(_PITCH_PROJET.get(type_c, ''))}</p>
+    947|   <span class='prix'>{t("start_from", LG)} {devises_cfg.prix_affiche(prix_min_fcfa / 655.96, TAUX, avec_equivalent=True)}</span>
+    948| </div>""", unsafe_allow_html=True)
+
+----- ui.py : 'services_cfg.' -----
+   1106|             st.session_state.show_sync = True
+   1107|             st.rerun()
+   1108|         st.markdown("**🌍 " + traduire("Pays d'origine masqués (non proposés) :", st.session_state.get("lang","fr")) + "**")
+>> 1109|         _off_act = sorted(services_cfg.origines_desactivees())
+   1110|         _off_sel = st.multiselect(traduire("Masquer ces origines", st.session_state.get("lang","fr")), sorted(ORIGINES.keys()),
+   1111|                                   default=_off_act, key="orig_off")
+   1112|         if set(_off_sel) != set(_off_act):
+   1113|             for _p in set(_off_sel) - set(_off_act):
+   1114|                 services_cfg.definir_origine(_p, False)
+   1115|             for _p in set(_off_act) - set(_off_sel):
+   1116|                 services_cfg.definir_origine(_p, True)
+   1117|             st.rerun()
+   1118|         st.markdown("---")
+   1119|         st.markdown("**🧩 " + traduire("Services proposés par destination :", st.session_state.get("lang","fr")) + "**")
+   1120|         _dsel = st.selectbox(traduire("Destination", st.session_state.get("lang","fr")), sorted(D, key=lambda c: D[c]["nom"]),
+   1121|                              format_func=lambda c: f"{D[c]['flag']} " + nom_pays(D[c]['nom'], st.session_state.get("lang","fr")),
+   1122|                              key="cfg_dest")
+   1123|         _eff = services_cfg.effectifs(_dsel, D[_dsel]["services"], list(SVC.keys()))
+
+######################################################################
+# PASSE 3 — devises_cfg.py (module devise existant)
+######################################################################
+
+    1| # =============================================================================
+    2| # devises_cfg.py — Devise d'affichage visiteur (base EUR)
+    3| # - Sélecteur manuel dans la sidebar (EUR par défaut)
+    4| # - Conversion arrondie à la CENTAINE la plus proche en devise locale
+    5| # - Écran admin pour activer/désactiver les devises proposées
+    6| # =============================================================================
+    7| import streamlit as st
+    8| import sqlite3
+    9| 
+   10| DB = "data/mobilite.db"
+   11| 
+   12| TAUX_DEFAUT = {"EUR":1.0,"USD":1.08,"XOF":655.96,"XAF":655.96,"CAD":1.47,"GBP":0.85,
+   13|                "MAD":10.8,"TND":3.4,"NGN":1650,"GHS":16,"KES":140,"HTG":145,"INR":92,
+   14|                "PKR":300,"IDR":17500,"BRL":6.0,"RWF":1420,"CDF":2900,"EGP":52,"ZAR":19.5}
+   15| 
+   16| 
+   17| def _init(taux=None):
+   18|     taux = taux or TAUX_DEFAUT
+   19|     con = sqlite3.connect(DB)
+   20|     con.execute("CREATE TABLE IF NOT EXISTS config_devises(code TEXT PRIMARY KEY, actif INT DEFAULT 1)")
+   21|     for c in taux:
+   22|         con.execute("INSERT OR IGNORE INTO config_devises VALUES(?,1)", (c,))
+   23|     con.commit(); con.close()
+   24| 
+   25| 
+   26| def actives(taux=None):
+   27|     taux = taux or TAUX_DEFAUT
+   28|     _init(taux)
+   29|     con = sqlite3.connect(DB)
+   30|     rows = [r[0] for r in con.execute("SELECT code FROM config_devises WHERE actif=1")]
+   31|     con.close()
+   32|     act = [c for c in taux if c in rows]
+   33|     if "EUR" not in act:
+   34|         act.insert(0, "EUR")     # l'euro (base) est toujours disponible
+   35|     return act
+   36| 
+   37| 
+   38| def devise_courante():
+   39|     return st.session_state.get("devise", "EUR")
+   40| 
+   41| 
+   42| def selecteur_sidebar(taux=None):
+   43|     """Sélecteur de devise dans la sidebar (EUR par défaut)."""
+   44|     taux = taux or TAUX_DEFAUT
+   45|     opts = actives(taux)
+   46|     cur = devise_courante()
+   47|     if cur not in opts:
+   48|         cur = "EUR"
+   49|     choix = st.selectbox("💱 Devise", opts, index=opts.index(cur), key="sel_devise")
+   50|     if choix != st.session_state.get("devise"):
+   51|         st.session_state.devise = choix
+   52| 
+   53| 
+   54| SYMBOLES = {"EUR": ("", " €"), "USD": ("$", ""), "GBP": ("£", ""),
+   55|             "CAD": ("", " $ CA"), "BRL": ("R$ ", "")}
+   56| 
+   57| 
+   58| def prix_affiche(montant_eur, taux=None, avec_equivalent=False):
+   59|     """Format « plateforme d'admission » : montant en devise choisie avec le
+   60|     bon symbole. Arrondi à la centaine pour les montants locaux >= 1 000
+   61|     (FCFA, NGN...), à l'unité pour les devises fortes (USD, GBP...).
+   62|     avec_equivalent=True ajoute « · ≈ X € » quand la devise n'est pas l'euro."""
+   63|     taux = taux or TAUX_DEFAUT
+   64|     dev = devise_courante()
+   65|     eur = round(float(montant_eur))
+   66|     eur_txt = f"{eur:,} €".replace(",", " ")
+   67|     if dev == "EUR" or dev not in taux:
+   68|         return eur_txt
+   69|     local = float(montant_eur) / taux["EUR"] * taux[dev]
+   70|     if local >= 1000:
+   71|         val = int(round(local / 100.0) * 100)
+   72|     else:
+   73|         val = int(round(local))
+   74|     pre, post = SYMBOLES.get(dev, ("", f" {dev}"))
+   75|     local_txt = f"{pre}{val:,}{post}".replace(",", " ")
+   76|     if avec_equivalent:
+   77|         return f"{local_txt} · ≈ {eur_txt}"
+   78|     return local_txt
+   79| 
+   80| 
+   81| def ecran_admin(taux=None):
+   82|     """Écran admin : activer/désactiver les devises. True si affiché."""
+   83|     taux = taux or TAUX_DEFAUT
+   84|     if not st.session_state.get("show_devises"):
+   85|         return False
+   86|     st.markdown("## 💱 Devises proposées aux visiteurs")
+   87|     st.caption("L'euro (base) est toujours disponible. Coche les devises "
+   88|                "locales proposées dans le sélecteur.")
+   89|     _init(taux)
+   90|     con = sqlite3.connect(DB)
+   91|     etat = dict(con.execute("SELECT code, actif FROM config_devises"))
+   92|     con.close()
+   93|     for c in taux:
+   94|         if c == "EUR":
+   95|             st.checkbox(f"{c} (base — toujours active)", value=True,
+   96|                         disabled=True, key=f"dv_{c}")
+   97|             continue
+   98|         cur = bool(etat.get(c, 1))
+   99|         nv = st.checkbox(c, value=cur, key=f"dv_{c}")
+  100|         if nv != cur:
+  101|             con = sqlite3.connect(DB)
+  102|             con.execute("INSERT OR REPLACE INTO config_devises VALUES(?,?)",
+  103|                         (c, 1 if nv else 0))
+  104|             con.commit(); con.close()
+  105|             st.rerun()
+  106|     st.divider()
+  107|     if st.button("← Retour", key="dv_retour"):
+  108|         st.session_state.show_devises = False
+  109|         st.rerun()
+  110|     return True
+
+######################################################################
+# PASSE 4 — services_cfg.py (signatures + tete)
+######################################################################
+
+    1| # =============================================================================
+    2| # services_cfg.py — Services proposés PAR destination, configurables en admin
+    3| # Stockés en base (table config_services). Au premier passage sur une
+    4| # destination, les valeurs par défaut du code sont copiées en base ;
+    5| # ensuite, seul l'admin décide (cases à cocher).
+    6| # =============================================================================
+    7| import sqlite3
+    8| 
+    9| DB = "data/mobilite.db"
+   10| 
+   11| def _init():
+   12|     con = sqlite3.connect(DB)
+   13|     con.execute("""CREATE TABLE IF NOT EXISTS config_services(
+   14|         destination TEXT, service TEXT, actif INT,
+   15|         PRIMARY KEY(destination, service))""")
+   16|     con.commit(); con.close()
+   17| 
+   18| def effectifs(destination, defauts, catalogue):
+   19|     """Liste des codes services actifs pour cette destination.
+   20|     - defauts   : liste par défaut définie dans le code (D[c]['services'])
+   21|     - catalogue : tous les codes possibles (ordre d'affichage = ordre du catalogue)
+   22|     Au premier appel pour une destination, initialise la base avec les défauts."""
+   23|     _init()
+   24|     con = sqlite3.connect(DB)
+   25|     rows = dict(con.execute(
+   26|         "SELECT service, actif FROM config_services WHERE destination=?",
+   27|         (destination,)).fetchall())
+   28|     if not rows:
+   29|         for s in catalogue:
+   30|             con.execute("INSERT OR IGNORE INTO config_services VALUES(?,?,?)",
+   31|                         (destination, s, 1 if s in defauts else 0))
+   32|         con.commit(); con.close()
+   33|         return [s for s in catalogue if s in defauts]
+   34|     con.close()
+   35|     return [s for s in catalogue if rows.get(s, 1 if s in defauts else 0) == 1]
+   36| 
+   37| def definir(destination, service, actif):
+   38|     _init()
+   39|     con = sqlite3.connect(DB)
+   40|     con.execute("INSERT OR REPLACE INTO config_services VALUES(?,?,?)",
+  ...
+   49| def _init_origines():
+   54| def origines_desactivees():
+   61| def definir_origine(nom, actif):
+   71| def _init_tarifs():
+   76| def tarifs_tous(defauts):
+   84| def definir_tarif(service, prix):
+
+===== FIN =====

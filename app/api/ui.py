@@ -7,14 +7,56 @@
 # - Admin : activer/désactiver pays + voir les demandes (mot de passe .env)
 # Lancement : streamlit run app/api/ui.py
 # =============================================================================
+# --- Secrets (.env) : charges AVANT tout import applicatif ---
+try:
+    from pathlib import Path as _PathEnv
+    from dotenv import load_dotenv as _load_dotenv
+    _load_dotenv(_PathEnv(__file__).resolve().parents[2] / ".env")
+except Exception:
+    pass
+
 import sqlite3, os, datetime
+
+# --- Verrous SQLite : patience globale (patch_verrous) ------------------------
+# Toute connexion ouverte par N'IMPORTE QUEL module de ce processus recoit
+# timeout=30 s + busy_timeout=30 s (sauf timeout explicite de l'appelant).
+# Streamlit relance ce script a chaque interaction : les acces concurrents
+# attendent leur tour au lieu de lever « database is locked ».
+if not getattr(sqlite3, "_yorbity_patience", False):
+    _sq_connect_origine = sqlite3.connect
+
+    def _sq_connect_patient(*args, **kwargs):
+        kwargs.setdefault("timeout", 30)
+        con = _sq_connect_origine(*args, **kwargs)
+        try:
+            con.execute("PRAGMA busy_timeout=30000")
+        except Exception:
+            pass
+        return con
+
+    sqlite3.connect = _sq_connect_patient
+    sqlite3._yorbity_patience = True
+# ------------------------------------------------------------------------------
 import streamlit as st
 from i18n import t, T, detecter_langue, LANGUES, RTL
+from pays_i18n import nom_pays
+import espace, auth, dossiers, services_cfg, config_projets, admin_projets, admin_comptes, mdp_oublie, opportunites_ui, offres_cfg, devises_cfg, eligibilite, offres_sync, recherche_poste, moteur_plans, console_accompagnement
+from traduction import traduire
+import autotrad  # traduction automatique globale (la langue prime sur tout)
+
+# Libellés du projet « Métier spécialisé » dans toutes les langues (grise le niveau)
+_METIER_LBLS = {v[3] for v in T["types"].values() if len(v) > 3}
+# Accroche du bandeau selon le type de projet (le résumé études reste pour Formation)
+_PITCH_PROJET = {
+    "Bourse": "Bourses accessibles selon ton pays d'origine — sélection mise à jour en continu.",
+    "Stage / Emploi étudiant": "Offres de stage et d'emploi étudiant ouvertes à ton profil — mises à jour en continu.",
+    "Métier spécialisé": "Postes pour travailleurs qualifiés ouverts aux candidats internationaux — mis à jour en continu.",
+}
 
 APP_NAME = "Yorbity"
 TAGLINE = "Ta trajectoire vers le monde"
 DB = "data/mobilite.db"
-ADMIN_PWD = os.environ.get("ADMIN_PASSWORD", "yorbity2026")
+ADMIN_PWD = os.environ.get("ADMIN_PASSWORD") or None  # fail-closed : admin verrouille si variable absente
 TODAY = datetime.date.today().isoformat()
 
 st.set_page_config(page_title=APP_NAME, page_icon="🚀", layout="centered")
@@ -32,6 +74,38 @@ with st.sidebar:
         st.session_state.lang = choix_lang
         st.rerun()
 LG = st.session_state.lang
+
+# ---------- Compte utilisateur (sidebar + écran auth) ----------
+espace.bloc_compte_sidebar()
+if espace.user_connecte():
+    with st.sidebar:
+        if st.button(t("mes_projets", LG), use_container_width=True):
+            st.session_state.show_espace = True
+            st.rerun()
+        try:  # patch_monetisation : bouton Premium masque tant que monetisation OFF
+            import offres_sync as _osy_mon
+            _mon_on = _osy_mon.param("monetisation_active", "0") != "0"
+        except Exception:
+            _mon_on = False
+        if _mon_on and st.button(t("btn_premium", LG), use_container_width=True):
+            st.session_state.show_premium = True
+        try:  # patch_plans_visiteur : bouton visiteur (masque si vue coupee)
+            import offres_sync as _osy_pvb
+            _pv_on = _osy_pvb.param("plans_visiteur_actif", "0") != "0"
+        except Exception:
+            _pv_on = True
+        if _pv_on and st.button("🗺️ " + traduire("Programmes d'accompagnement",
+                                st.session_state.get("lang", "fr")),
+                                use_container_width=True, key="btn_pv"):
+            st.session_state.show_programmes = True
+            st.rerun()
+        if st.button("📋 " + traduire("Mes démarches", st.session_state.get("lang","fr")), use_container_width=True):
+            st.session_state.show_demarches = True
+            st.rerun()
+        if espace.est_admin():
+            if st.button("🛠 " + traduire("Gestion des dossiers", st.session_state.get("lang","fr")), use_container_width=True):
+                st.session_state.show_gestion = True
+                st.rerun()
 if LG in RTL:
     st.markdown("<style>.main .block-container{direction:rtl; text-align:right;}</style>",
                 unsafe_allow_html=True)
@@ -45,12 +119,30 @@ st.markdown("""
 .hero p {margin:0; opacity:.92; font-size:1.02rem;}
 .prix {display:inline-block; background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.4);
   padding:.45rem 1rem; border-radius:999px; margin-top:.7rem; font-weight:600;}
-.badge {display:inline-block; background:#eff6ff; color:#1d4ed8; border-radius:999px;
-  padding:.15rem .7rem; font-size:.8rem; margin-right:.4rem;}
-div[data-testid="stExpander"] {border-radius:12px; border:1px solid #e5e7eb; margin-bottom:.4rem;}
+.badge {display:inline-block; background:rgba(59,130,246,.16);
+  color:var(--text-color); border:1px solid rgba(59,130,246,.4); border-radius:999px;
+  padding:.18rem .75rem; font-size:.88rem; margin-right:.4rem;}
+div[data-testid="stExpander"] {border-radius:12px;
+  border:1px solid rgba(128,128,128,.35); margin-bottom:.4rem;}
+/* --- Lisibilite (patch_lisibilite) : tailles + couleurs liees au theme --- */
+div[data-testid="stWidgetLabel"] p, div[data-testid="stWidgetLabel"] label {
+  font-size:1.06rem !important; font-weight:600;
+  color:var(--text-color) !important;}
+div[data-baseweb="select"] div {font-size:1.04rem !important;}
+li[role="option"], ul[data-testid="stSelectboxVirtualDropdown"] li {
+  font-size:1.04rem !important;}
+div[data-testid="stExpander"] summary p {
+  font-size:1.06rem !important; font-weight:600;
+  color:var(--text-color) !important;}
+div[data-testid="stExpander"] p, div[data-testid="stExpander"] li {
+  font-size:1.0rem; color:var(--text-color);}
+div[data-testid="stCaptionContainer"] p {font-size:.95rem !important;
+  color:var(--text-color) !important; opacity:.8;}
+div[data-testid="stMarkdownContainer"] p {color:var(--text-color);}
 </style>""", unsafe_allow_html=True)
 
 # ---------- Taux internes (uniquement pour le prix d'appel) ----------
+R = 655.96  # FCFA/EUR (taux fixe depuis 1999)
 TAUX = {"EUR":1.0,"USD":1.08,"XOF":655.96,"XAF":655.96,"CAD":1.47,"GBP":0.85,
         "MAD":10.8,"TND":3.4,"NGN":1650,"GHS":16,"KES":140,"HTG":145,"INR":92,
         "PKR":300,"IDR":17500,"BRL":6.0,"RWF":1420,"CDF":2900,"EGP":52,"ZAR":19.5}
@@ -58,7 +150,18 @@ def conv(m, de, vers):
     if de in TAUX and vers in TAUX: return m / TAUX[de] * TAUX[vers]
     return None
 
+with st.sidebar:
+    st.session_state.setdefault("devise", "EUR")  # devise auto par destination — selecteur retire (patch_jobboard2)
+
 # ---------- Pays d'origine (nom → code, devise locale) ----------
+# --- Tri des noms sans accents (Sénégal, Bénin retrouvent leur place) ---
+_ACCENTS = str.maketrans(
+    "àáâãäåçèéêëìíîïñòóôõöùúûüýÿ",
+    "aaaaaaceeeeiiiinooooouuuuyy")
+def _tri_sans_accents(_s):
+    return _s.lower().translate(_ACCENTS)
+
+
 ORIGINES = {
  "Afghanistan":("AF","USD"),"Afrique du Sud":("ZA","ZAR"),"Algérie":("DZ","EUR"),
  "Angola":("AO","USD"),"Bangladesh":("BD","USD"),"Bénin":("BJ","XOF"),
@@ -79,6 +182,14 @@ ORIGINES = {
  "Turquie":("TR","USD"),"Ukraine":("UA","USD"),"Vietnam":("VN","USD"),
  "Zambie":("ZM","USD"),"Zimbabwe":("ZW","USD"),
 }
+
+# --- Toutes les origines du monde (fusion : n'écrase pas les existantes) ---
+try:
+    from pays_monde import ORIGINES_MONDE
+    for _p, _v in ORIGINES_MONDE.items():
+        ORIGINES.setdefault(_p, _v)
+except ImportError:
+    pass
 
 # Pays soumis à la procédure Études en France (EEF / Campus France)
 EEF = {"ZA","DZ","BJ","BF","BI","CM","CN","CO","KM","CG","CD","CI","DJ","EG","ET",
@@ -113,7 +224,7 @@ SVC = {
              "conforme aux exigences exactes de ta destination.", 20000),
  "VISA":    ("🛂 Accompagnement visa de A à Z",
              "Checklist personnalisée, remplissage des formulaires, prise de "
-             "rendez-vous, préparation des justificatifs, suivi jusqu'à la décision.", 20000),
+             "rendez-vous, préparation des justificatifs, suivi jusqu'au dépôt + une relance.", 20000),
  "LOGEMENT":("🏠 Recherche de logement & attestation",
              "Dossier locataire, candidatures résidences/CROUS/privé et obtention de "
              "l'attestation d'hébergement exigée pour le visa.", 25000),
@@ -123,10 +234,35 @@ SVC = {
  "TRAD":    ("📑 Traductions certifiées & légalisations",
              "Coordination des traductions assermentées, apostilles et "
              "authentifications exigées par ta destination.", 10000),
- "PACK":    ("🚀 Pack complet « Décollage »",
-             "On gère tout ton projet de bout en bout : orientation, admissions, "
-             "dossier, fonds, visa, installation. Toi, tu prépares ta valise.", 89000),
+# patch_pack_retire : PACK retire du catalogue tant que les heures
+# reelles ne sont pas mesurees (remise de 63 % sur la somme des parties
+# = travail a perte). Pour le reactiver : retirer les '# ' ci-dessous.
+# "PACK":    ("🚀 Pack complet « Décollage »",
+#              "On gère tout ton projet de bout en bout : orientation, admissions, "
+#              "dossier, fonds, visa, installation. Toi, tu prépares ta valise.", 89000),
 }
+
+# --- Services applicables PAR TYPE DE PROJET (patch_jobboard2) ---------------
+# Cle absente = service propose pour tous les types de projet.
+SVC_TYPES = {
+    "ADMIS":    {"Formation (admission)"},
+    "EEF":      {"Formation (admission)"},
+    "PACK":     {"Formation (admission)"},
+    "ORIENT":   {"Formation (admission)", "Bourse"},
+    "BOURSE":   {"Formation (admission)", "Bourse"},
+    "FONDS":    {"Formation (admission)", "Stage / Emploi étudiant"},
+    "VISA":     {"Formation (admission)", "Stage / Emploi étudiant", "Métier spécialisé"},
+    "LOGEMENT": {"Formation (admission)", "Stage / Emploi étudiant", "Métier spécialisé"},
+    "FLUSSI":   {"Métier spécialisé"},  # _lot6_parcours_v1 : étiquette étapes travail
+}
+
+
+def _services_pour_type(codes, type_projet):
+    """Ne garde que les services pertinents pour CE type de projet.
+    Repli : si le filtre vide tout, on rend la liste d'origine."""
+    filt = [s for s in codes if type_projet in SVC_TYPES.get(s, {type_projet})]
+    return filt or list(codes)
+
 
 # =============================================================================
 # DESTINATIONS — chaque étape : (titre, détail, lien, code_service_ou_None)
@@ -271,7 +407,9 @@ D["DE"] = dict(nom="Allemagne", flag="🇩🇪",
  bourses=[("DAAD", "~934 €/mois en master, programmes dédiés Afrique/Asie.", "https://www.daad.de/en/")])
 
 D["BE"] = dict(nom="Belgique", flag="🇧🇪",
- resume="Le choix naturel des francophones : frais modérés (835–4 175 €/an), universités réputées.",
+ resume="Le choix naturel des francophones : frais modérés (835–4 175 €/an), universités réputées. "
+        "Deux bourses entièrement financées s'adressent directement aux Africains : ARES (Belgique, "
+        "Bac+3/Bac+5, 20 pays partenaires) et MasterCard Foundation Scholars (mondial, jusqu'à 35 ans).",
  ressources="≈650 €/mois à justifier",
  travail="20 h/semaine", post="Séjour de recherche d'emploi possible",
  portail="https://www.studyinbelgium.be",
@@ -281,22 +419,93 @@ D["BE"] = dict(nom="Belgique", flag="🇧🇪",
   ("S'inscrire à l'université", "Candidatures juin–septembre pour la rentrée d'octobre.", None, "ADMIS"),
   ("Visa D étudiant", "Admission + équivalence + fonds + assurance.", None, "VISA"),
  ],
- bourses=[("ARES", "Bourse complète de la coopération belge (pays partenaires).", "https://www.ares-ac.be")])
+ bourses=[
+  # ── ARES ──────────────────────────────────────────────────────────────────
+  ("🇧🇪 Bourses ARES — coopération belge",
+   "200 bourses entièrement financées/an : Bachelier ou Master de spécialisation (1 an) "
+   "ou Formation continue (2–6 mois) dans les universités FWB (ULB, UCLouvain, ULiège, "
+   "UNamur, HE Vinci…). Couverture : inscription + 1 150 €/mois × 12 + billet A/R + visa "
+   "+ assurance. "
+   "Conditions : résider ET travailler dans l'un des 31 pays éligibles · Bac+3 minimum · "
+   "≥ 2 ans d'expérience professionnelle après le diplôme · diplôme ≤ 20 ans · "
+   "1 seule candidature · GRATUIT (fraude → bourses-cooperation@ares-ac.be). "
+   "Pays africains éligibles (20/31) : Afrique du Sud, Bénin, Burkina Faso, Burundi, "
+   "Cameroun, Éthiopie, Guinée, Kenya, Madagascar, Mali, Maroc, Mozambique, Niger, "
+   "Ouganda, RDC, Rwanda, Sénégal, Tanzanie, Tunisie, Zimbabwe. "
+   "ABSENTS : Congo-Brazzaville, Gabon, Tchad, Togo, Guinée équatoriale. "
+   "⚠️ Pas de critère d'âge — le '40 ans max' circulant sur les réseaux est FAUX. "
+   "Calendrier : appel ~4 août → clôture ~mi-septembre (plateforme GIRAF). "
+   "Préparer le dossier DÈS MAINTENANT.",
+   "https://www.ares-ac.be/fr/bourses"),
+  # ── MasterCard Foundation ──────────────────────────────────────────────────
+  ("🌍 MasterCard Foundation Scholars Program",
+   "L'un des plus grands programmes de bourses au monde (50 000+ boursiers, objectif 100 000 "
+   "d'ici 2030, 71 % de femmes). Entièrement financé : frais de scolarité + logement + "
+   "matériel + transport + assurance + mentorat. Niveaux : Secondaire, Bachelor (≤ 29 ans), "
+   "Master (≤ 35 ans). Réservé aux citoyens africains — réfugiés inclus. "
+   "EXCLUS : double nationalité ou résidence permanente US/Canada/UK/UE. "
+   "62+ universités partenaires dont Sciences Po (Paris), Cambridge, McGill, Toronto, "
+   "UC Berkeley, CMU-Africa, Makerere, KNUST, Univ. Rwanda… "
+   "Candidature DÉCENTRALISÉE : postuler directement auprès de chaque université partenaire "
+   "(chacune a son calendrier, sept → janv pour une rentrée 2027). "
+   "⚠️ ALERTE OFFICIELLE : des posts Facebook frauduleux 'recrutent' en demandant des frais. "
+   "Le programme ne demande JAMAIS d'argent. Signalement : privacy@mastercardfdn.org.",
+   "https://mastercardfdn.org/en/what-we-do/our-programs/mastercard-foundation-scholars-program/where-to-apply/"),
+ ])
 
 D["IT"] = dict(nom="Italie", flag="🇮🇹",
- resume="Le secret le mieux gardé d'Europe : frais calculés sur TES revenus (souvent 500–3 000 €/an) "
-        "et bourses régionales DSU qui couvrent logement + repas + allocation, même pour les étrangers.",
- ressources="≈6 500 €/an à justifier (hors bourse DSU)",
- travail="20 h/semaine", post="Permesso de recherche d'emploi 12 mois",
+ resume="Études en Italie : frais calculés sur tes revenus, souvent 500–3 000 €/an, "  # _lot7_desc_italie_v1
+        "avec les bourses régionales DSU. Inscription via la plateforme officielle Universitaly. "
+        "Coût de la vie modéré et diplômes reconnus dans toute l'Europe.",
+ ressources="≈6 500 €/an à justifier pour le visa (hors bourse DSU).",
+ travail="20 h/semaine autorisées pendant les études.",
+ post="Permesso de recherche d'emploi 12 mois après le diplôme.",
  portail="https://studyinitaly.esteri.it",
  services=["ORIENT","ADMIS","DOSSIER","BOURSE","VISA","TRAD","PACK"],
  etapes=[
   ("Pré-inscription sur Universitaly", "La plateforme officielle reliée à ton consulat — l'équivalent italien de Campus France.", "https://www.universitaly.it", "ADMIS"),
   ("Demander la bourse régionale DSU", "Sur critères sociaux : logement + cantine + ~5 200 €/an. Peu de candidats étrangers la connaissent.", None, "BOURSE"),
   ("Visa D études", "Admission + fonds + logement + assurance.", None, "VISA"),
+  # ── Decreto Flussi (Métier / Saisonnier) ──────────────────────────────────
+  ("🛂 Decreto Flussi — trouver un emploi en Italie",
+   "DPCM 02/10/2025 : 497 550 entrées sur 2026-2028 (164 850/an). "
+   "L'employeur fait TOUT : il dépose la demande de nulla osta sur le Portale ALI, "
+   "tu n'as qu'à être prêt avec les documents. "
+   "Trois groupes selon ton pays d'origine — voir ci-dessous.", None, "FLUSSI"),
+  ("Groupe 1 — 14 pays africains à quota réservé (click day 16 fév)",
+   "Algérie, Côte d'Ivoire, Égypte, Éthiopie, Gambie, Ghana, Mali, Maroc, Maurice, "
+   "Niger, Nigeria, Sénégal, Soudan, Tunisie. "
+   "25 000 places/an rien que pour ces pays. "
+   "⚠️ Maroc : circuit d'avis renforcé Questura + Inspectorat — délais plus longs, "
+   "dossier irréprochable requis. "
+   "Précompilation ALI : oct–déc 2026 (fenêtre annuelle). "
+   "Secteurs : transport CQC, bâtiment, mécanique, télécoms, hôtellerie, "
+   "électriciens, plombiers, alimentaire, naval.",
+   "https://portaleservizi.dlci.interno.it/AliSportello/ali/home.htm", "FLUSSI"),
+  ("Groupe 2 — tous les autres pays (Cameroun, RDC, Guinée…) — click day 18 fév",
+   "Quote générale — compétition plus large mais deux canaux stratégiques sous-utilisés : "
+   "(1) SAISONNIER (agricole 12 jan, tourisme 9 fév) : la concurrence s'est effondrée "
+   "(72 000 demandes en 2025 vs 337 000 en 2024 pour ~82 000 quotas). "
+   "(2) BADANTI hors quota (DL 146/2025) : 10 000 places supplémentaires pour l'assistance "
+   "aux handicapés et aux 80+ ans, ouverts dès le 1er janvier via agences pour l'emploi — "
+   "utilisés à seulement 13 % en 2025. Aucune restriction de nationalité.",
+   "https://portaleservizi.dlci.interno.it/AliSportello/ali/home.htm", "FLUSSI"),
+  ("Groupe 3 — colf/badanti (aide domestique) — click day 18 fév",
+   "13 600 places A-bis exclusif domestique + ~19 300 hors quota. "
+   "AUCUNE restriction de nationalité. Condition côté employeur : revenu ≥ 20 000 €/an. "
+   "Canal le plus accessible pour qui a une expérience dans l'aide à la personne.",
+   None, "FLUSSI"),
+  ("Préparer MAINTENANT pour 2027",
+   "Les click days 2026 sont passés. Les dates 2027 sont déjà connues (même calendrier annuel). "
+   "Action immédiate : trouver un employeur italien intéressé (offres Yorbity + candidature à distance), "
+   "rassembler les documents (casier judiciaire international, diplômes traduits, CV en italien). "
+   "La précompilation ALI ouvre en octobre 2026 — l'employeur doit être prêt à ce moment-là.",
+   "https://www.interno.gov.it/it/servizi/servizi-line/procedure-flussi", "FLUSSI"),
  ],
- bourses=[("DSU régional", "Logement + repas + allocation sur critères sociaux.", None),
-          ("Invest Your Talent in Italy", "Masters ciblés + stage en entreprise italienne.", "https://investyourtalentapplication.esteri.it")])
+ bourses=[
+  ("DSU régional", "Logement + repas + allocation sur critères sociaux (études).", None),
+  ("Invest Your Talent in Italy", "Masters ciblés + stage en entreprise italienne.", "https://investyourtalentapplication.esteri.it"),
+ ])
 
 D["ES"] = dict(nom="Espagne", flag="🇪🇸",
  resume="Frais publics 1 000–3 500 €/an, qualité de vie, espagnol = 2e langue mondiale.",
@@ -697,18 +906,202 @@ D["IE"] = dict(nom="Irlande", flag="🇮🇪",
  ],
  bourses=[("Government of Ireland Intl Scholarship", "10 000 € + frais offerts (60/an).", "https://hea.ie")])
 
+
+D["RU"] = dict(
+    nom='Russie',
+    flag='🇷🇺',
+    resume="Universités scientifiques et médicales réputées, coût de la vie bas. Voie principale : le quota de bourses de l'État russe, avec une année de langue russe intégrée au parcours.",
+    ressources="Frais et coût de la vie parmi les plus bas ; quota d'État couvrant la scolarité (environ 15 000 places/an).",
+    travail="Depuis 2020, travail pendant le temps libre SANS permis pour les étudiants à temps plein d'un établissement accrédité (sauf postes réglementés : comptabilité en chef, fonction publique/sécurité).",
+    post="Pas de dispositif post-études simple et documenté — se renseigner en fin d'études auprès de l'université.",
+    portail='https://education-in-russia.com',
+    services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
+    etapes=[
+        ("Déposer une demande de quota d'État", 'Candidature via le portail officiel des quotas (sélection par le canal russe accrédité dans ton pays).', 'https://education-in-russia.com', None),
+        ('Passer la sélection', 'Épreuves ou entretien selon la filière, puis classement des candidats.', None, None),
+        ('Année préparatoire de langue russe', 'Intégrée au parcours quota pour les cursus enseignés en russe.', None, None),
+    ],
+    bourses=[],
+)
+
+D["RS"] = dict(
+    nom='Serbie',
+    flag='🇷🇸',
+    resume="Coût de la vie bas au cœur des Balkans. Cursus surtout en serbe, quelques programmes en anglais (médecine, ingénierie). Reconnaissance du diplôme obligatoire AVANT l'inscription.",
+    ressources='Coût de la vie bas (chambre partagée dès ~50 €/mois) ; scolarité hors bourse ~500 à 2 500 €/an.',
+    travail="Permis unique séjour + travail depuis la réforme de la loi sur les étrangers ; pas de quota d'heures « étudiant » publié — à confirmer au moment voulu.",
+    post='À confirmer auprès des autorités serbes.',
+    portail='https://studyinserbia.rs',
+    services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
+    etapes=[
+        ('Faire reconnaître ton diplôme (ENIC/NARIC)', "Démarche via l'agence serbe (azk.gov.rs) AVANT l'inscription — s'y prendre tôt, c'est long.", 'https://studyinserbia.rs', None),
+        ('Choisir un programme accrédité', 'Catalogue officiel des programmes (dont ~180 en anglais).', 'https://studyinserbia.rs', None),
+        ("Passer l'examen d'entrée", "Vers juin (licence), septembre–octobre (master) selon l'université.", None, None),
+    ],
+    bourses=[],
+)
+
+D["DZ"] = dict(
+    nom='Algérie',
+    flag='🇩🇿',
+    resume="Frais d'inscription très bas, enseignement en arabe et en français. L'inscription d'un étudiant étranger passe OBLIGATOIREMENT par la voie officielle (Direction de la coopération).",
+    ressources="Frais d'inscription très modestes ; coût de la vie bas.",
+    travail="Pas de cadre publié pour l'emploi étudiant étranger — ne pas compter dessus.",
+    post='À confirmer auprès des autorités algériennes.',
+    portail='https://www.mesrs.dz',
+    services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
+    etapes=[
+        ("Obtenir l'équivalence de ton diplôme", "Équivalence du baccalauréat/diplôme requise pour l'inscription.", 'https://www.mesrs.dz', None),
+        ('Passer par la Direction de la coopération (MESRS)', "Autorisation d'inscription via le canal officiel (circulaire n°47) ; pour les boursiers, demande via le pays d'origine.", None, None),
+        ("Visite médicale d'admission", "À l'arrivée, selon l'établissement.", None, None),
+    ],
+    bourses=[],
+)
+
+D["MU"] = dict(
+    nom='Maurice',
+    flag='🇲🇺',
+    resume='Hub régional anglophone et francophone, environnement sûr. Deux universités publiques ; possibilité de travailler et de rester après le diplôme.',
+    ressources='Scolarité hors bourse ~120 000 à 350 000 MUR/an (licence) ; coût de la vie modéré.',
+    travail="Jusqu'à 20 h/semaine pour les étudiants étrangers à temps plein (inscrits depuis ≥1 an, visa valide) ; pas de travail les 90 premiers jours.",
+    post="Young Professional Occupation Permit : jusqu'à 3 ans après une licence obtenue à Maurice (demande déposée par l'employeur).",
+    portail='https://edbmauritius.org/education',
+    services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
+    etapes=[
+        ('Être admis dans un établissement mauricien', 'Universités publiques (University of Mauritius, UTM) ou privées agréées.', 'https://edbmauritius.org/education', None),
+        ('Obtenir le visa étudiant', "Via l'établissement et l'immigration mauricienne.", None, None),
+        ('Option travail (après 90 jours)', "Jusqu'à 20 h/semaine une fois inscrit et en règle.", None, None),
+    ],
+    bourses=[],
+)
+
+D["BN"] = dict(
+    nom='Brunei',
+    flag='🇧🇳',
+    resume="Petit État riche d'Asie du Sud-Est, cursus en anglais. La bourse du gouvernement (BDGS) couvre presque tout ; guichet unique une fois par an.",
+    ressources='Scolarité et vie couvertes par la bourse BDGS (allocation, logement, repas, billets aller-retour).',
+    travail="Cadre d'emploi étudiant limité — se renseigner auprès de l'établissement.",
+    post="À confirmer ; la bourse vise en priorité un PREMIER séjour d'études au Brunei.",
+    portail='https://www.mfa.gov.bn/Pages/scholarship.aspx',
+    services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
+    etapes=[
+        ('Choisir un établissement public', 'UBD, UNISSA, UTB ou Politeknik Brunei ; programmes sur leurs sites.', 'https://www.mfa.gov.bn/Pages/scholarship.aspx', None),
+        ('Candidater à la BDGS pendant la fenêtre', 'Ouverture ~mi-décembre, clôture STRICTE le 15 février (heure de Brunei).', None, None),
+        ("Justifier le niveau d'anglais", 'IELTS 6.0 / TOEFL 550 ou équivalent.', None, None),
+    ],
+    bourses=[],
+)
+
+D["MX"] = dict(
+    nom='Mexique',
+    flag='🇲🇽',
+    resume="Grand système universitaire hispanophone (UNAM, IPN, COLMEX…). Les bourses d'excellence AMEXCID financent master, doctorat et séjours de recherche.",
+    ressources='Coût de la vie modéré ; bourse AMEXCID couvrant scolarité, allocation et assurance santé.',
+    travail='Selon le statut migratoire de la bourse — se renseigner ; études à temps plein attendues.',
+    post='À confirmer auprès des autorités mexicaines.',
+    portail='https://www.gob.mx/amexcid/acciones-y-programas/becas-para-extranjeros-29785',
+    services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
+    etapes=[
+        ("Obtenir une (pré)acceptation d'un établissement", "Souvent exigée par l'appel AMEXCID — anticiper cette démarche.", 'https://www.gob.mx/amexcid/acciones-y-programas/becas-para-extranjeros-29785', None),
+        ("Candidater pendant l'appel annuel", 'Publication vers mai, clôture vers juin.', None, None),
+        ("Justifier le niveau d'espagnol", 'Études en espagnol : niveau exigé.', None, None),
+    ],
+    bourses=[],
+)
+
+D["SK"] = dict(
+    nom='Slovaquie',
+    flag='🇸🇰',
+    resume="Bourses d'État de la coopération slovaque, tous cycles dans les universités publiques. Quotas par pays fixés à chaque cycle ; cursus en slovaque avec préparation linguistique.",
+    ressources='Scolarité couverte + allocation mensuelle ; coût de la vie modéré.',
+    travail='Selon la réglementation étudiante slovaque — à confirmer.',
+    post='À confirmer auprès des autorités slovaques.',
+    portail='https://www.vladnestipendia.sk/en/',
+    services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
+    etapes=[
+        ("Vérifier l'éligibilité de ton pays", "Liste des pays partenaires revue à chaque cycle (annexe de l'appel).", 'https://www.vladnestipendia.sk/en/', None),
+        ('Candidater en ligne (mars–mai)', 'Portail actif ~23 mars → fin mai ; réponse au plus tard le 15 juillet.', None, None),
+        ('Envoyer le dossier papier (si lauréat)', "Seuls les lauréats transmettent l'original signé au ministère.", None, None),
+    ],
+    bourses=[],
+)
+
+D["KZ"] = dict(
+    nom='Kazakhstan',
+    flag='🇰🇿',
+    resume="Environ 550 bourses d'État par an (tous cycles), cursus en kazakh, russe ou anglais. Prise en charge PARTIELLE : billet, visa et assurance restent à ta charge.",
+    ressources='Scolarité + allocation mensuelle couvertes ; billet, visa et assurance à ta charge.',
+    travail='Selon la réglementation étudiante kazakhe — à confirmer.',
+    post='À confirmer auprès des autorités kazakhes.',
+    portail='https://studyin.kz/admission',
+    services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
+    etapes=[
+        ('Créer un compte sur le portail', 'Inscription et dépôt en ligne pendant la fenêtre (30 mars → 31 mai).', 'https://studyin.kz/admission', None),
+        ("Passer le test et l'entretien en ligne", "Sélection par l'opérateur national de l'enseignement supérieur.", None, None),
+        ('Prévoir billet, visa et assurance', 'Non couverts par la bourse.', None, None),
+    ],
+    bourses=[],
+)
+
 # =============================================================================
 # BASE (pays actifs + demandes)
 # =============================================================================
+# --- Toutes les destinations du monde (fiches générales pour les non-détaillées) ---
+try:
+    from destinations_monde import completer_destinations
+    D["KW"] = dict(
+        nom='Koweït',
+        flag='🇰🇼',
+        resume='Marché privé porté par les services, la finance et le BTP ; recrutement encadré par la Public Authority for Manpower (PAM).',
+        ressources='Emploi via un employeur sponsor (permis art. 18) ; démarches en ligne sur la plateforme Sahel/Ashal de la PAM.',
+        travail='Restreint',
+        post='Selon secteur',
+        portail='https://www.manpower.gov.kw',
+        services=['ORIENT', 'DOSSIER', 'VISA', 'TRAD'],
+        etapes=[('Trouver un employeur sponsor', "L'employeur dépose la demande de permis de travail (art. 18) auprès de la Public Authority for Manpower.", 'https://www.manpower.gov.kw', 'ORIENT'), ('Permis + résidence (iqama)', "Après approbation, entrée puis résidence liée à l'employeur ; démarches via le portail e-gov.", 'https://www.e.gov.kw', 'DOSSIER')],
+        bourses=[],
+    )
+    D["BH"] = dict(
+        nom='Bahreïn',
+        flag='🇧🇭',
+        resume='Hub financier régional, installation moins coûteuse que ses voisins ; marché du travail régulé par la LMRA.',
+        ressources="Tout permis de travail passe par la LMRA (Expat Management System) ; le poste est d'abord publié localement.",
+        travail='Restreint',
+        post='Selon secteur',
+        portail='https://lmra.gov.bh',
+        services=['ORIENT', 'DOSSIER', 'VISA', 'TRAD'],
+        etapes=[("Offre d'emploi via la LMRA", "L'employeur publie le poste puis dépose le permis via l'Expat Management System de la LMRA.", 'https://lmra.gov.bh', 'ORIENT'), ('Permis de travail + résidence', 'Après approbation LMRA et examen médical : permis de travail et carte de résidence.', 'https://lmra.gov.bh', 'DOSSIER')],
+        bourses=[],
+    )
+    D["OM"] = dict(
+        nom='Oman',
+        flag='🇴🇲',
+        resume="Économie tirée par l'énergie et la logistique (Vision 2040) ; réformes récentes du travail (mobilité d'employeur après 1 an).",
+        ressources="Deux étapes : autorisation de main-d'œuvre (ministère du Travail, soumise au quota d'omanisation) puis visa d'emploi (ROP).",
+        travail='Restreint',
+        post='Selon secteur',
+        portail='https://www.rop.gov.om',
+        services=['ORIENT', 'DOSSIER', 'VISA', 'TRAD'],
+        etapes=[("Autorisation de main-d'œuvre", "L'employeur obtient la clearance du ministère du Travail (soumise au quota d'omanisation — vérifier que le poste est ouvert).", None, 'ORIENT'), ("Visa d'emploi (Royal Oman Police)", "L'employeur dépose le visa d'emploi auprès de la ROP ; iqama après examen médical.", 'https://www.rop.gov.om', 'DOSSIER')],
+        bourses=[],
+    )
+    completer_destinations(D)
+except ImportError:
+    pass
+
 def db():
     con = sqlite3.connect(DB)
     con.execute("CREATE TABLE IF NOT EXISTS config_pays(code TEXT PRIMARY KEY, actif INT DEFAULT 1)")
     con.execute("""CREATE TABLE IF NOT EXISTS leads(
         id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, nom TEXT, contact TEXT,
         origine TEXT, destination TEXT, service TEXT, message TEXT)""")
-    for code in D:
-        con.execute("INSERT OR IGNORE INTO config_pays(code,actif) VALUES(?,1)", (code,))
-    con.commit()
+    # Seed des pays UNIQUEMENT s'il en manque (patch_seed_v1) : plus
+    # d'ecriture a chaque rerun -> plus de collision entre onglets.
+    _n = con.execute("SELECT COUNT(*) FROM config_pays").fetchone()[0]
+    if _n < len(D):
+        for code in D:
+            con.execute("INSERT OR IGNORE INTO config_pays(code,actif) VALUES(?,1)", (code,))
+        con.commit()
     return con
 
 con = db()
@@ -716,13 +1109,82 @@ actifs = {r[0] for r in con.execute("SELECT code FROM config_pays WHERE actif=1"
 
 if "svc" not in st.session_state: st.session_state.svc = None
 
+# --- Pages dediees « accompagnement » et « contact » (patch_jobboard2) ------
+# Un NOUVEL ONGLET = une nouvelle session : le contexte arrive par l'URL.
+#   ?page=accompagnement&dest=DE&lg=fr&orig=Benin&type=M%C3%A9tier%20sp%C3%A9cialis%C3%A9
+_qp = st.query_params
+if _qp.get("page") in ("accompagnement", "contact"):
+    import urllib.parse as _up
+    _tr = globals().get("tr", lambda s: s)
+    _lg_qp = _qp.get("lg") or ""
+    if _lg_qp in LANGUES and _lg_qp != LG:
+        st.session_state.lang = _lg_qp
+        LG = _lg_qp
+    _dst = (_qp.get("dest") or "").upper()
+    _type_qp = _up.unquote(_qp.get("type") or "")
+    _d = D.get(_dst)
+    if not _d:
+        st.warning("🌍 " + _tr("Choisis d'abord un pays de destination sur la page principale."))
+        st.link_button("← Yorbity", "/")
+        st.stop()
+
+    try:
+        import theme_pays
+        theme_pays.appliquer(_dst, theme_pays.type_interne(_type_qp), _tr)
+    except Exception:
+        pass
+
+    _svc_dest = (services_cfg.effectifs(_dst, _d["services"], list(SVC.keys()))
+                 or _d["services"])
+    if _type_qp:
+        _svc_dest = _services_pour_type(_svc_dest, _type_qp)
+    _noms = []
+
+    if _qp.get("page") == "accompagnement":
+        st.markdown(f"## {t('accompagne', LG)} {nom_pays(_d['nom'], LG)}")
+        st.write(t("accompagne_desc", LG))
+        for _s in _svc_dest:
+            _n, _de, _ = SVC[_s]
+            _n, _de = _tr(_n), _tr(_de)
+            _noms.append(_n)
+            with st.expander(_n):
+                st.write(_de)
+    else:
+        _noms = [_tr(SVC[_s][0]) for _s in _svc_dest]
+
+    st.markdown("#### " + t("form_titre", LG))
+    with st.form("lead_page_dediee"):
+        _f1, _f2 = st.columns(2)
+        _nom_lead = _f1.text_input(t("nom", LG))
+        _contact = _f2.text_input(t("contact", LG))
+        _svc_choisi = st.selectbox(t("service_interet", LG), _noms)
+        _msg = st.text_area(t("projet_2lignes", LG))
+        if st.form_submit_button(t("lancer", LG)):
+            if _nom_lead.strip() and _contact.strip():
+                con.execute(
+                    "INSERT INTO leads(date,nom,contact,origine,destination,service,message) "
+                    "VALUES(?,?,?,?,?,?,?)",
+                    (TODAY, _nom_lead.strip(), _contact.strip(),
+                     _up.unquote(_qp.get("orig") or ""), _d["nom"],
+                     _svc_choisi, _msg.strip()))
+                con.commit()
+                st.success("✅ " + _tr("Merci ! Notre équipe te répond sous 24 h."))
+            else:
+                st.error(_tr("Nom et contact sont obligatoires."))
+    st.caption(_tr("Nous préparons et organisons tes démarches avec toi. "
+                   "Personne ne peut garantir une admission ou un visa — "
+                   "méfie-toi de ceux qui le promettent."))
+    st.stop()
+# -----------------------------------------------------------------------------
+
+
 # =============================================================================
 # EN-TÊTE
 # =============================================================================
 st.markdown(f"""
 <div style='text-align:center; padding:.4rem 0 .8rem;'>
   <h1 style='margin-bottom:0; font-size:2.7rem;'>🚀 {APP_NAME}</h1>
-  <p style='color:#6b7280; margin-top:.15rem; font-size:1.05rem;'>{t('tagline', LG)}</p>
+  <p style='color:var(--text-color); opacity:.72; margin-top:.15rem; font-size:1.1rem;'>{t('tagline', LG)}</p>
 </div>""", unsafe_allow_html=True)
 
 # ---------- Listes traduites (affichage) + valeurs canoniques (logique) ----------
@@ -733,157 +1195,523 @@ CANON_TYPES   = T["types"]["fr"]
 CANON_NIVEAUX = T["niveaux"]["fr"]
 CANON_DOM     = T["domaines"]["fr"]
 
+# ---------- Écran connexion/inscription (si demandé) ----------
+if espace.ecran_auth(ORIGINES):
+    st.stop()
+
+# --- Changement de mot de passe obligatoire apres reinitialisation ---
+if admin_comptes.ecran_changement_force():
+    st.stop()
+if mdp_oublie.ecran():
+    st.stop()
+
+# ---------- Boutique : Premium + services a la carte (patch_boutique) -------
+import paiement as _paiement
+# patch_fix_ordre : helper défini avant sa 1re utilisation
+def _monetisation_active():  # patch_monetisation : interrupteur maitre (defaut OFF)
+    try:
+        import offres_sync as _osy_mon2
+        return _osy_mon2.param("monetisation_active", "0") != "0"
+    except Exception:
+        return False
+_paiement.enregistrer_services(SVC)
+if _monetisation_active() and espace.user_connecte() and _paiement.ecran_boutique(st.session_state.user):  # patch_monetisation
+    st.stop()
+
+# ---------- Écran Premium ----------
+import questionnaire_reco as _questionnaire_reco  # patch_questionnaire
+if _questionnaire_reco.ecran(ORIGINES): st.stop()
+if _monetisation_active() and espace.ecran_premium():
+    st.stop()
+
+# ---------- Suivi des démarches ----------
+if espace.user_connecte() and dossiers.ecran_mes_demarches(espace.user_connecte()):
+    st.stop()
+if espace.est_admin() and dossiers.ecran_admin():
+    st.stop()
+# --- Seed automatique des etoiles (une fois par session) ---
+if "seed_etoiles_fait" not in st.session_state:
+    try:
+        admin_projets._seed_initial(D, ORIGINES)
+        st.session_state.seed_etoiles_fait = True
+    except Exception:
+        pass
+if espace.est_admin() and admin_projets.ecran(D, ORIGINES):
+    st.stop()
+if espace.est_admin() and admin_comptes.ecran():
+    st.stop()
+if espace.est_admin() and offres_cfg.ecran():
+    st.stop()
+if espace.est_admin() and devises_cfg.ecran_admin(TAUX):
+    st.stop()
+if espace.est_admin() and eligibilite.ecran():
+    st.stop()
+if espace.est_admin() and offres_sync.ecran():
+    st.stop()
+if espace.est_admin() and moteur_plans.ecran(ORIGINES):
+    st.stop()
+if espace.est_admin() and console_accompagnement.ecran(D, ORIGINES):
+    st.stop()
+import plans_visiteur as _pv_mod  # patch_plans_visiteur : vue visiteur,
+# placee AVANT le bloc qui fait st.query_params.clear() plus bas.
+if _pv_mod.ecran(ORIGINES):
+    st.stop()
+
+# ---------- Retour de paiement CinetPay (mode réel) ----------
+_params = st.query_params
+if "paiement_retour" in _params:
+    import paiement
+    tid = _params["paiement_retour"]
+    statut = paiement.verifier_paiement(tid)
+    if statut == "paye":
+        info = paiement.offre_de_transaction(tid)
+        if info and espace.user_connecte():
+            jours = paiement.duree_jours(info["offre"])  # patch_boutique :
+            # 0 jour = service a la carte (l'ancien defaut offrait 30 j de
+            # Premium a tout code inconnu).
+            if jours > 0:
+                nouveau = auth.activer_premium(espace.user_connecte()["id"], jours)
+                st.session_state.user["premium_jusqu"] = nouveau
+            else:
+                st.success("✅ " + paiement.livrer_service(
+                    info, espace.user_connecte()))
+            st.success(t("recu", LG))
+    else:
+        st.error("Le paiement n'a pas abouti. Réessaie ou contacte-nous.")
+    st.query_params.clear()
+
+# ---------- Espace perso : tableau de bord enrichi ----------
+if st.session_state.get("show_espace") and espace.user_connecte():
+    u = espace.user_connecte()
+    try:
+        import tableau_bord
+        tableau_bord.ecran(u)
+    except Exception as _e_tb:
+        st.markdown(f"## {t('mon_espace', LG)} — {u['nom'] or u['email']}")
+        projets = espace.mes_projets(u["id"])
+        if projets:
+            st.markdown("### " + t("projets_sauv", LG))
+            for p in projets:
+                st.markdown(f"- **{p['origine']} \u2192 {p['destination']}** \u00b7 {p['type']} \u00b7 "
+                            f"{p['niveau']}  _(cr\u00e9\u00e9 le {p['date']})_")
+        else:
+            st.info(t("aucun_projet", LG))
+        if st.button(t("retour_recherche", LG)):
+            st.session_state.show_espace = False
+            st.rerun()
+    st.stop()
+
 # =============================================================================
+# patch_questionnaire : bouton conseiller auto (visible anonymes)
+if st.button("🎯 " + t("questionnaire_btn", LG),
+             use_container_width=True, key="btn_quest"):
+    st.session_state.show_questionnaire = True
+    st.rerun()
 # LE PARCOURS — 4 questions
 # =============================================================================
 c1, c2 = st.columns(2)
-origine = c1.selectbox(t("q_origine", LG), [t("choisir", LG)] + sorted(ORIGINES.keys()))
-dest_codes = sorted([c for c in D if c in actifs], key=lambda c: D[c]["nom"])
-destination = c2.selectbox(t("q_dest", LG), [t("choisir", LG)] + dest_codes,
-    format_func=lambda c: c if c == t("choisir", LG) else f"{D[c]['flag']} {D[c]['nom']}")
+# --- patch_projets_visibles : l'admin peut retirer des projets du menu
+# visiteur (config_params · projet_visible:<canon>, defaut visible).
+# Filtre PARALLELE T_TYPES/CANON_TYPES : la conversion par index
+# (l.~1279 et ~1345) reste juste dans toutes les langues.
+def _projet_visible(_pc):
+    try:
+        import offres_sync
+        return offres_sync.param(f"projet_visible:{_pc}", "1") != "0"
+    except Exception:
+        return True
+_idx_pjv = [i for i, _pc in enumerate(CANON_TYPES) if _projet_visible(_pc)]
+if _idx_pjv and len(_idx_pjv) < len(CANON_TYPES):
+    T_TYPES = [T_TYPES[i] for i in _idx_pjv]
+    CANON_TYPES = [CANON_TYPES[i] for i in _idx_pjv]
+# tout masque -> repli : listes inchangees (jamais de menu vide)
+# --- fin patch_projets_visibles
+# 1) Type de projet d'abord (il filtre les pays proposés)
+type_ = c1.selectbox(t("q_type", LG), [t("choisir", LG)] + T_TYPES)
+# projet canonique (indépendant de la langue) pour la config
+_proj_canon = CANON_TYPES[T_TYPES.index(type_)] if type_ in T_TYPES else None
+
+# 2) Origine — filtrée par projet (étoile OU activée) + masquage global admin
+_orig_off = services_cfg.origines_desactivees()
+if _proj_canon:
+    _vis_o = set(config_projets.pays_visibles(_proj_canon, "origine"))
+    _orig_list = [p for p in sorted(ORIGINES.keys(), key=_tri_sans_accents) if p not in _orig_off and (not _vis_o or p in _vis_o)]
+    _etoiles_o = dict(config_projets.etat(_proj_canon, "origine"))
+else:
+    _orig_list = [p for p in sorted(ORIGINES.keys(), key=_tri_sans_accents) if p not in _orig_off]
+    _etoiles_o = {}
+def _lbl_o(p):
+    if p == t("choisir", LG): return p
+    return nom_pays(p, LG)
+origine = c2.selectbox(t("q_origine", LG), [t("choisir", LG)] + _orig_list, format_func=_lbl_o)
+
 c3, c4 = st.columns(2)
-type_ = c3.selectbox(t("q_type", LG), [t("choisir", LG)] + T_TYPES)
-niveau = c4.selectbox(t("q_niveau", LG), [t("choisir", LG)] + T_NIVEAUX)
-domaine = st.selectbox(t("q_domaine", LG), T_DOMAINES)
+# 3) Destination — filtrée par projet
+if _proj_canon:
+    _vis_d = set(config_projets.pays_visibles(_proj_canon, "destination"))
+    _dnoms = dict(config_projets.etat(_proj_canon, "destination"))
+    dest_codes = sorted([c for c in D if c in actifs and (not _vis_d or D[c]["nom"] in _vis_d)],
+                        key=lambda c: D[c]["nom"])
+else:
+    _dnoms = {}
+    dest_codes = sorted([c for c in D if c in actifs], key=lambda c: D[c]["nom"])
+def _lbl_d(c):
+    if c == t("choisir", LG): return c
+    return f"{D[c]['flag']} {nom_pays(D[c]['nom'], LG)}"
+if _proj_canon == "Volontariat":
+    # patch_vol_programmes : pour le Volontariat, la « destination » devient le
+    # PROGRAMME (ONU, VIF, weltwärts…), filtre par le pays d'origine.
+    import volontariat_flux as _vfx
+    _co_vfx = ORIGINES[origine][0] if origine != t("choisir", LG) else None
+    _progs_vfx = _vfx.programmes(_co_vfx)
+    _plbl_vfx = dict(_progs_vfx)
+    _plab_vfx = {"fr": "🤝 Programme de volontariat", "en": "🤝 Volunteering programme", "es": "🤝 Programa de voluntariado", "pt": "🤝 Programa de voluntariado", "zh": "🤝 志愿服务项目", "ar": "🤝 برنامج التطوع", "ja": "🤝 ボランティアプログラム", "ko": "🤝 자원봉사 프로그램", "id": "🤝 Program relawan"}.get(LG, "🤝 Programme de volontariat")
+    destination = c3.selectbox(_plab_vfx, [t("choisir", LG)] + [c for c, _ in _progs_vfx], format_func=lambda c: _plbl_vfx.get(c, c))
+else:
+    destination = c3.selectbox(t("q_dest", LG), [t("choisir", LG)] + dest_codes, format_func=_lbl_d)
+
+_poste_rech = ""
+if _proj_canon in ("Sport", "Art", "Volontariat"):
+    _dmap = T.get("disciplines", {}).get(_proj_canon, {})
+    _disc = _dmap.get(LG) or _dmap.get("fr", [])
+    _dlabel = {"fr": "🏅 Discipline", "en": "🏅 Discipline", "es": "🏅 Disciplina", "pt": "🏅 Disciplina", "zh": "🏅 项目", "ar": "🏅 التخصص", "ja": "🏅 種目", "ko": "🏅 종목", "id": "🏅 Disiplin"}.get(LG, "🏅 Discipline")
+    if _proj_canon == "Volontariat":
+        _dlabel = {"fr": "🤝 Domaine de mission", "en": "🤝 Mission field", "es": "🤝 Ámbito de misión", "pt": "🤝 Área de missão", "zh": "🤝 志愿领域", "ar": "🤝 مجال المهمة", "ja": "🤝 活動分野", "ko": "🤝 활동 분야", "id": "🤝 Bidang misi"}.get(LG, "🤝 Domaine de mission")
+    niveau = c4.selectbox(_dlabel, [t("choisir", LG)] + _disc)
+elif recherche_poste.concerne(_proj_canon) and destination != t("choisir", LG):
+    _poste_rech = recherche_poste.selecteur(c4, _proj_canon, destination, lambda x: traduire(x, LG))
+    niveau = t("choisir", LG)
+else:
+    niveau = c4.selectbox(t("q_niveau", LG), [t("choisir", LG)] + T_NIVEAUX, disabled=(type_ in _METIER_LBLS))
+if _proj_canon in ("Sport", "Art", "Volontariat"):
+    domaine = T_DOMAINES[0]        # pas de filiere academique pour Sport/Art
+else:
+    domaine = st.selectbox(t("q_domaine", LG), T_DOMAINES)
 
 st.divider()
 
 # =============================================================================
 # RÉSULTAT
 # =============================================================================
-if t("choisir", LG) in (origine, destination, type_, niveau):
+_sans_niveau = recherche_poste.concerne(_proj_canon) and _proj_canon not in ("Sport", "Art", "Volontariat")
+_req = (origine, destination, type_) if _sans_niveau else (origine, destination, type_, niveau)
+if _proj_canon == "Volontariat":
+    # patch_vol_programmes : resultat = le PROGRAMME choisi (plan client + offres liees)
+    if t("choisir", LG) in (origine, destination):
+        st.info(t("intro", LG))
+    else:
+        import volontariat_flux as _vfx2
+        _vfx2.rendre(destination, ORIGINES[origine][0], ORIGINES, LG)
+elif t("choisir", LG) in _req:
     st.info(t("intro", LG))
 else:
     d = D[destination]
     code_orig, dev_orig = ORIGINES[origine]
+    # ---- Swimpe : bouton "Sauvegarder ce projet" (si connecte) ----
+    try:
+        _u_save = espace.user_connecte()
+        _cols_save = st.columns([3, 2])
+        with _cols_save[0]:
+            if _u_save:
+                if st.button("\U0001F4BE " + t("sauver_projet_btn", LG), key="save_projet_top",
+                             use_container_width=True):
+                    espace.sauver_projet(_u_save["id"], origine, destination,
+                                         type_, niveau, domaine)
+                    st.success(t("projet_sauve_ok", LG))
+                    st.balloons()
+            else:
+                st.caption("\U0001F512 " + t("connecte_pour_sauver", LG))
+    except Exception:
+        pass
+    # ---- fin bouton sauvegarder ----
+    def tr(x): return traduire(x, LG)  # traduit le contenu dans la langue courante
+    if LG != "fr":
+        st.caption("🌐 " + {"en":"Content translated automatically.","es":"Contenido traducido automáticamente.",
+                   "pt":"Conteúdo traduzido automaticamente.","zh":"内容为自动翻译。","ar":"المحتوى مترجم آليًا.",
+                   "ja":"内容は自動翻訳されています。","ko":"콘텐츠는 자동 번역되었습니다.",
+                   "id":"Konten diterjemahkan secara otomatis."}.get(LG,""))
     # Convertir les choix affichés (traduits) en valeurs canoniques FR pour la logique
     type_c   = CANON_TYPES[T_TYPES.index(type_)]     if type_   in T_TYPES   else type_
     niveau_c = CANON_NIVEAUX[T_NIVEAUX.index(niveau)] if niveau in T_NIVEAUX else niveau
     domaine_c= CANON_DOM[T_DOMAINES.index(domaine)]   if domaine in T_DOMAINES else domaine
 
     # ---- Prix d'appel = service le moins cher proposé pour cette destination
-    prix_min_fcfa = min(SVC[s][2] for s in d["services"])
+    services_dest = services_cfg.effectifs(destination, d["services"], list(SVC.keys()))
+    if not services_dest:
+        services_dest = d["services"]
+    services_dest = _services_pour_type(services_dest, type_c)  # patch_jobboard2
+    _prix = services_cfg.tarifs_tous({k: v[2] for k, v in SVC.items()})
+    prix_min_fcfa = min((_prix[s] for s in services_dest if s in _prix), default=(min(_prix.values()) if _prix else 0))
     prix_local = conv(prix_min_fcfa, "XOF", dev_orig)
     if dev_orig in ("XOF", "XAF") or prix_local is None:
         prix_txt = f"{prix_min_fcfa:,} FCFA".replace(",", " ")
     else:
         prix_txt = f"{prix_local:,.0f} {dev_orig}".replace(",", " ")
 
+    # ---- Prix en DEVISE DE DESTINATION + lien accompagnement (patch_accompagnement)
+    import urllib.parse as _up
+    _eur_min = prix_min_fcfa / 655.96
+    try:
+        import devises as _dev
+        _p = _dev.prix(_eur_min, destination)
+        _n = _dev.note(_eur_min, destination)
+        _prix_banniere = _p + ((" · " + _n) if _n else "")
+    except Exception:
+        _prix_banniere = devises_cfg.prix_affiche(_eur_min, TAUX, avec_equivalent=True)
+    _url_acc = ("?page=accompagnement&dest=" + destination + "&lg=" + LG
+                + "&orig=" + _up.quote(origine or "")
+                + "&type=" + _up.quote(type_c or ""))
+    _url_contact = _url_acc.replace("page=accompagnement", "page=contact")
     # ---- Bandeau héro marketing
     st.markdown(f"""
 <div class='hero'>
-  <h2>{d['flag']} {origine} → {d['nom']}</h2>
-  <p>{d['resume']}</p>
-  <span class='prix'>{t("start_from", LG)} {prix_txt}</span>
+  <h2>{d['flag']} {nom_pays(origine, LG)} → {nom_pays(d['nom'], LG)}</h2>
+  <p>{tr(d['resume']) if type_c == "Formation (admission)" else tr(_PITCH_PROJET.get(type_c, ''))}</p>
+  <div style='display:flex; flex-wrap:wrap; align-items:center; gap:.7rem; margin-top:1.15rem;'>  <!-- patch_finitions -->
+    <span class='prix' style='margin:0;'>{t("start_from", LG)} {_prix_banniere}</span>
+    <a href='{_url_acc}' target='_blank' style='text-decoration:none; background:#e9b949; color:#1f2937; padding:.55rem 1.1rem; border-radius:10px; font-weight:600; display:inline-block; box-shadow:0 1px 3px rgba(0,0,0,.18);'>{t('accompagne', LG)} {nom_pays(d['nom'], LG)} →</a>
+    <a href='{_url_contact}' target='_blank' style='text-decoration:none; background:rgba(255,255,255,.94); color:#1f2937; padding:.55rem 1.1rem; border-radius:10px; font-weight:600; display:inline-block; box-shadow:0 1px 3px rgba(0,0,0,.18);'>{t('form_titre', LG).split('—')[0].strip()} →</a>
+  </div>
 </div>""", unsafe_allow_html=True)
 
-    st.markdown(
-        f"<span class='badge'>{type_}</span><span class='badge'>{niveau}</span>"
-        + (f"<span class='badge'>{domaine}</span>" if domaine_c != "Tous les domaines" else ""),
-        unsafe_allow_html=True)
+    # Badges type/niveau retires (patch_finitions) : redondants avec les selecteurs.
 
-    colA, colB = st.columns(2)
-    colA.markdown(f"**{t('budget', LG)}** {d['ressources']}")
-    colB.markdown(f"**{t('travail', LG)}** {d['travail']}")
-    st.markdown(f"**{t('apres', LG)}** {d['post']}")
+    # ---- Infos budget/travail/après : uniquement pour Formation (admission) ----
+    if type_c == "Formation (admission)":
+        colA, colB = st.columns(2)
+        colA.markdown(f"**{t('budget', LG)}** {tr(d['ressources'])}")
+        colB.markdown(f"**{t('travail', LG)}** {tr(d['travail'])}")
+        st.markdown(f"**{t('apres', LG)}** {tr(d['post'])}")
 
     # ---- Bourses d'abord si le projet est "Bourse"
     if type_c == "Bourse":
         st.markdown("### " + t("bourses_pour_toi", LG))
+        _connecte = espace.user_connecte() is not None
         for nom_b, det, lien in d["bourses"]:
-            with st.expander(f"💰 {nom_b}", expanded=True):
-                st.write(det)
-                if lien: st.markdown(f"[🔗 Site officiel]({lien})")
+            with st.expander(f"💰 {tr(nom_b)}", expanded=True):
+                if _connecte:
+                    st.write(tr(det))
+                    if lien: st.markdown(f"[🔗 Site officiel]({lien})")
+                else:
+                    # Aperçu : 1re phrase seulement, puis invitation à créer un compte
+                    apercu = tr(det.split(".")[0]) + "…"
+                    st.write(apercu)
+                    st.warning("🔒 Crée un compte gratuit pour voir les montants exacts, "
+                               "les conditions détaillées et le lien de candidature.")
+                    if st.button(tr("Débloquer gratuitement"), key=f"unlock_{nom_b}"):
+                        st.session_state.show_auth = True
+                        st.rerun()
 
     if type_c == "Stage / Emploi étudiant":
-        st.success(f"💼 En {d['nom']}, tu peux travailler **{d['travail']}** pendant tes études, "
-                   f"et après le diplôme : {d['post']}. La porte d'entrée reste le statut étudiant :")
+        st.success(tr(f"💼 {d['nom']} — pendant tes études, tu peux travailler : **{(d.get('travail') or '').rstrip(' .')}**. Après le diplôme : {(d.get('post') or '').rstrip(' .')}."))
 
-    # ---- Étapes (adaptées à l'origine pour la France)
-    st.markdown("### " + t("chemin", LG))
-    if destination == "FR":
-        etapes = d["etapes_eef"] if code_orig in EEF else d["etapes_std"]
-        if code_orig in EEF:
-            st.caption(f"ℹ️ En tant que ressortissant·e du pays « {origine} », ta procédure "
-                       f"passe par **Campus France / Études en France**. Voici exactement comment ça se déroule :")
-    else:
-        etapes = d["etapes"]
+    # ---- Contenu par TYPE DE PROJET (offres emploi/stage/bourse filtrées) ----
+    # --- habillage destination (patch_theme.py) ---
+    try:
+        import theme_pays
+        theme_pays.appliquer(destination, theme_pays.type_interne(type_c), tr)
+    except Exception as _e_theme:
+        print('theme_pays indisponible :', _e_theme)
+    # -----------------------------------------------
+    if type_c == "Bourse":  # _lot_bourses_d_v1
+        try:
+            import bourses_web_ui_v1
+            bourses_web_ui_v1.afficher(code_orig, destination, domaine_c,
+                                       nom_pays=d["nom"], nom_origine=origine,
+                                       connecte=(espace.user_connecte() is not None),
+                                       est_admin=espace.est_admin())
+        except Exception as _e_bw:
+            print("bourses_web_ui indisponible :", _e_bw)
+    _mode_opp = opportunites_ui.afficher(type_c, destination, code_orig, tr, poste=_poste_rech, domaine=domaine_c)
+    etapes = []
+    if not _mode_opp:
+        # ---- Étapes (adaptées à l'origine pour la France)
+        st.markdown("### " + t("chemin", LG))
+        if destination == "FR":
+            etapes = d["etapes_eef"] if code_orig in EEF else d["etapes_std"]
+            if code_orig in EEF:
+                st.caption(tr(f"ℹ️ En tant que ressortissant·e du pays « {origine} », ta procédure "
+                           f"passe par **Campus France / Études en France**. Voici exactement comment ça se déroule :"))
+        else:
+            etapes = d["etapes"]
 
-    for i, etape in enumerate(etapes, 1):
+    # _lot6_parcours_v1 : masquer les étapes "travail" (Decreto Flussi) hors parcours métier
+    _TAGS_TRAVAIL = {"FLUSSI"}
+    _etapes_vues = []
+    for _et in etapes:
+        _sc = _et[3] if len(_et) >= 4 else None
+        if _sc in _TAGS_TRAVAIL and type_c not in SVC_TYPES.get(_sc, set()):
+            continue
+        _etapes_vues.append(_et)
+    for i, etape in enumerate(_etapes_vues, 1):
         titre, det, lien, svc_code = (etape + (None,))[:4] if len(etape) == 3 else etape
-        with st.expander(f"{t('etape', LG)} {i} — {titre}", expanded=(i == 1)):
-            st.write(det)
+        with st.expander(f"{t('etape', LG)} {i} — {tr(titre)}", expanded=(i == 1)):
+            st.write(tr(det))
             if lien:
                 st.markdown(f"[{t('lien_officiel', LG)}]({lien})")
-            if svc_code and svc_code in d["services"]:
+            if svc_code and svc_code in services_dest:
                 if st.button(t("aide_etape", LG),
                              key=f"btn_{i}_{svc_code}"):
                     st.session_state.svc = svc_code
+                if st.session_state.get("svc") == svc_code:
+                    _sn, _sd, _sp = SVC[svc_code]
+                    st.success("✅ **" + tr(_sn) + "**\n\n" + tr(_sd))
+                    st.caption(tr("📩 Ce service est présélectionné dans le formulaire tout en bas de la page — remplis-le pour qu'on démarre."))
 
-    st.link_button(f"{t('portail', LG)} {d['nom']}", d["portail"])
+    if d.get("portail"):
+        st.link_button(f"{t('portail', LG)} {nom_pays(d['nom'], LG)}", d["portail"])
 
-    # ---- Bloc accompagnement (services filtrés par destination, SANS prix)
+    # ---- Accompagnement : deplace sur sa page dediee (patch_accompagnement)
     st.markdown("---")
-    st.markdown(f"## {t('accompagne', LG)} {d['nom']}")
-    st.write(t("accompagne_desc", LG))
+    _cA, _cB = st.columns(2)  # patch_jobboard3
+    _cA.link_button(t("accompagne", LG) + " " + nom_pays(d["nom"], LG) + " →",
+                    _url_acc, use_container_width=True, type="primary")
+    _cB.link_button(t("form_titre", LG).split("—")[0].strip() + " →",
+                    _url_contact, use_container_width=True, type="secondary")
+    # Le formulaire ci-dessous a besoin de la liste des services :
+    noms_services = [tr(SVC[s][0]) for s in services_dest]
 
-    noms_services = []
-    for s in d["services"]:
-        nom_s, desc_s, _ = SVC[s]
-        noms_services.append(nom_s)
-        ouvert = (st.session_state.svc == s)
-        with st.expander(nom_s, expanded=ouvert):
-            st.write(desc_s)
-
-    st.markdown("#### " + t("form_titre", LG))
-    with st.form("lead"):
-        f1, f2 = st.columns(2)
-        nom_lead = f1.text_input(t("nom", LG))
-        contact = f2.text_input(t("contact", LG))
-        pre = 0
-        if st.session_state.svc and SVC[st.session_state.svc][0] in noms_services:
-            pre = noms_services.index(SVC[st.session_state.svc][0])
-        service_choisi = st.selectbox(t("service_interet", LG), noms_services, index=pre)
-        msg = st.text_area(t("projet_2lignes", LG))
-        ok = st.form_submit_button(t("lancer", LG))
-        if ok:
-            if nom_lead.strip() and contact.strip():
-                con.execute("INSERT INTO leads(date,nom,contact,origine,destination,service,message) "
-                            "VALUES(?,?,?,?,?,?,?)",
-                            (TODAY, nom_lead, contact, origine, d["nom"], service_choisi, msg))
-                con.commit()
-                st.success(t("recu", LG))
-                st.balloons()
-            else:
-                st.error(t("champs_requis", LG))
-
+    # Formulaire retire de la page principale (patch_jobboard3) :
+    # il vit sur ?page=contact et ?page=accompagnement (liens ci-dessus).
     st.caption(t("disclaimer", LG))
 
 # =============================================================================
 # ADMIN
 # =============================================================================
 with st.sidebar:
-    st.markdown(f"### {APP_NAME} · Admin")
-    pwd = st.text_input("Mot de passe", type="password")
-    if pwd == ADMIN_PWD:
-        st.success("Mode admin")
-        st.markdown("**Pays visibles :**")
+    if espace.est_admin():
+        st.markdown(f"### {APP_NAME} · Admin")
+        st.link_button("🧭 Console d'accompagnement", "?page=console",
+                       use_container_width=True)  # _lot4_bouton_console_v1
+        st.link_button("🗺️ Moteur de plans", "?page=plans",
+                       use_container_width=True)
+        st.markdown("**💰 " + traduire("Monétisation :", st.session_state.get("lang","fr")) + "**")  # patch_monetisation
+        try:
+            import offres_sync as _osy_monT
+            _on_mon = _osy_monT.param("monetisation_active", "0") != "0"
+        except Exception:
+            _osy_monT = None
+            _on_mon = False
+        _nv_mon = st.checkbox(traduire("Activer Premium & boutique", st.session_state.get("lang","fr")),
+                              value=_on_mon, key="mon_active")
+        if _osy_monT is not None and _nv_mon != _on_mon:
+            _osy_monT.definir_param("monetisation_active", "1" if _nv_mon else "0")
+            st.rerun()
+        st.markdown("---")
+        st.markdown("**🗺️ " + traduire("Plans visiteur :", st.session_state.get("lang","fr")) + "**")  # patch_plans_visiteur
+        for _cle_pv, _lib_pv, _def_pv in (
+            ("plans_visiteur_actif", "Afficher les programmes aux visiteurs", "0"),
+            ("plans_visiteur_premium", "Réserver au Premium", "0"),
+        ):
+            try:
+                import offres_sync as _osy_pvt
+                _on_pv = _osy_pvt.param(_cle_pv, _def_pv) != "0"
+            except Exception:
+                _osy_pvt = None
+                _on_pv = _def_pv != "0"
+            _nv_pv = st.checkbox(traduire(_lib_pv, st.session_state.get("lang","fr")),
+                                 value=_on_pv, key=f"pvv_{_cle_pv}")
+            if _osy_pvt is not None and _nv_pv != _on_pv:
+                _osy_pvt.definir_param(_cle_pv, "1" if _nv_pv else "0")
+                st.rerun()
+        st.markdown("---")
+        st.markdown("**🗂 " + traduire("Projets visibles (menu visiteur) :", st.session_state.get("lang","fr")) + "**")  # patch_projets_visibles
+        st.caption(traduire("Décoché = retiré du menu du visiteur. Tout décocher = tout afficher.", st.session_state.get("lang","fr")))
+        for _pj in config_projets.PROJETS:
+            try:
+                import offres_sync as _osy_pjv
+                _on_pj = _osy_pjv.param(f"projet_visible:{_pj}", "1") != "0"
+            except Exception:
+                _osy_pjv = None
+                _on_pj = True
+            _nv_pj = st.checkbox(traduire(_pj, st.session_state.get("lang","fr")),
+                                 value=_on_pj, key=f"pjv_{_pj}")
+            if _osy_pjv is not None and _nv_pj != _on_pj:
+                try:
+                    _osy_pjv.definir_param(f"projet_visible:{_pj}", "1" if _nv_pj else "0")
+                except Exception as _e_pjv:
+                    st.error(f"Enregistrement impossible : {_e_pjv}")
+                else:
+                    st.rerun()
+        st.markdown("---")
+        st.markdown("**" + traduire("Pays visibles :", st.session_state.get("lang","fr")) + "**")
         for code in sorted(D, key=lambda c: D[c]["nom"]):
             etat = code in actifs
-            nouveau = st.checkbox(f"{D[code]['flag']} {D[code]['nom']}", value=etat, key=f"adm_{code}")
+            nouveau = st.checkbox(f"{D[code]['flag']} " + nom_pays(D[code]['nom'], st.session_state.get("lang","fr")), value=etat, key=f"adm_{code}")
             if nouveau != etat:
                 con.execute("UPDATE config_pays SET actif=? WHERE code=?", (1 if nouveau else 0, code))
                 con.commit(); st.rerun()
         st.markdown("---")
-        st.markdown("**📥 Demandes clients (15 dernières) :**")
+        st.markdown("**📥 " + traduire("Demandes clients (15 dernières) :", st.session_state.get("lang","fr")) + "**")
         rows = con.execute("SELECT date,nom,contact,origine,destination,service "
                            "FROM leads ORDER BY id DESC LIMIT 15").fetchall()
         for r in rows:
             st.write(f"• {r[0]} — **{r[1]}** ({r[2]}) : {r[3]} → {r[4]} · {r[5]}")
-        if not rows: st.caption("Aucune demande pour l'instant.")
+        if not rows: st.caption(traduire("Aucune demande pour l'instant.", st.session_state.get("lang","fr")))
         st.markdown("---")
-        st.markdown("**💰 Grille interne (jamais affichée aux clients) :**")
-        for code_s, (nom_s, _, prix) in SVC.items():
-            st.caption(f"{nom_s} : {prix:,} FCFA".replace(",", " "))
-    elif pwd:
-        st.error("Mot de passe incorrect")
+        if st.button("🎛 " + traduire("Configuration par projet", st.session_state.get("lang","fr")), key="btn_cfg_proj", use_container_width=True):
+            st.session_state.show_cfg_projets = True
+            st.rerun()
+        if st.button("🔐 Comptes utilisateurs", key="btn_cfg_comptes", use_container_width=True):
+            st.session_state.show_comptes = True
+            st.rerun()
+        if st.button("💎 Offres Premium", key="btn_cfg_offres", use_container_width=True):
+            st.session_state.show_offres = True
+            st.rerun()
+        if st.button("💱 Devises", key="btn_cfg_devises", use_container_width=True):
+            st.session_state.show_devises = True
+            st.rerun()
+        if st.button("🛂 Admissibilité", key="btn_cfg_elig", use_container_width=True):
+            st.session_state.show_eligibilite = True
+            st.rerun()
+        if st.button("🔄 Offres & liens", key="btn_cfg_sync", use_container_width=True):
+            st.session_state.show_sync = True
+            st.rerun()
+        st.markdown("**🌍 " + traduire("Pays d'origine masqués (non proposés) :", st.session_state.get("lang","fr")) + "**")
+        _off_act = sorted(services_cfg.origines_desactivees())
+        _off_sel = st.multiselect(traduire("Masquer ces origines", st.session_state.get("lang","fr")), sorted(ORIGINES.keys(), key=_tri_sans_accents),
+                                  default=_off_act, key="orig_off")
+        if set(_off_sel) != set(_off_act):
+            for _p in set(_off_sel) - set(_off_act):
+                services_cfg.definir_origine(_p, False)
+            for _p in set(_off_act) - set(_off_sel):
+                services_cfg.definir_origine(_p, True)
+            st.rerun()
+        st.markdown("---")
+        st.markdown("**🧩 " + traduire("Services proposés par destination :", st.session_state.get("lang","fr")) + "**")
+        _dsel = st.selectbox(traduire("Destination", st.session_state.get("lang","fr")), sorted(D, key=lambda c: D[c]["nom"]),
+                             format_func=lambda c: f"{D[c]['flag']} " + nom_pays(D[c]['nom'], st.session_state.get("lang","fr")),
+                             key="cfg_dest")
+        _eff = services_cfg.effectifs(_dsel, D[_dsel]["services"], list(SVC.keys()))
+        for _cs in SVC:
+            _on = st.checkbox(traduire(SVC[_cs][0], st.session_state.get("lang","fr")), value=_cs in _eff, key=f"svc_{_dsel}_{_cs}")
+            if _on != (_cs in _eff):
+                services_cfg.definir(_dsel, _cs, _on)
+                st.rerun()
+        st.markdown("---")
+        st.markdown("**💰 " + traduire("Tarifs des services (EUR) — modifiables :", st.session_state.get("lang","fr")) + "**")
+        _prix_adm = services_cfg.tarifs_tous({k: v[2] for k, v in SVC.items()})
+        for _cs2 in SVC:
+            _px_eur = int(round(_prix_adm[_cs2] / R)) if _prix_adm[_cs2] > 500 else int(_prix_adm[_cs2])
+            _np = st.number_input(traduire(SVC[_cs2][0], st.session_state.get("lang","fr")), min_value=0, step=5,
+                                  value=_px_eur, key=f"tar_{_cs2}",
+                                  help=f"Equivalent: {int(_px_eur * R):,} FCFA")
+            if _np != _px_eur:
+                services_cfg.definir_tarif(_cs2, int(_np))
+                st.rerun()
+
+
+
+# =============================================================================
+# NOUS CONTACTER (pied de page)
+# =============================================================================
+st.divider()
+st.markdown("## " + t("contact_titre", LG))
+_cw = os.environ.get("CONTACT_WHATSAPP", "+241 00 00 00 00")
+_ce = os.environ.get("CONTACT_EMAIL", "contact@yorbity.com")
+_fa, _fb = st.columns(2)
+_fa.markdown(f"**WhatsApp :** [{_cw}](https://wa.me/{_cw.replace(' ','').replace('+','')})")
+_fb.markdown(f"**E-mail :** [{_ce}](mailto:{_ce})")
+st.caption(t("contact_texte", LG))
+
+# _patch_fiches_italie_belgique_mcf_v1

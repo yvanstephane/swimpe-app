@@ -1,0 +1,247 @@
+=== SONDE LOT 4 — Wed 15 Jul 2026 01:47:35 CEST — yvans-macbook-pro.home ===
+--- 0. etat installation lot23 ---
+  "version": "1.2",
+1
+-rw-r--r--  1 yvannkoo  staff  10086 Jul 14 01:39 /Users/yvannkoo/mobilite-ia/app/api/moteur_plans.py.bak-20260714-043936
+-rw-r--r--  1 yvannkoo  staff  10056 Jul 15 01:40 /Users/yvannkoo/mobilite-ia/app/api/moteur_plans.py.bak-20260715-014015
+-rw-r--r--  1 yvannkoo  staff  10394 Jul 14 01:39 /Users/yvannkoo/mobilite-ia/data/plans_pays_v1.json.bak-20260714-043936
+-rw-r--r--  1 yvannkoo  staff  15926 Jul 15 01:40 /Users/yvannkoo/mobilite-ia/data/plans_pays_v1.json.bak-20260715-014015
+--- 1. console_accompagnement.py (complet) ---
+     198 /Users/yvannkoo/mobilite-ia/app/api/console_accompagnement.py
+# =============================================================================
+# console_accompagnement.py — Console d'accompagnement admin (v2a)
+# Accès : ?page=accompagnement (gating admin fait par ui.py).
+# Principes : profil ISOLÉ (session acc_*), diagnostic sourcé
+# (data/refus_par_pays_v1.json), offres via jobs_api (sources réelles,
+# AUCUNE modification), plan via moteur_plans (base vérifiée, sans IA).
+# =============================================================================
+import json
+import re
+from datetime import date
+from pathlib import Path
+
+import streamlit as st
+
+import jobs_api
+import moteur_plans
+
+_REF_RE = re.compile(r"^(?:[A-Z]{2,4}-\d+|OPP-\d+)$")
+
+# ── Données refus ────────────────────────────────────────────────────────────
+
+def _refus_path():
+    p = Path("data/refus_par_pays_v1.json")
+    if p.exists():
+        return p
+    return Path(__file__).resolve().parents[2] / "data" / "refus_par_pays_v1.json"
+
+@st.cache_data(show_spinner=False)
+def _refus():
+    with open(_refus_path(), encoding="utf-8") as f:
+        return json.load(f)
+
+# ── Zone 0 : profil client (état isolé acc_*) ───────────────────────────────
+
+def _zone_profil(D, ORIGINES):
+    st.markdown("#### 👤 Profil du client")
+    c1, c2, c3, c4 = st.columns(4)
+    with c1:
+        type_c = st.selectbox("📌 Type de projet",
+                              ["Métier spécialisé", "Stage / Emploi",
+                               "Bourse / Études"],
+                              key="acc_type")
+    with c2:
+        noms = sorted(ORIGINES.keys())
+        defaut = noms.index("Cameroun") if "Cameroun" in noms else 0
+        pays_nom = st.selectbox("🌍 Pays d'origine", noms, index=defaut,
+                                key="acc_orig")
+        code_orig = ORIGINES[pays_nom][0]
+    with c3:
+        codes = sorted(D.keys(), key=lambda c: D[c]["nom"])
+        defaut_d = codes.index("IT") if "IT" in codes else 0
+        dest = st.selectbox("🎯 Destination", codes, index=defaut_d,
+                            key="acc_dest",
+                            format_func=lambda c: f"{D[c].get('flag','')} {D[c]['nom']}")
+    with c4:
+        domaine = st.text_input("📚 Domaine (optionnel)", key="acc_dom")
+    return type_c, pays_nom, code_orig, dest, domaine
+
+# ── Zone 1 : recherche ──────────────────────────────────────────────────────
+
+def _zone_recherche():
+    q = st.text_input("🔍 Métier ou mots-clés de l'offre",
+                      key="acc_q",
+                      placeholder="électricien, plombier, soudeur…")
+    q = (q or "").strip()
+    if q and _REF_RE.match(q.upper()):
+        st.caption("ℹ️ Recherche par référence exacte : arrive en v2b — "
+                   "recherche par mots-clés lancée en attendant.")
+    return q
+
+# ── Zone 2 : diagnostic refus ───────────────────────────────────────────────
+
+def _zone_diagnostic(code_orig, pays_nom, dest):
+    R = _refus()
+    st.markdown(f"#### 🚦 Diagnostic {pays_nom} → destination")
+    taux_pays = R["taux_schengen_pays"].get(code_orig)
+    c1, c2 = st.columns(2)
+    with c1:
+        if taux_pays is not None:
+            st.metric("Refus visas Schengen — " + pays_nom,
+                      f"~{taux_pays:.0f} %",
+                      help=R["sources"]["schengen"])
+        else:
+            st.metric("Refus Schengen (moy. demandeurs africains)",
+                      f"~{R['taux_schengen_zone_afrique']:.0f} %",
+                      help=R["sources"]["schengen"])
+    with c2:
+        st.metric("Permis d'études Canada — Afrique francophone",
+                  f"~{R['taux_refus_canada_afr_fr']:.0f} % refusés",
+                  help=R["sources"]["canada"])
+    st.markdown("**Les causes principales — et comment on les répare :**")
+    for c in R["causes_principales"]:
+        st.markdown(f"- 🔴 **{c['cause']}** ({c['part']} % des refus) "
+                    f"→ 🟢 service **{c['service']}** : {c['remede']}")
+    spec = R["specificites"].get(dest)
+    if spec:
+        st.markdown(f"- ⚠️ **Spécifique {dest}** : {spec}")
+    st.caption("Trois causes sur quatre se réparent dans le dossier. "
+               "Sources : " + R["sources"]["note"])
+
+# ── Zone 3 : offres réelles (jobs_api, non modifié) ─────────────────────────
+
+def _zone_offres(type_c, dest, code_orig, poste, domaine):
+    st.markdown("#### 📋 Offres (sources officielles, à jour)")
+    if not jobs_api.disponible():
+        st.caption("⚙️ Job board inactif : clés ADZUNA manquantes dans .env.")
+        return
+    if not jobs_api.couvre(dest):
+        st.info("Pas de source d'offres en direct pour cette destination — "
+                "le plan d'accompagnement reste disponible ci-dessous.")
+        return
+    types_live = ("metier",) if type_c == "Métier spécialisé" else ("stage", "emploi")
+    jobs_api.afficher(dest, _tr, admin=True, code_orig=code_orig,
+                      types_live=types_live, poste=poste, domaine=domaine)
+
+def _tr(s):
+    return s  # console admin : français
+
+# ── Zone 4 : plan daté (moteur vérifié, sans IA) ────────────────────────────
+
+def _chip_compte_a_rebours(libelle, d):
+    j = (d - date.today()).days
+    st.markdown(f"`{libelle} : {moteur_plans._fmt(d)} · J−{j}`")
+
+def _zone_plan(type_c, code_orig, pays_nom, dest, ORIGINES, q):
+    st.markdown("#### 🧭 Plan d'accompagnement")
+    bourse = type_c == "Bourse / Études"
+    if bourse:
+        progs = []
+        if dest == "BE":
+            progs.append(("BE", "🇧🇪 Bourse ARES (Belgique)"))
+        progs.append(("MCF", "🎓 MasterCard Foundation (multi-destinations)"))
+        if dest == "IT":
+            st.caption("💡 Italie + études : la passerelle « permis études → "
+                       "travail hors quota » est dans la fiche Italie.")
+        prog = st.radio("Programme", [p[0] for p in progs],
+                        format_func=dict(progs).get, horizontal=True,
+                        key="acc_prog")
+        cible = prog
+    else:
+        cible = dest
+        if dest == "IT":
+            c1, c2, c3 = st.columns(3)
+            with c1:
+                _chip_compte_a_rebours("Précompilation ALI (ouverture)",
+                                       moteur_plans._prochaine(23, 10))
+            with c2:
+                _chip_compte_a_rebours("Click day quota réservé",
+                                       moteur_plans._prochaine(16, 2))
+            with c3:
+                _chip_compte_a_rebours("Click day quote générale",
+                                       moteur_plans._prochaine(18, 2))
+    offre_txt = st.text_input("Offre ou référence pour personnaliser le plan "
+                              "(copier le titre depuis la liste ci-dessus)",
+                              value=q, key="acc_offre")
+    if st.button("⚙️ Générer le plan", type="primary", key="acc_go"):
+        if cible not in ("IT", "BE", "MCF"):
+            st.info("Le moteur v1 couvre Italie, Belgique (ARES) et "
+                    "MasterCard Foundation. Les autres destinations "
+                    "s'ajoutent dans data/plans_pays_v1.json.")
+            return
+        plan, notes = moteur_plans.generer_plan(cible, code_orig,
+                                                ORIGINES, offre_txt)
+        st.subheader("Plan client (copier-coller)")
+        st.code(plan, language="markdown")
+        with st.expander("👁️ Aperçu mis en forme"):
+            st.markdown(plan)
+        if notes:
+            st.divider()
+            st.markdown(notes)
+
+# ── Écran ────────────────────────────────────────────────────────────────────
+
+def ecran(D, ORIGINES):
+    """Console ?page=accompagnement. True si affichée (admin géré en amont)."""
+    try:
+        page = st.query_params.get("page")
+    except Exception:
+        page = (st.experimental_get_query_params().get("page") or [None])[0]
+    if page != "console":
+        return False
+
+    st.title("🧭 Console d'accompagnement")
+    st.caption("Profil isolé · diagnostic sourcé · offres officielles en "
+               "direct · plan 100 % déterministe (base vérifiée "
+               f"{moteur_plans._kb()['meta']['maj']}).")
+
+    type_c, pays_nom, code_orig, dest, domaine = _zone_profil(D, ORIGINES)
+    st.divider()
+    q = _zone_recherche()
+    st.divider()
+    _zone_diagnostic(code_orig, pays_nom, dest)
+    st.divider()
+    if type_c != "Bourse / Études":
+        _zone_offres(type_c, dest, code_orig, q, domaine)
+        st.divider()
+    _zone_plan(type_c, code_orig, pays_nom, dest, ORIGINES, q)
+    return True
+--- 2. ui.py : barre laterale admin (ancres pour le bouton console) ---
+1280-    if espace.est_admin():
+1281-        st.markdown(f"### {APP_NAME} · Admin")
+1282:        st.markdown("**" + traduire("Pays visibles :", st.session_state.get("lang","fr")) + "**")
+1283-        for code in sorted(D, key=lambda c: D[c]["nom"]):
+1284-            etat = code in actifs
+1285-            nouveau = st.checkbox(f"{D[code]['flag']} " + nom_pays(D[code]['nom'], st.session_state.get("lang","fr")), value=etat, key=f"adm_{code}")
+1286-            if nouveau != etat:
+1287-                con.execute("UPDATE config_pays SET actif=? WHERE code=?", (1 if nouveau else 0, code))
+1288-                con.commit(); st.rerun()
+1289-        st.markdown("---")
+1290-        st.markdown("**📥 " + traduire("Demandes clients (15 dernières) :", st.session_state.get("lang","fr")) + "**")
+60:with st.sidebar:
+70:# ---------- Compte utilisateur (sidebar + écran auth) ----------
+71:espace.bloc_compte_sidebar()
+73:    with st.sidebar:
+131:with st.sidebar:
+1279:with st.sidebar:
+/Users/yvannkoo/mobilite-ia/app/api/autotrad.py:27:           "link_button", "download_button", "metric", "toggle", "slider",
+/Users/yvannkoo/mobilite-ia/app/api/jobs_api.py:406:                    st.link_button(
+/Users/yvannkoo/mobilite-ia/app/api/opportunites_ui.py:103:                    st.link_button(lib, o["source_url"])
+/Users/yvannkoo/mobilite-ia/app/api/paiement.py:372:            st.link_button(f"💳 Payer {res['montant']} {res['devise']} — "
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-005228.py:848:        st.link_button("← Yorbity", "/")
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-005228.py:1182:        st.link_button(f"{t('portail', LG)} {nom_pays(d['nom'], LG)}", d["portail"])
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-005228.py:1187:    _cA.link_button(t("accompagne", LG) + " " + nom_pays(d["nom"], LG) + " →",
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-005228.py:1189:    _cB.link_button(t("form_titre", LG).split("—")[0].strip() + " →",
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-014505.py:922:        st.link_button("← Yorbity", "/")
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-014505.py:1256:        st.link_button(f"{t('portail', LG)} {nom_pays(d['nom'], LG)}", d["portail"])
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-014505.py:1261:    _cA.link_button(t("accompagne", LG) + " " + nom_pays(d["nom"], LG) + " →",
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-014505.py:1263:    _cB.link_button(t("form_titre", LG).split("—")[0].strip() + " →",
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-035118.py:922:        st.link_button("← Yorbity", "/")
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-035118.py:1258:        st.link_button(f"{t('portail', LG)} {nom_pays(d['nom'], LG)}", d["portail"])
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-035118.py:1263:    _cA.link_button(t("accompagne", LG) + " " + nom_pays(d["nom"], LG) + " →",
+/Users/yvannkoo/mobilite-ia/app/api/ui.bak-20260714-035118.py:1265:    _cB.link_button(t("form_titre", LG).split("—")[0].strip() + " →",
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:922:        st.link_button("← Yorbity", "/")
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:1260:        st.link_button(f"{t('portail', LG)} {nom_pays(d['nom'], LG)}", d["portail"])
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:1265:    _cA.link_button(t("accompagne", LG) + " " + nom_pays(d["nom"], LG) + " →",
+/Users/yvannkoo/mobilite-ia/app/api/ui.py:1267:    _cB.link_button(t("form_titre", LG).split("—")[0].strip() + " →",
+--- 3. diagnostic feuille de route (Downloads) ---

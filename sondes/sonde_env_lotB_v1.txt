@@ -1,0 +1,53 @@
+=== SONDE ENV LOT B — Wed 15 Jul 2026 04:51:09 CEST ===
+--- A. Python du venv ---
+/Users/yvannkoo/mobilite-ia/.venv/bin/python3
+Python 3.14.5
+--- B. librairies web deja presentes ? ---
+requests 2.34.2
+beautifulsoup4 4.15.0
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import trafilatura; print('trafilatura', trafilatura.__version__)
+    ^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'trafilatura'
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import ddgs; print('ddgs OK')
+    ^^^^^^^^^^^
+ModuleNotFoundError: No module named 'ddgs'
+Traceback (most recent call last):
+  File "<string>", line 1, in <module>
+    import duckduckgo_search; print('duckduckgo_search OK')
+    ^^^^^^^^^^^^^^^^^^^^^^^^
+ModuleNotFoundError: No module named 'duckduckgo_search'
+--- C. base SQLite : chemin et tables existantes ---
+-rw-r--r--  1 yvannkoo  staff  4771840 Jul 15 04:34 /Users/yvannkoo/mobilite-ia/data/mobilite.db
+['destinations', 'origines', 'corridors', 'opportunites', 'sqlite_sequence', 'config_pays', 'leads', 'users', 'trad_cache', 'security_events', 'dossiers', 'projets', 'config_origines', 'config_services', 'config_tarifs', 'config_projet_pays', 'reset_codes', 'config_devises', 'config_params', 'jobs_cache', 'eligibilite', 'paiements']
+--- D. comment jobs_api fait ses appels web (modele a reutiliser) ---
+10:import sqlite3, os, json, datetime, urllib.request, urllib.parse
+30:    traduction_offres (Ollama + cache SQLite).
+105:    con = sqlite3.connect(DB)
+106:    con.execute("""CREATE TABLE IF NOT EXISTS jobs_cache(
+118:    url = f"https://api.adzuna.com/v1/api/jobs/{pays_adz}/search/1?{params}"
+120:        rep = json.loads(urllib.request.urlopen(url, timeout=20).read())
+146:    """Offres en direct (cache 12 h). Retourne une liste (peut être vide)."""
+153:    con = sqlite3.connect(DB); con.row_factory = sqlite3.Row
+154:    row = con.execute("SELECT * FROM jobs_cache WHERE cle=?", (cle,)).fetchone()
+174:    if offres is None:                      # API en panne → dernier cache connu
+176:    con = sqlite3.connect(DB)
+177:    con.execute("INSERT OR REPLACE INTO jobs_cache VALUES(?,?,?,?,?)",
+185:def _cx(timeout=30):
+187:    con = sqlite3.connect(DB, timeout=timeout)
+189:        con.execute("PRAGMA busy_timeout=30000")
+195:def _cache_lire(cle, heures=CACHE_HEURES):
+198:    con.row_factory = sqlite3.Row
+200:        row = con.execute("SELECT * FROM jobs_cache WHERE cle=?", (cle,)).fetchone()
+214:def _cache_ecrire(cle, dest, type_projet, offres):
+219:            "INSERT OR REPLACE INTO jobs_cache(cle,dest,type,contenu,maj) "
+234:    cache = _cache_lire(cle)
+235:    if cache is not None:
+236:        return cache
+248:        _cache_ecrire(cle, dest_code.upper(), type_projet, offres)
+250:        print("cache non ecrit :", e)
+--- E. Ollama tourne ? modeles dispo ---
+['compagnon:latest', 'nomic-embed-text:latest', 'qwen3-coder:30b', 'gpt-oss:120b', 'llama3.3:70b-instruct-q4_K_M', 'llama3.2:3b']
