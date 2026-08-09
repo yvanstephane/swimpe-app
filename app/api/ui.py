@@ -24,33 +24,44 @@ import sqlite3, os, datetime
 # attendent leur tour au lieu de lever « database is locked ».
 if not getattr(sqlite3, "_yorbity_patience", False):
     _sq_connect_origine = sqlite3.connect
-    _DBURL = os.environ.get("DATABASE_URL", "")
-    if not _DBURL:
+    _dbc_cache = {}
+
+    def _resoudre_dburl():
+        u = os.environ.get("DATABASE_URL", "")
+        if u:
+            return u
         try:
-            import streamlit as _st_boot
-            if hasattr(_st_boot, "secrets"):
-                for _k in list(_st_boot.secrets.keys()):
+            import streamlit as _st_lazy
+            if hasattr(_st_lazy, "secrets"):
+                for _k in list(_st_lazy.secrets.keys()):
                     if _k not in os.environ:
-                        os.environ[_k] = str(_st_boot.secrets[_k])
-                _DBURL = os.environ.get("DATABASE_URL", "")
+                        os.environ[_k] = str(_st_lazy.secrets[_k])
+                return os.environ.get("DATABASE_URL", "")
         except Exception:
             pass
-    if _DBURL:
-        import sys as _sys, os as _os
-        _sys.path.insert(0, _os.path.dirname(__file__))
-        import db as _dbc
-        sqlite3.connect = lambda *a, **k: _dbc.connect(*a, **k)
-        sqlite3.Row = _dbc.Row
-    else:
-        def _sq_connect_patient(*args, **kwargs):
-            kwargs.setdefault("timeout", 30)
-            con = _sq_connect_origine(*args, **kwargs)
-            try:
-                con.execute("PRAGMA busy_timeout=30000")
-            except Exception:
-                pass
-            return con
-        sqlite3.connect = _sq_connect_patient
+        return ""
+
+    def _sq_connect_patient(*args, **kwargs):
+        if _resoudre_dburl():
+            if "db" not in _dbc_cache:
+                import sys as _sys, os as _os
+                _sys.path.insert(0, _os.path.dirname(__file__))
+                import db as _dbc
+                _dbc_cache["db"] = _dbc
+                try:
+                    sqlite3.Row = _dbc.Row
+                except Exception:
+                    pass
+            return _dbc_cache["db"].connect(*args, **kwargs)
+        kwargs.setdefault("timeout", 30)
+        con = _sq_connect_origine(*args, **kwargs)
+        try:
+            con.execute("PRAGMA busy_timeout=30000")
+        except Exception:
+            pass
+        return con
+
+    sqlite3.connect = _sq_connect_patient
     sqlite3._yorbity_patience = True
 # ------------------------------------------------------------------------------
 import streamlit as st
