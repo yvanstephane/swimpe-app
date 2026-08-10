@@ -1,5 +1,5 @@
 # =============================================================================
-# YORBITY — Ta trajectoire vers le monde (multilingue, détection auto)
+# SWIMPE — Votre trajectoire vers le monde (multilingue, détection auto)
 # - Parcours guidé 4 questions → conditions d'admission déroulées (style Campus France)
 # - Procédure adaptée au pays d'ORIGINE (ex : Gabon → France = Études en France)
 # - Services d'accompagnement PAR DESTINATION, intégrés aux étapes, sans prix affichés
@@ -80,13 +80,20 @@ _PITCH_PROJET = {
     "Métier spécialisé": "Postes pour travailleurs qualifiés ouverts aux candidats internationaux — mis à jour en continu.",
 }
 
-APP_NAME = "Yorbity"
-TAGLINE = "Ta trajectoire vers le monde"
+APP_NAME = "Swimpe"
+TAGLINE = "Votre trajectoire vers le monde"
 DB = "data/mobilite.db"
 ADMIN_PWD = os.environ.get("ADMIN_PASSWORD") or None  # fail-closed : admin verrouille si variable absente
 TODAY = datetime.date.today().isoformat()
 
-st.set_page_config(page_title=APP_NAME, page_icon="🚀", layout="centered")
+st.set_page_config(page_title=APP_NAME, page_icon="🧭", layout="centered")
+# --- Habillage Swimpe (harmonisation avec le site vitrine) ---
+try:
+    import swimpe_theme
+    swimpe_theme.injecter()
+except Exception:
+    pass
+# --- fin habillage ---
 
 # ---------- Langue : détection auto (1re visite) + sélecteur ----------
 if "lang" not in st.session_state:
@@ -140,7 +147,7 @@ if LG in RTL:
 # ---------- Style ----------
 st.markdown("""
 <style>
-.hero {background: linear-gradient(135deg,#1e3a8a 0%,#3b82f6 55%,#06b6d4 100%);
+.hero {background: linear-gradient(100deg,#101B5C 0%,#1B2C86 100%);
   color:white; border-radius:18px; padding:1.6rem 1.8rem; margin:0.8rem 0 1.2rem;}
 .hero h2 {color:white; margin:0 0 .3rem; font-size:1.5rem;}
 .hero p {margin:0; opacity:.92; font-size:1.02rem;}
@@ -1210,7 +1217,7 @@ if _qp.get("page") in ("accompagnement", "contact"):
 # =============================================================================
 st.markdown(f"""
 <div style='text-align:center; padding:.4rem 0 .8rem;'>
-  <h1 style='margin-bottom:0; font-size:2.7rem;'>🚀 {APP_NAME}</h1>
+  <h1 style='margin-bottom:0; font-size:2.5rem;'><span style='display:inline-grid;place-items:center;width:46px;height:46px;background:#2653F1;color:#fff;border-radius:8px;font-size:26px;font-weight:800;vertical-align:middle;margin-right:10px'>S</span>{APP_NAME}</h1>
   <p style='color:var(--text-color); opacity:.72; margin-top:.15rem; font-size:1.1rem;'>{t('tagline', LG)}</p>
 </div>""", unsafe_allow_html=True)
 
