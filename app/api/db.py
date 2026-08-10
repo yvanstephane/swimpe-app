@@ -126,6 +126,14 @@ def _traduire(sql):
             s = re.sub(r"(CREATE\s+TABLE)\s+", r"\1 IF NOT EXISTS ", s,
                        count=1, flags=re.I)
         return s
+    # ALTER TABLE ... ADD COLUMN : rendre idempotent (PG supporte IF NOT EXISTS).
+    # Le code SQLite attrape sqlite3.OperationalError si la colonne existe deja,
+    # mais en PG l'erreur est DuplicateColumn (non attrapee) -> on previent.
+    if re.match(r"\s*ALTER\s+TABLE", s, re.I) and re.search(r"ADD\s+COLUMN", s, re.I):
+        if not re.search(r"ADD\s+COLUMN\s+IF\s+NOT\s+EXISTS", s, re.I):
+            s = re.sub(r"ADD\s+COLUMN\s+", "ADD COLUMN IF NOT EXISTS ", s,
+                       count=1, flags=re.I)
+        return s
     m = re.match(r"\s*INSERT\s+OR\s+REPLACE\s+INTO\s+(\w+)\s*(\([^)]*\))?", s, re.I)
     if m:
         table, cols_decl = m.group(1), m.group(2)
