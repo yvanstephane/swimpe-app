@@ -166,6 +166,10 @@ class _Cur:
         return self
     def fetchone(self): return self._raw.fetchone()
     def fetchall(self): return self._raw.fetchall()
+    def __iter__(self):
+        # Permet 'for r in con.execute(...)' comme en SQLite : on itere sur
+        # les lignes du curseur PostgreSQL.
+        return iter(self._raw.fetchall())
     @property
     def lastrowid(self):
         try:
