@@ -112,6 +112,20 @@ def _traduire(sql):
         return "SELECT 1"
     if "sqlite_master" in s.lower():
         return "SELECT tablename AS name FROM pg_tables WHERE schemaname='public'"
+    # CREATE TABLE : traduire les specificites SQLite vers PostgreSQL.
+    # Les tables existent deja dans Supabase, donc IF NOT EXISTS les laisse
+    # intactes ; il faut juste que la syntaxe soit valide pour PG.
+    if re.match(r"\s*CREATE\s+TABLE", s, re.I):
+        # INTEGER PRIMARY KEY AUTOINCREMENT  ->  SERIAL PRIMARY KEY
+        s = re.sub(r"\bINTEGER\s+PRIMARY\s+KEY\s+AUTOINCREMENT\b",
+                   "SERIAL PRIMARY KEY", s, flags=re.I)
+        # AUTOINCREMENT residuel  ->  retire (PG ne connait pas)
+        s = re.sub(r"\bAUTOINCREMENT\b", "", s, flags=re.I)
+        # garantir IF NOT EXISTS pour ne jamais casser sur table existante
+        if not re.search(r"IF\s+NOT\s+EXISTS", s, re.I):
+            s = re.sub(r"(CREATE\s+TABLE)\s+", r"\1 IF NOT EXISTS ", s,
+                       count=1, flags=re.I)
+        return s
     m = re.match(r"\s*INSERT\s+OR\s+REPLACE\s+INTO\s+(\w+)\s*(\([^)]*\))?", s, re.I)
     if m:
         table, cols_decl = m.group(1), m.group(2)
