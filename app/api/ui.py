@@ -1123,21 +1123,14 @@ try:
 except ImportError:
     pass
 
-# --- Connexion + donnees de reference mises en cache (patch_lenteur) ---------
-# EN LIGNE (PostgreSQL) : UNE connexion reutilisee entre les reruns via
-#   st.cache_resource -> plus de handshake reseau vers Francfort a chaque clic.
-#   Ping "SELECT 1" + reconnexion auto si la connexion est tombee (veille /
-#   pooler). UNE seule reouverture, jamais en boucle (respecte le disjoncteur).
-# EN LOCAL (SQLite) : connexion fraiche par rerun (comportement d'origine ;
-#   evite "SQLite objects can only be used in the same thread").
-_TTL_REF = 3600  # duree de vie du cache des pays actifs (s) ; None = permanent
-
-def _init_schema(con):
+def db():
+    con = sqlite3.connect(DB)
     con.execute("CREATE TABLE IF NOT EXISTS config_pays(code TEXT PRIMARY KEY, actif INT DEFAULT 1)")
     con.execute("""CREATE TABLE IF NOT EXISTS leads(
         id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, nom TEXT, contact TEXT,
         origine TEXT, destination TEXT, service TEXT, message TEXT)""")
-    # Seed des pays UNIQUEMENT s'il en manque (patch_seed_v1).
+    # Seed des pays UNIQUEMENT s'il en manque (patch_seed_v1) : plus
+    # d'ecriture a chaque rerun -> plus de collision entre onglets.
     _n = con.execute("SELECT COUNT(*) FROM config_pays").fetchone()[0]
     if _n < len(D):
         for code in D:
@@ -1145,42 +1138,8 @@ def _init_schema(con):
         con.commit()
     return con
 
-@st.cache_resource(show_spinner=False)
-def _con_cache():
-    # sqlite3.connect est redirige vers db.connect (PostgreSQL) par le patch patient.
-    return _init_schema(sqlite3.connect(DB))
-
-def _online():
-    try:
-        import db as _dbmod
-        return bool(_dbmod._resoudre_database_url())
-    except Exception:
-        return bool(os.environ.get("DATABASE_URL", "").strip())
-
-def db():
-    if not _online():
-        # Local SQLite : connexion fraiche (pas de partage entre threads).
-        return _init_schema(sqlite3.connect(DB))
-    con = _con_cache()
-    try:
-        con.rollback()                      # solde une transaction laissee ouverte
-        con.execute("SELECT 1").fetchone()  # ping
-        con.rollback()                      # pas de "idle in transaction"
-        return con
-    except Exception:
-        try:
-            con.close()
-        except Exception:
-            pass
-        _con_cache.clear()                  # jette la connexion morte
-        return _con_cache()                 # UNE reouverture, pas de boucle
-
-@st.cache_data(ttl=_TTL_REF, show_spinner=False)
-def _charger_actifs(_con):
-    return {r[0] for r in _con.execute("SELECT code FROM config_pays WHERE actif=1")}
-
 con = db()
-actifs = _charger_actifs(con)
+actifs = {r[0] for r in con.execute("SELECT code FROM config_pays WHERE actif=1")}
 
 if "svc" not in st.session_state: st.session_state.svc = None
 
@@ -1715,12 +1674,7 @@ with st.sidebar:
             nouveau = st.checkbox(f"{D[code]['flag']} " + nom_pays(D[code]['nom'], st.session_state.get("lang","fr")), value=etat, key=f"adm_{code}")
             if nouveau != etat:
                 con.execute("UPDATE config_pays SET actif=? WHERE code=?", (1 if nouveau else 0, code))
-                con.commit()
-                try:
-                    _charger_actifs.clear()   # invalide le cache des pays actifs
-                except Exception:
-                    pass
-                st.rerun()
+                con.commit(); st.rerun()
         st.markdown("---")
         st.markdown("**📥 " + traduire("Demandes clients (15 dernières) :", st.session_state.get("lang","fr")) + "**")
         rows = con.execute("SELECT date,nom,contact,origine,destination,service "
