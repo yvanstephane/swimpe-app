@@ -75,8 +75,8 @@ import autotrad  # traduction automatique globale (la langue prime sur tout)
 _METIER_LBLS = {v[3] for v in T["types"].values() if len(v) > 3}
 # Accroche du bandeau selon le type de projet (le résumé études reste pour Formation)
 _PITCH_PROJET = {
-    "Bourse": "Bourses accessibles selon ton pays d'origine — sélection mise à jour en continu.",
-    "Stage / Emploi étudiant": "Offres de stage et d'emploi étudiant ouvertes à ton profil — mises à jour en continu.",
+    "Bourse": "Bourses accessibles selon votre pays d'origine — sélection mise à jour en continu.",
+    "Stage / Emploi étudiant": "Offres de stage et d'emploi étudiant ouvertes à votre profil — mises à jour en continu.",
     "Métier spécialisé": "Postes pour travailleurs qualifiés ouverts aux candidats internationaux — mis à jour en continu.",
 }
 
@@ -237,25 +237,25 @@ EEF = {"ZA","DZ","BJ","BF","BI","CM","CN","CO","KM","CG","CD","CI","DJ","EG","ET
 # =============================================================================
 SVC = {
  "ORIENT":  ("🧭 Orientation & choix des formations",
-             "On analyse ton profil et on te propose les formations et établissements "
-             "les plus cohérents avec ton niveau, ton budget et ton projet — comme le "
-             "ferait un conseiller Parcoursup, mais dédié à toi.", 15000),
+             "On analyse votre profil et on vous propose les formations et établissements "
+             "les plus cohérents avec votre niveau, votre budget et votre projet — comme le "
+             "ferait un conseiller Parcoursup, mais dédié à vous.", 15000),
  "ADMIS":   ("🎓 Admission directe auprès des écoles",
-             "Nous contactons les établissements pour toi, montons tes candidatures "
-             "(y compris hors plateformes officielles) et t'obtenons des admissions "
-             "que tu intègres ensuite à ta procédure officielle.", 45000),
+             "Nous contactons les établissements pour vous, montons vos candidatures "
+             "(y compris hors plateformes officielles) et vous obtenons des admissions "
+             "que vous intégrez ensuite à votre procédure officielle.", 45000),
  "EEF":     ("🗂 Prise en charge du dossier Études en France",
-             "Création et remplissage complet de ton dossier EEF, choix stratégique "
+             "Création et remplissage complet de votre dossier EEF, choix stratégique "
              "des vœux, vérification des pièces, suivi des délais Campus France.", 30000),
  "DOSSIER": ("✍️ Lettre de motivation, CV & projet d'études",
-             "Rédaction et optimisation de ton dossier (3 itérations) pour maximiser "
-             "tes chances d'acceptation.", 25000),
+             "Rédaction et optimisation de votre dossier (3 itérations) pour maximiser "
+             "vos chances d'acceptation.", 25000),
  "ENTRETIEN":("🎤 Préparation à l'entretien",
              "Simulations réalistes (Campus France, consulat…) + débrief + fiches "
              "réponses personnalisées.", 15000),
  "FONDS":   ("💶 Montage de la preuve de fonds",
              "AVI, compte bloqué, GIC ou relevés : on construit un dossier financier "
-             "conforme aux exigences exactes de ta destination.", 20000),
+             "conforme aux exigences exactes de votre destination.", 20000),
  "VISA":    ("🛂 Accompagnement visa de A à Z",
              "Checklist personnalisée, remplissage des formulaires, prise de "
              "rendez-vous, préparation des justificatifs, suivi jusqu'au dépôt + une relance.", 20000),
@@ -267,7 +267,7 @@ SVC = {
              "complète au montage de 2 dossiers.", 20000),
  "TRAD":    ("📑 Traductions certifiées & légalisations",
              "Coordination des traductions assermentées, apostilles et "
-             "authentifications exigées par ta destination.", 10000),
+             "authentifications exigées par votre destination.", 10000),
 # patch_pack_retire : PACK retire du catalogue tant que les heures
 # reelles ne sont pas mesurees (remise de 63 % sur la somme des parties
 # = travail a perte). Pour le reactiver : retirer les '# ' ci-dessous.
@@ -308,19 +308,19 @@ D["FR"] = dict(nom="France", flag="🇫🇷",
  resume="Études quasi gratuites à l'université publique (exonérations fréquentes des "
         "droits différenciés). Diplômes reconnus mondialement, vie étudiante riche.",
  ressources="7 380 € par an à justifier (615 €/mois) — l'AVI est la solution la plus simple",
- travail="964 h/an (~20 h/semaine)", post="APS 1 an : rester chercher un emploi ou créer ton entreprise",
+ travail="964 h/an (~20 h/semaine)", post="APS 1 an : rester chercher un emploi ou créer votre entreprise",
  portail="https://www.campusfrance.org",
  services=["ORIENT","EEF","ADMIS","DOSSIER","ENTRETIEN","FONDS","VISA","LOGEMENT","BOURSE","TRAD","PACK"],
  etapes_eef=[
-  ("Créer ton dossier Études en France (Campus France)",
+  ("Créer votre dossier Études en France (Campus France)",
    "Ta procédure passe obligatoirement par la plateforme EEF gérée par Campus France : "
    "création du compte, saisie des vœux (souvent 3), paiement des frais de dossier "
    "(~70 000–85 000 FCFA selon le pays, non remboursables), dépôt des bulletins et diplômes scannés.",
    "https://pastel.diplomatie.gouv.fr/etudesenfrance", "EEF"),
-  ("Booster tes chances : l'admission directe en parallèle",
-   "En plus de tes vœux EEF, tu peux contacter directement des écoles et obtenir une "
-   "admission par tes propres démarches, puis l'ajouter dans EEF via « Je suis accepté » "
-   "et continuer ta procédure normalement. C'est le meilleur plan B — et on peut le faire pour toi.",
+  ("Booster vos chances : l'admission directe en parallèle",
+   "En plus de vos vœux EEF, vous pouvez contacter directement des écoles et obtenir une "
+   "admission par vos propres démarches, puis l'ajouter dans EEF via « Je suis accepté » "
+   "et continuer votre procédure normalement. C'est le meilleur plan B — et on peut le faire pour vous.",
    None, "ADMIS"),
   ("Préparer un dossier qui se démarque",
    "Lettre de motivation, CV et projet d'études : c'est ce que lisent les universités "
@@ -330,30 +330,30 @@ D["FR"] = dict(nom="France", flag="🇫🇷",
    "≈15 minutes décisives : motivation, cohérence du projet, connaissance de la France. "
    "Ça se prépare comme un oral d'examen.",
    None, "ENTRETIEN"),
-  ("Prouver tes ressources (7 380 €/an)",
+  ("Prouver vos ressources (7 380 €/an)",
    "Attestation de Virement Irrévocable (AVI), garant ou compte : le consulat veut un "
    "dossier financier carré. C'est le motif n°1 de refus de visa évitable.",
    None, "FONDS"),
   ("Demander le visa étudiant (VLS-TS)",
    "Sur France-Visas : formulaire, justificatifs, rendez-vous, dépôt. Délai 3–8 semaines.",
    "https://france-visas.gouv.fr", "VISA"),
-  ("Trouver ton logement AVANT le visa",
+  ("Trouver votre logement AVANT le visa",
    "Une attestation d'hébergement est exigée au dossier visa : CROUS, résidences privées, "
-   "colocation… On peut mener cette démarche en parallèle pour toi.",
+   "colocation… On peut mener cette démarche en parallèle pour vous.",
    "https://trouverunlogement.lescrous.fr", "LOGEMENT"),
  ],
  etapes_std=[
   ("Candidater directement (Parcoursup / établissements)",
-   "Ton pays n'est pas soumis à la procédure Études en France : tu candidates via "
+   "Votre pays n'est pas soumis à la procédure Études en France : vous candidatez via "
    "Parcoursup (licence) ou directement auprès des établissements (DAP au consulat pour la L1).",
    "https://www.parcoursup.gouv.fr", "ADMIS"),
-  ("Préparer ton dossier", "Lettre, CV, projet d'études solides.", None, "DOSSIER"),
-  ("Prouver tes ressources", "7 380 €/an (AVI, garant…).", None, "FONDS"),
+  ("Préparer votre dossier", "Lettre, CV, projet d'études solides.", None, "DOSSIER"),
+  ("Prouver vos ressources", "7 380 €/an (AVI, garant…).", None, "FONDS"),
   ("Visa étudiant VLS-TS", "Sur France-Visas.", "https://france-visas.gouv.fr", "VISA"),
   ("Logement", "Attestation exigée pour le visa.", "https://trouverunlogement.lescrous.fr", "LOGEMENT"),
  ],
  bourses=[("Bourse Eiffel", "Master/doctorat d'excellence, ~1 000–1 700 €/mois, déposée par l'établissement.", "https://www.campusfrance.org/fr/le-programme-de-bourses-eiffel"),
-          ("Bourses bilatérales", "Selon accords entre ton gouvernement et la France.", "https://www.campusfrance.org/fr/les-bourses")])
+          ("Bourses bilatérales", "Selon accords entre votre gouvernement et la France.", "https://www.campusfrance.org/fr/les-bourses")])
 
 D["CA"] = dict(nom="Canada", flag="🇨🇦",
  resume="Études + travail + immigration possible après le diplôme (PGWP → résidence). "
@@ -366,7 +366,7 @@ D["CA"] = dict(nom="Canada", flag="🇨🇦",
  etapes=[
   ("Décrocher l'admission d'un établissement désigné (EED)",
    "Seuls les établissements de la liste officielle IRCC permettent un permis d'études. "
-   "Le choix province/programme conditionne aussi tes chances (quotas).",
+   "Le choix province/programme conditionne aussi vos chances (quotas).",
    "https://www.canada.ca/fr/immigration-refugies-citoyennete/services/etudier-canada/etablissements-designes.html", "ADMIS"),
   ("Obtenir la LAP (hors Québec) ou le CAQ (Québec)",
    "Lettre d'attestation provinciale ou Certificat d'acceptation du Québec (~127 CAD, 4–6 semaines).",
@@ -376,7 +376,7 @@ D["CA"] = dict(nom="Canada", flag="🇨🇦",
    "motif n°1 de refus.",
    None, "FONDS"),
   ("Rédiger un plan d'études convaincant",
-   "Une page qui explique pourquoi CE programme, CE pays, et ton retour/projet. "
+   "Une page qui explique pourquoi CE programme, CE pays, et votre retour/projet. "
    "La 2e cause de refus la plus fréquente.",
    None, "DOSSIER"),
   ("Déposer la demande de permis d'études (IRCC)",
@@ -396,7 +396,7 @@ D["US"] = dict(nom="États-Unis", flag="🇺🇸",
  services=["ORIENT","ADMIS","DOSSIER","ENTRETIEN","FONDS","BOURSE","TRAD","PACK"],
  etapes=[
   ("Être admis dans une école certifiée SEVP",
-   "L'école t'envoie le formulaire I-20 avec le montant annuel à prouver.",
+   "L'école vous envoie le formulaire I-20 avec le montant annuel à prouver.",
    "https://studyinthestates.dhs.gov", "ADMIS"),
   ("Payer SEVIS puis remplir le DS-160",
    "Taxe SEVIS 350 USD (fmjfee.com) + formulaire DS-160 + frais visa 185 USD.",
@@ -405,11 +405,11 @@ D["US"] = dict(nom="États-Unis", flag="🇺🇸",
    "Les fonds doivent être stables, traçables et cohérents avec l'I-20.",
    None, "FONDS"),
   ("Réussir l'entretien consulaire (2 à 5 minutes !)",
-   "Le refus 214(b) tombe si l'agent doute de tes liens avec ton pays ou de tes fonds. "
+   "Le refus 214(b) tombe si l'agent doute de vos liens avec votre pays ou de vos fonds. "
    "Chaque réponse doit être prête.",
    None, "ENTRETIEN"),
  ],
- bourses=[("Fulbright", "Bourse complète master/doctorat, via l'ambassade US de ton pays.", "https://foreign.fulbrightonline.org"),
+ bourses=[("Fulbright", "Bourse complète master/doctorat, via l'ambassade US de votre pays.", "https://foreign.fulbrightonline.org"),
           ("Universités need-blind / full-need", "Certaines financent à 100 % les internationaux admis.", None)])
 
 D["GB"] = dict(nom="Royaume-Uni", flag="🇬🇧",
@@ -434,7 +434,7 @@ D["DE"] = dict(nom="Allemagne", flag="🇩🇪",
  portail="https://www.daad.de/en/",
  services=["ORIENT","ADMIS","DOSSIER","FONDS","VISA","BOURSE","TRAD","PACK"],
  etapes=[
-  ("Vérifier l'équivalence de ton diplôme", "Via anabin/uni-assist (~75 €). Certains bacs exigent une année préparatoire (Studienkolleg).", "https://www.uni-assist.de", "ADMIS"),
+  ("Vérifier l'équivalence de votre diplôme", "Via anabin/uni-assist (~75 €). Certains bacs exigent une année préparatoire (Studienkolleg).", "https://www.uni-assist.de", "ADMIS"),
   ("Ouvrir le compte bloqué", "≈11 904 €/an chez Expatrio, Coracle ou Deutsche Bank.", "https://www.make-it-in-germany.com", "FONDS"),
   ("Visa national D", "Admission + Sperrkonto + assurance + logement.", None, "VISA"),
  ],
@@ -449,7 +449,7 @@ D["BE"] = dict(nom="Belgique", flag="🇧🇪",
  portail="https://www.studyinbelgium.be",
  services=["ORIENT","ADMIS","DOSSIER","FONDS","VISA","BOURSE","TRAD","PACK"],
  etapes=[
-  ("Faire reconnaître ton diplôme (équivalence FWB)", "Dossier à déposer TÔT : 3–4 mois de délai, indispensable pour s'inscrire.", "https://www.equivalences.cfwb.be", "TRAD"),
+  ("Faire reconnaître votre diplôme (équivalence FWB)", "Dossier à déposer TÔT : 3–4 mois de délai, indispensable pour s'inscrire.", "https://www.equivalences.cfwb.be", "TRAD"),
   ("S'inscrire à l'université", "Candidatures juin–septembre pour la rentrée d'octobre.", None, "ADMIS"),
   ("Visa D étudiant", "Admission + équivalence + fonds + assurance.", None, "VISA"),
  ],
@@ -488,7 +488,7 @@ D["BE"] = dict(nom="Belgique", flag="🇧🇪",
  ])
 
 D["IT"] = dict(nom="Italie", flag="🇮🇹",
- resume="Études en Italie : frais calculés sur tes revenus, souvent 500–3 000 €/an, "  # _lot7_desc_italie_v1
+ resume="Études en Italie : frais calculés sur vos revenus, souvent 500–3 000 €/an, "  # _lot7_desc_italie_v1
         "avec les bourses régionales DSU. Inscription via la plateforme officielle Universitaly. "
         "Coût de la vie modéré et diplômes reconnus dans toute l'Europe.",
  ressources="≈6 500 €/an à justifier pour le visa (hors bourse DSU).",
@@ -497,15 +497,15 @@ D["IT"] = dict(nom="Italie", flag="🇮🇹",
  portail="https://studyinitaly.esteri.it",
  services=["ORIENT","ADMIS","DOSSIER","BOURSE","VISA","TRAD","PACK"],
  etapes=[
-  ("Pré-inscription sur Universitaly", "La plateforme officielle reliée à ton consulat — l'équivalent italien de Campus France.", "https://www.universitaly.it", "ADMIS"),
+  ("Pré-inscription sur Universitaly", "La plateforme officielle reliée à votre consulat — l'équivalent italien de Campus France.", "https://www.universitaly.it", "ADMIS"),
   ("Demander la bourse régionale DSU", "Sur critères sociaux : logement + cantine + ~5 200 €/an. Peu de candidats étrangers la connaissent.", None, "BOURSE"),
   ("Visa D études", "Admission + fonds + logement + assurance.", None, "VISA"),
   # ── Decreto Flussi (Métier / Saisonnier) ──────────────────────────────────
   ("🛂 Decreto Flussi — trouver un emploi en Italie",
    "DPCM 02/10/2025 : 497 550 entrées sur 2026-2028 (164 850/an). "
    "L'employeur fait TOUT : il dépose la demande de nulla osta sur le Portale ALI, "
-   "tu n'as qu'à être prêt avec les documents. "
-   "Trois groupes selon ton pays d'origine — voir ci-dessous.", None, "FLUSSI"),
+   "vous n'avez qu'à être prêt avec les documents. "
+   "Trois groupes selon votre pays d'origine — voir ci-dessous.", None, "FLUSSI"),
   ("Groupe 1 — 14 pays africains à quota réservé (click day 16 fév)",
    "Algérie, Côte d'Ivoire, Égypte, Éthiopie, Gambie, Ghana, Mali, Maroc, Maurice, "
    "Niger, Nigeria, Sénégal, Soudan, Tunisie. "
@@ -531,7 +531,7 @@ D["IT"] = dict(nom="Italie", flag="🇮🇹",
    None, "FLUSSI"),
   ("Préparer MAINTENANT pour 2027",
    "Les click days 2026 sont passés. Les dates 2027 sont déjà connues (même calendrier annuel). "
-   "Action immédiate : trouver un employeur italien intéressé (offres Yorbity + candidature à distance), "
+   "Action immédiate : trouver un employeur italien intéressé (offres Swimpe + candidature à distance), "
    "rassembler les documents (casier judiciaire international, diplômes traduits, CV en italien). "
    "La précompilation ALI ouvre en octobre 2026 — l'employeur doit être prêt à ce moment-là.",
    "https://www.interno.gov.it/it/servizi/servizi-line/procedure-flussi", "FLUSSI"),
@@ -548,7 +548,7 @@ D["ES"] = dict(nom="Espagne", flag="🇪🇸",
  portail="https://www.universidades.gob.es",
  services=["ORIENT","ADMIS","DOSSIER","VISA","TRAD","PACK"],
  etapes=[
-  ("Homologuer ton bac (UNEDasiss)", "Obligatoire pour entrer en licence.", "https://unedasiss.uned.es", "TRAD"),
+  ("Homologuer votre bac (UNEDasiss)", "Obligatoire pour entrer en licence.", "https://unedasiss.uned.es", "TRAD"),
   ("Candidater aux universités", "Directement ou via les préinscriptions régionales.", None, "ADMIS"),
   ("Visa D études", "Admission + fonds + assurance.", None, "VISA"),
  ],
@@ -566,14 +566,14 @@ D["PT"] = dict(nom="Portugal", flag="🇵🇹",
  bourses=[("Bourses des universités + Camões", "Selon accords (pays lusophones surtout).", None)])
 
 D["NL"] = dict(nom="Pays-Bas", flag="🇳🇱",
- resume="Énorme offre en anglais, l'université dépose elle-même ta demande de séjour : zéro stress visa.",
+ resume="Énorme offre en anglais, l'université dépose elle-même votre demande de séjour : zéro stress visa.",
  ressources="≈13 500 €/an (norme IND) + scolarité 8 000–20 000 €/an",
  travail="16 h/semaine", post="Orientation year : 12 mois pour trouver un emploi",
  portail="https://www.studyinnl.org",
  services=["ORIENT","ADMIS","DOSSIER","FONDS","BOURSE","PACK"],
  etapes=[
   ("Candidater via Studielink", "Plateforme nationale unique.", "https://www.studielink.nl", "ADMIS"),
-  ("L'université gère ton visa", "Elle dépose la demande IND pour toi après admission et preuve de fonds.", None, "FONDS"),
+  ("L'université gère votre visa", "Elle dépose la demande IND pour vous après admission et preuve de fonds.", None, "FONDS"),
  ],
  bourses=[("Orange Knowledge / Orange Tulip", "Pays ciblés + bourses d'universités.", "https://www.studyinnl.org")])
 
@@ -589,14 +589,14 @@ D["GR"] = dict(nom="Grèce", flag="🇬🇷",
  bourses=[("Bourses IKY", "Fondation d'État, selon accords bilatéraux.", "https://www.iky.gr")])
 
 D["CZ"] = dict(nom="République tchèque", flag="🇨🇿",
- resume="GRATUIT si tu étudies en tchèque (année de langue possible) ; 2 000–6 000 €/an en anglais. "
+ resume="GRATUIT si vous étudiez en tchèque (année de langue possible) ; 2 000–6 000 €/an en anglais. "
         "Bourses d'État pour les pays en développement.",
  ressources="≈4 400 €/an à justifier",
  travail="Autorisé avec les études", post="9 mois de recherche d'emploi",
  portail="https://www.studyin.cz",
  services=["ORIENT","ADMIS","DOSSIER","VISA","TRAD","BOURSE","PACK"],
  etapes=[
-  ("Candidater + nostrifier ton diplôme", "Reconnaissance du diplôme (nostrification) + candidature directe.", "https://www.studyin.cz", "ADMIS"),
+  ("Candidater + nostrifier votre diplôme", "Reconnaissance du diplôme (nostrification) + candidature directe.", "https://www.studyin.cz", "ADMIS"),
   ("Visa long séjour", "Admission + fonds + logement + casier.", None, "VISA"),
  ],
  bourses=[("Bourses du gouvernement tchèque", "Pays en développement, via l'ambassade.", "https://www.mzv.cz")])
@@ -621,7 +621,7 @@ D["RO"] = dict(nom="Roumanie", flag="🇷🇴",
  services=["ORIENT","ADMIS","DOSSIER","BOURSE","VISA","TRAD","PACK"],
  etapes=[
   ("Obtenir la lettre d'acceptation du ministère",
-   "L'université transmet ton dossier au ministère roumain (4–8 semaines). C'est LA pièce clé du visa.",
+   "L'université transmet votre dossier au ministère roumain (4–8 semaines). C'est LA pièce clé du visa.",
    None, "ADMIS"),
   ("Visa D/SD", "Acceptation + fonds + assurance + casier.", None, "VISA"),
  ],
@@ -634,7 +634,7 @@ D["HU"] = dict(nom="Hongrie", flag="🇭🇺",
  portail="https://studyinhungary.hu",
  services=["ORIENT","DOSSIER","BOURSE","VISA","TRAD","PACK"],
  etapes=[
-  ("Candidater au Stipendium (janvier)", "Via l'organisme d'envoi de ton pays + la plateforme officielle.", "https://stipendiumhungaricum.hu", "BOURSE"),
+  ("Candidater au Stipendium (janvier)", "Via l'organisme d'envoi de votre pays + la plateforme officielle.", "https://stipendiumhungaricum.hu", "BOURSE"),
   ("Visa D après attribution", "", None, "VISA"),
  ],
  bourses=[("Stipendium Hungaricum", "Bourse complète, tous cycles.", "https://stipendiumhungaricum.hu")])
@@ -648,7 +648,7 @@ D["TR"] = dict(nom="Turquie", flag="🇹🇷",
  services=["ORIENT","DOSSIER","ENTRETIEN","BOURSE","VISA","TRAD","PACK"],
  etapes=[
   ("Candidater sur turkiyeburslari.gov.tr", "Jusqu'à 12 programmes ; l'université est ensuite assignée.", "https://www.turkiyeburslari.gov.tr", "BOURSE"),
-  ("Réussir l'entretien (juin–juillet)", "Motivation + projet — un entretien préparé multiplie tes chances (taux global ~3–4 %).", None, "ENTRETIEN"),
+  ("Réussir l'entretien (juin–juillet)", "Motivation + projet — un entretien préparé multiplie vos chances (taux global ~3–4 %).", None, "ENTRETIEN"),
   ("Visa étudiant", "Après acceptation.", None, "VISA"),
  ],
  bourses=[("Türkiye Bursları", "Complète, tous cycles, tous pays.", "https://www.turkiyeburslari.gov.tr")])
@@ -716,7 +716,7 @@ D["PK"] = dict(nom="Pakistan", flag="🇵🇰",
   ("Candidater via la HEC / universités", "La Higher Education Commission centralise l'accueil international.", "https://www.hec.gov.pk", "ADMIS"),
   ("Visa étudiant", "Admission + NOC selon programme.", None, "VISA"),
  ],
- bourses=[("Bourses HEC / accords bilatéraux", "Selon conventions avec ton pays.", "https://www.hec.gov.pk")])
+ bourses=[("Bourses HEC / accords bilatéraux", "Selon conventions avec votre pays.", "https://www.hec.gov.pk")])
 
 D["ID"] = dict(nom="Indonésie", flag="🇮🇩",
  resume="Bourse KNB dédiée aux pays en développement : scolarité + allocation + billets. "
@@ -788,7 +788,7 @@ D["MA"] = dict(nom="Maroc", flag="🇲🇦",
  portail="https://www.amci.ma",
  services=["ORIENT","DOSSIER","BOURSE","TRAD"],
  etapes=[
-  ("Candidater à l'AMCI", "Via le ministère de ton pays ou l'ambassade du Maroc — dossier annuel.", "https://www.amci.ma", "BOURSE"),
+  ("Candidater à l'AMCI", "Via le ministère de votre pays ou l'ambassade du Maroc — dossier annuel.", "https://www.amci.ma", "BOURSE"),
   ("Inscription + séjour", "Beaucoup de nationalités africaines sont exemptées de visa.", None, None),
  ],
  bourses=[("AMCI", "Scolarité + allocation + logement campus.", "https://www.amci.ma")])
@@ -801,7 +801,7 @@ D["TN"] = dict(nom="Tunisie", flag="🇹🇳",
  portail="https://www.mes.tn",
  services=["ORIENT","ADMIS","DOSSIER","TRAD"],
  etapes=[
-  ("Candidater via la coopération / directement", "Ministère de ton pays ou ambassade de Tunisie.", None, "ADMIS"),
+  ("Candidater via la coopération / directement", "Ministère de votre pays ou ambassade de Tunisie.", None, "ADMIS"),
   ("Carte de séjour étudiant", "Après l'arrivée.", None, None),
  ],
  bourses=[("Bourses de coopération tunisienne", "Selon accords bilatéraux.", None)])
@@ -951,7 +951,7 @@ D["RU"] = dict(
     portail='https://education-in-russia.com',
     services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
     etapes=[
-        ("Déposer une demande de quota d'État", 'Candidature via le portail officiel des quotas (sélection par le canal russe accrédité dans ton pays).', 'https://education-in-russia.com', None),
+        ("Déposer une demande de quota d'État", 'Candidature via le portail officiel des quotas (sélection par le canal russe accrédité dans votre pays).', 'https://education-in-russia.com', None),
         ('Passer la sélection', 'Épreuves ou entretien selon la filière, puis classement des candidats.', None, None),
         ('Année préparatoire de langue russe', 'Intégrée au parcours quota pour les cursus enseignés en russe.', None, None),
     ],
@@ -968,7 +968,7 @@ D["RS"] = dict(
     portail='https://studyinserbia.rs',
     services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
     etapes=[
-        ('Faire reconnaître ton diplôme (ENIC/NARIC)', "Démarche via l'agence serbe (azk.gov.rs) AVANT l'inscription — s'y prendre tôt, c'est long.", 'https://studyinserbia.rs', None),
+        ('Faire reconnaître votre diplôme (ENIC/NARIC)', "Démarche via l'agence serbe (azk.gov.rs) AVANT l'inscription — s'y prendre tôt, c'est long.", 'https://studyinserbia.rs', None),
         ('Choisir un programme accrédité', 'Catalogue officiel des programmes (dont ~180 en anglais).', 'https://studyinserbia.rs', None),
         ("Passer l'examen d'entrée", "Vers juin (licence), septembre–octobre (master) selon l'université.", None, None),
     ],
@@ -985,7 +985,7 @@ D["DZ"] = dict(
     portail='https://www.mesrs.dz',
     services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
     etapes=[
-        ("Obtenir l'équivalence de ton diplôme", "Équivalence du baccalauréat/diplôme requise pour l'inscription.", 'https://www.mesrs.dz', None),
+        ("Obtenir l'équivalence de votre diplôme", "Équivalence du baccalauréat/diplôme requise pour l'inscription.", 'https://www.mesrs.dz', None),
         ('Passer par la Direction de la coopération (MESRS)', "Autorisation d'inscription via le canal officiel (circulaire n°47) ; pour les boursiers, demande via le pays d'origine.", None, None),
         ("Visite médicale d'admission", "À l'arrivée, selon l'établissement.", None, None),
     ],
@@ -1053,7 +1053,7 @@ D["SK"] = dict(
     portail='https://www.vladnestipendia.sk/en/',
     services=['ORIENT', 'ADMIS', 'DOSSIER', 'VISA', 'TRAD'],
     etapes=[
-        ("Vérifier l'éligibilité de ton pays", "Liste des pays partenaires revue à chaque cycle (annexe de l'appel).", 'https://www.vladnestipendia.sk/en/', None),
+        ("Vérifier l'éligibilité de votre pays", "Liste des pays partenaires revue à chaque cycle (annexe de l'appel).", 'https://www.vladnestipendia.sk/en/', None),
         ('Candidater en ligne (mars–mai)', 'Portail actif ~23 mars → fin mai ; réponse au plus tard le 15 juillet.', None, None),
         ('Envoyer le dossier papier (si lauréat)', "Seuls les lauréats transmettent l'original signé au ministère.", None, None),
     ],
@@ -1063,8 +1063,8 @@ D["SK"] = dict(
 D["KZ"] = dict(
     nom='Kazakhstan',
     flag='🇰🇿',
-    resume="Environ 550 bourses d'État par an (tous cycles), cursus en kazakh, russe ou anglais. Prise en charge PARTIELLE : billet, visa et assurance restent à ta charge.",
-    ressources='Scolarité + allocation mensuelle couvertes ; billet, visa et assurance à ta charge.',
+    resume="Environ 550 bourses d'État par an (tous cycles), cursus en kazakh, russe ou anglais. Prise en charge PARTIELLE : billet, visa et assurance restent à votre charge.",
+    ressources='Scolarité + allocation mensuelle couvertes ; billet, visa et assurance à votre charge.',
     travail='Selon la réglementation étudiante kazakhe — à confirmer.',
     post='À confirmer auprès des autorités kazakhes.',
     portail='https://studyin.kz/admission',
@@ -1123,14 +1123,14 @@ try:
 except ImportError:
     pass
 
-def db():
-    con = sqlite3.connect(DB)
+# --- Connexion + donnees de reference mises en cache (patch_lenteur) ---------
+_TTL_REF = 3600
+
+def _init_schema(con):
     con.execute("CREATE TABLE IF NOT EXISTS config_pays(code TEXT PRIMARY KEY, actif INT DEFAULT 1)")
     con.execute("""CREATE TABLE IF NOT EXISTS leads(
         id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT, nom TEXT, contact TEXT,
         origine TEXT, destination TEXT, service TEXT, message TEXT)""")
-    # Seed des pays UNIQUEMENT s'il en manque (patch_seed_v1) : plus
-    # d'ecriture a chaque rerun -> plus de collision entre onglets.
     _n = con.execute("SELECT COUNT(*) FROM config_pays").fetchone()[0]
     if _n < len(D):
         for code in D:
@@ -1138,8 +1138,40 @@ def db():
         con.commit()
     return con
 
+@st.cache_resource(show_spinner=False)
+def _con_cache():
+    return _init_schema(sqlite3.connect(DB))
+
+def _online():
+    try:
+        import db as _dbmod
+        return bool(_dbmod._resoudre_database_url())
+    except Exception:
+        return bool(os.environ.get("DATABASE_URL", "").strip())
+
+def db():
+    if not _online():
+        return _init_schema(sqlite3.connect(DB))
+    con = _con_cache()
+    try:
+        con.rollback()
+        con.execute("SELECT 1").fetchone()
+        con.rollback()
+        return con
+    except Exception:
+        try:
+            con.close()
+        except Exception:
+            pass
+        _con_cache.clear()
+        return _con_cache()
+
+@st.cache_data(ttl=_TTL_REF, show_spinner=False)
+def _charger_actifs(_con):
+    return {r[0] for r in _con.execute("SELECT code FROM config_pays WHERE actif=1")}
+
 con = db()
-actifs = {r[0] for r in con.execute("SELECT code FROM config_pays WHERE actif=1")}
+actifs = _charger_actifs(con)
 
 if "svc" not in st.session_state: st.session_state.svc = None
 
@@ -1158,8 +1190,8 @@ if _qp.get("page") in ("accompagnement", "contact"):
     _type_qp = _up.unquote(_qp.get("type") or "")
     _d = D.get(_dst)
     if not _d:
-        st.warning("🌍 " + _tr("Choisis d'abord un pays de destination sur la page principale."))
-        st.link_button("← Yorbity", "/")
+        st.warning("🌍 " + _tr("Choisissez d'abord un pays de destination sur la page principale."))
+        st.link_button("← Swimpe", "/")
         st.stop()
 
     try:
@@ -1202,12 +1234,12 @@ if _qp.get("page") in ("accompagnement", "contact"):
                      _up.unquote(_qp.get("orig") or ""), _d["nom"],
                      _svc_choisi, _msg.strip()))
                 con.commit()
-                st.success("✅ " + _tr("Merci ! Notre équipe te répond sous 24 h."))
+                st.success("✅ " + _tr("Merci ! Notre équipe vous répond sous 24 h."))
             else:
                 st.error(_tr("Nom et contact sont obligatoires."))
-    st.caption(_tr("Nous préparons et organisons tes démarches avec toi. "
+    st.caption(_tr("Nous préparons et organisons vos démarches avec vous. "
                    "Personne ne peut garantir une admission ou un visa — "
-                   "méfie-toi de ceux qui le promettent."))
+                   "méfiez-vous de ceux qui le promettent."))
     st.stop()
 # -----------------------------------------------------------------------------
 
@@ -1530,14 +1562,14 @@ else:
                     # Aperçu : 1re phrase seulement, puis invitation à créer un compte
                     apercu = tr(det.split(".")[0]) + "…"
                     st.write(apercu)
-                    st.warning("🔒 Crée un compte gratuit pour voir les montants exacts, "
+                    st.warning("🔒 Créez un compte gratuit pour voir les montants exacts, "
                                "les conditions détaillées et le lien de candidature.")
                     if st.button(tr("Débloquer gratuitement"), key=f"unlock_{nom_b}"):
                         st.session_state.show_auth = True
                         st.rerun()
 
     if type_c == "Stage / Emploi étudiant":
-        st.success(tr(f"💼 {d['nom']} — pendant tes études, tu peux travailler : **{(d.get('travail') or '').rstrip(' .')}**. Après le diplôme : {(d.get('post') or '').rstrip(' .')}."))
+        st.success(tr(f"💼 {d['nom']} — pendant vos études, vous pouvez travailler : **{(d.get('travail') or '').rstrip(' .')}**. Après le diplôme : {(d.get('post') or '').rstrip(' .')}."))
 
     # ---- Contenu par TYPE DE PROJET (offres emploi/stage/bourse filtrées) ----
     # --- habillage destination (patch_theme.py) ---
@@ -1564,7 +1596,7 @@ else:
         if destination == "FR":
             etapes = d["etapes_eef"] if code_orig in EEF else d["etapes_std"]
             if code_orig in EEF:
-                st.caption(tr(f"ℹ️ En tant que ressortissant·e du pays « {origine} », ta procédure "
+                st.caption(tr(f"ℹ️ En tant que ressortissant·e du pays « {origine} », votre procédure "
                            f"passe par **Campus France / Études en France**. Voici exactement comment ça se déroule :"))
         else:
             etapes = d["etapes"]
@@ -1674,7 +1706,12 @@ with st.sidebar:
             nouveau = st.checkbox(f"{D[code]['flag']} " + nom_pays(D[code]['nom'], st.session_state.get("lang","fr")), value=etat, key=f"adm_{code}")
             if nouveau != etat:
                 con.execute("UPDATE config_pays SET actif=? WHERE code=?", (1 if nouveau else 0, code))
-                con.commit(); st.rerun()
+                con.commit()
+                try:
+                    _charger_actifs.clear()
+                except Exception:
+                    pass
+                st.rerun()
         st.markdown("---")
         st.markdown("**📥 " + traduire("Demandes clients (15 dernières) :", st.session_state.get("lang","fr")) + "**")
         rows = con.execute("SELECT date,nom,contact,origine,destination,service "
