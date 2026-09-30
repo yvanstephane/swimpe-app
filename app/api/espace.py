@@ -1,5 +1,5 @@
 # =============================================================================
-# espace.py — Écrans de compte Yorbity (connexion, inscription, espace perso)
+# espace.py — Écrans de compte Swimpe (connexion, inscription, espace perso)
 # S'appuie sur auth.py. Importé par ui.py.
 # =============================================================================
 import streamlit as st
@@ -164,12 +164,12 @@ def ecran_premium():
         st.session_state.show_auth = True
         st.rerun()
 
-    st.markdown("## ⭐ Passe au Premium")
+    st.markdown("## ⭐ Passez au Premium")
     st.write("Le Premium débloque l'accompagnement personnalisé, les démarches "
-             "déléguées et le suivi complet de tes dossiers.")
+             "déléguées et le suivi complet de vos dossiers.")
 
     if auth.est_premium(u):
-        st.success(f"✅ Ton Premium est déjà actif jusqu'au {u['premium_jusqu']}.")
+        st.success(f"✅ Votre Premium est déjà actif jusqu'au {u['premium_jusqu']}.")
 
     if paiement.MODE != "reel":
         st.info(t("mode_test_info", _lg()))
@@ -203,7 +203,7 @@ def ecran_premium():
                         st.balloons()
                     else:
                         st.markdown(f"### [👉 Payer maintenant]({res['url']})")
-                        st.caption("Tu seras redirigé vers la page sécurisée CinetPay "
+                        st.caption("Vous serez redirigé vers la page sécurisée CinetPay "
                                    "(Mobile Money ou carte).")
                 else:
                     st.error(res["message"])

@@ -45,14 +45,14 @@ def _init():
 def _envoyer_email(dest, code):
     user = _env("YORBITY_SMTP_USER"); pwd = _env("YORBITY_SMTP_PASS")
     if not (user and pwd) or pwd == "A_REMPLACER":
-        return False, ("Envoi d'e-mail non configuré. Mets YORBITY_SMTP_PASS "
+        return False, ("Envoi d'e-mail non configuré. Mettez YORBITY_SMTP_PASS "
                        "(mot de passe d'application Gmail) dans le fichier .env.")
     try:
-        msg = MIMEText(f"Ton code de récupération Yorbity : {code}\n"
+        msg = MIMEText(f"Votre code de récupération Swimpe : {code}\n"
                        f"Valable {VALIDITE_MIN} minutes ({MAX_ESSAIS} essais max).\n"
-                       "Si tu n'es pas à l'origine de cette demande, ignore ce message.",
+                       "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.",
                        _charset="utf-8")
-        msg["Subject"] = "Yorbity — code de récupération"
+        msg["Subject"] = "Swimpe — code de récupération"
         msg["From"] = user; msg["To"] = dest
         hote = _env("YORBITY_SMTP_HOST", "smtp.gmail.com")
         port = int(_env("YORBITY_SMTP_PORT", "465"))
@@ -77,7 +77,7 @@ def _envoyer_whatsapp(tel, code):
     try:
         data = urllib.parse.urlencode({
             "From": f"whatsapp:{dep}", "To": f"whatsapp:{tel}",
-            "Body": f"Yorbity — code de récupération : {code} "
+            "Body": f"Swimpe — code de récupération : {code} "
                     f"(valable {VALIDITE_MIN} min)"}).encode()
         req = urllib.request.Request(
             f"https://api.twilio.com/2010-04-01/Accounts/{sid}/Messages.json", data=data)
@@ -133,10 +133,10 @@ def verifier_code(email, code):
         if not r:
             return False, "Code invalide."
         if r["essais"] >= MAX_ESSAIS:
-            return False, "Trop d'essais. Redemande un nouveau code."
+            return False, "Trop d'essais. Redemandez un nouveau code."
         try:
             if datetime.datetime.fromisoformat(r["expire"]) < datetime.datetime.now():
-                return False, "Code expiré. Redemande un nouveau code."
+                return False, "Code expiré. Redemandez un nouveau code."
         except Exception:
             pass
         if auth._hash((code or "").strip(), r["code_salt"]) != r["code_hash"]:
@@ -159,7 +159,7 @@ def ecran():
 
     if etape == 1:
         with st.form("mdpo_email"):
-            email = st.text_input("Ton adresse e-mail")
+            email = st.text_input("Votre adresse e-mail")
             canaux = ["E-mail"] + (["WhatsApp"] if whatsapp_dispo() else [])
             canal = st.radio("Recevoir le code par", canaux, horizontal=True)
             c1, c2 = st.columns(2)
@@ -186,7 +186,7 @@ def ecran():
         with st.form("mdpo_code"):
             code = st.text_input("Code reçu")
             n1 = st.text_input("Nouveau mot de passe", type="password")
-            n2 = st.text_input("Confirme le nouveau mot de passe", type="password")
+            n2 = st.text_input("Confirmez le nouveau mot de passe", type="password")
             c1, c2 = st.columns(2)
             ok = c1.form_submit_button("Valider", type="primary", use_container_width=True)
             annul = c2.form_submit_button("← Retour", use_container_width=True)
@@ -209,7 +209,7 @@ def ecran():
                         st.error(msg)
 
     else:
-        st.success("✅ Mot de passe changé. Tu peux te connecter.")
+        st.success("✅ Mot de passe changé. Vous pouvez vous connecter.")
         if st.button("Se connecter", type="primary"):
             for k in ("show_mdp_oublie", "mdpo_etape", "_mdpo_email"):
                 st.session_state.pop(k, None)
