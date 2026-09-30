@@ -1,5 +1,5 @@
 # =============================================================================
-# i18n.py — Système multilingue de Yorbity
+# i18n.py — Système multilingue de Swimpe
 # 6 langues : français, anglais, espagnol, portugais, chinois, arabe
 # Détection auto de la langue selon le pays du visiteur (IP → pays → langue)
 # + sélecteur manuel. À importer dans ui.py.
@@ -58,7 +58,7 @@ def detecter_langue(defaut="fr"):
 # ----------------------------------------------------------------------------
 T = {
   "nom_legal_note": {
-   "fr":"Tel qu'il apparaîtra sur tes dossiers officiels.",
+   "fr":"Tel qu'il apparaîtra sur vos dossiers officiels.",
    "en":"As it will appear on your official files.",
    "es":"Tal como aparecerá en tus expedientes oficiales.",
    "pt":"Como aparecerá nos seus dossiês oficiais.",
@@ -68,11 +68,11 @@ T = {
    "ko":"공식 서류에 표시될 이름입니다.",
    "id":"Seperti yang akan tercantum pada berkas resmimu."},
  "tagline": {
-   "fr":"Ta trajectoire vers le monde", "en":"Your trajectory to the world",
+   "fr":"Votre trajectoire vers le monde", "en":"Your trajectory to the world",
    "es":"Tu trayectoria hacia el mundo", "pt":"Sua trajetória para o mundo",
    "zh":"你通向世界的轨道", "ar":"مسارك نحو العالم"},
  "q_origine": {
-   "fr":"🛂 Ta nationalité (passeport)", "en":"🛂 Your nationality (passport)",
+   "fr":"🛂 Votre nationalité (passeport)", "en":"🛂 Your nationality (passport)",
    "es":"🛂 Tu nacionalidad (pasaporte)", "pt":"🛂 Sua nacionalidade (passaporte)",
    "zh":"🛂 你的国籍（护照）", "ar":"🛂 جنسيتك (جواز السفر)"},
  "q_dest": {
@@ -92,7 +92,7 @@ T = {
    "es":"📚 Área de estudio", "pt":"📚 Área de estudo",
    "zh":"📚 学习领域", "ar":"📚 مجال الدراسة"},
   "questionnaire_btn": {
-   "fr":"Trouve mon meilleur projet", "en":"Find my best-fit project",
+   "fr":"Trouvez mon meilleur projet", "en":"Find my best-fit project",
    "es":"Encuentra mi mejor proyecto", "pt":"Encontra o meu melhor projeto",
    "zh":"找到最适合我的项目", "ar":"ابحث عن أفضل مشروع لي",
    "ja":"最適なプロジェクトを見つける", "ko":"나에게 맞는 프로젝트 찾기",
@@ -102,14 +102,14 @@ T = {
    "fr":"Choisir…", "en":"Choose…", "es":"Elegir…", "pt":"Escolher…",
    "zh":"选择…", "ar":"اختر…"},
  "intro": {
-   "fr":"👆 Réponds aux 4 questions : ton parcours détaillé s'affiche instantanément ici.",
+   "fr":"👆 Répondez aux 4 questions : votre parcours détaillé s'affiche instantanément ici.",
    "en":"👆 Answer the 4 questions: your detailed path appears instantly here.",
    "es":"👆 Responde las 4 preguntas: tu recorrido detallado aparece al instante aquí.",
    "pt":"👆 Responda às 4 perguntas: seu percurso detalhado aparece aqui na hora.",
    "zh":"👆 回答这4个问题，你的详细路径将立即显示在这里。",
    "ar":"👆 أجب عن الأسئلة الأربعة: سيظهر مسارك المفصل هنا فورًا."},
  "start_from": {
-   "fr":"✨ Commence ton projet à partir de", "en":"✨ Start your project from",
+   "fr":"✨ Commencez votre projet à partir de", "en":"✨ Start your project from",
    "es":"✨ Comienza tu proyecto desde", "pt":"✨ Comece seu projeto a partir de",
    "zh":"✨ 开启你的项目，仅需", "ar":"✨ ابدأ مشروعك بدءًا من"},
  "budget": {
@@ -125,7 +125,7 @@ T = {
    "es":"🎯 Después del diploma:", "pt":"🎯 Após o diploma:",
    "zh":"🎯 毕业后：", "ar":"🎯 بعد التخرج:"},
  "chemin": {
-   "fr":"🗺️ Ton chemin, étape par étape", "en":"🗺️ Your path, step by step",
+   "fr":"🗺️ Votre chemin, étape par étape", "en":"🗺️ Your path, step by step",
    "es":"🗺️ Tu camino, paso a paso", "pt":"🗺️ Seu caminho, passo a passo",
    "zh":"🗺️ 你的路径，逐步指引", "ar":"🗺️ طريقك، خطوة بخطوة"},
  "etape": {
@@ -145,40 +145,40 @@ T = {
    "es":"🌐 Portal oficial —", "pt":"🌐 Portal oficial —",
    "zh":"🌐 官方门户 —", "ar":"🌐 البوابة الرسمية —"},
  "bourses_pour_toi": {
-   "fr":"💰 Les bourses pour toi", "en":"💰 Scholarships for you",
+   "fr":"💰 Les bourses pour vous", "en":"💰 Scholarships for you",
    "es":"💰 Becas para ti", "pt":"💰 Bolsas para você",
    "zh":"💰 适合你的奖学金", "ar":"💰 المنح الدراسية لك"},
  "accompagne": {
-   "fr":"🤝 On t'accompagne dans ton projet —", "en":"🤝 We guide you through your project —",
+   "fr":"🤝 On vous accompagne dans votre projet —", "en":"🤝 We guide you through your project —",
    "es":"🤝 Te acompañamos en tu proyecto —", "pt":"🤝 Acompanhamos você no seu projeto —",
    "de":"🤝 Wir begleiten dich bei deinem Projekt —",
    "zh":"🤝 我们陪你推进你的项目 —", "ar":"🤝 نرافقك في مشروعك —"},
  "accompagne_desc": {
-   "fr":"Choisis les démarches que tu veux déléguer — notre équipe s'en charge, tu gardes le contrôle à chaque étape.",
+   "fr":"Choisissez les démarches que vous voulez déléguer — notre équipe s'en charge, vous gardez le contrôle à chaque étape.",
    "en":"Choose the steps you want to delegate — our team handles them, you stay in control at every stage.",
    "es":"Elige los trámites que quieras delegar — nuestro equipo se encarga, tú mantienes el control en cada etapa.",
    "pt":"Escolha as etapas que deseja delegar — nossa equipe cuida de tudo, você mantém o controle em cada fase.",
    "zh":"选择你想委托的步骤——我们的团队负责处理，你在每个阶段都掌握主动权。",
    "ar":"اختر الإجراءات التي تريد تفويضها — يتولى فريقنا الأمر، وتبقى أنت المتحكم في كل مرحلة."},
  "form_titre": {
-   "fr":"📩 Parle-nous de ton projet — réponse sous 24 h",
+   "fr":"📩 Parlez-nous de votre projet — réponse sous 24 h",
    "en":"📩 Tell us about your project — reply within 24h",
    "es":"📩 Cuéntanos tu proyecto — respuesta en 24h",
    "pt":"📩 Fale sobre seu projeto — resposta em 24h",
    "zh":"📩 告诉我们你的项目——24小时内回复",
    "ar":"📩 أخبرنا عن مشروعك — الرد خلال 24 ساعة"},
  "nom": {
-   "fr":"Ton nom complet", "en":"Your full name", "es":"Tu nombre completo",
+   "fr":"Votre nom complet", "en":"Your full name", "es":"Tu nombre completo",
    "pt":"Seu nome completo", "zh":"你的全名", "ar":"اسمك الكامل"},
  "contact": {
    "fr":"WhatsApp ou e-mail", "en":"WhatsApp or e-mail", "es":"WhatsApp o correo",
    "pt":"WhatsApp ou e-mail", "zh":"WhatsApp 或电子邮箱", "ar":"واتساب أو البريد الإلكتروني"},
  "service_interet": {
-   "fr":"La démarche qui t'intéresse", "en":"The service you're interested in",
+   "fr":"La démarche qui vous intéresse", "en":"The service you're interested in",
    "es":"El servicio que te interesa", "pt":"O serviço que te interessa",
    "zh":"你感兴趣的服务", "ar":"الخدمة التي تهمك"},
  "projet_2lignes": {
-   "fr":"Ton projet en 2 lignes (optionnel)", "en":"Your project in 2 lines (optional)",
+   "fr":"Votre projet en 2 lignes (optionnel)", "en":"Your project in 2 lines (optional)",
    "es":"Tu proyecto en 2 líneas (opcional)", "pt":"Seu projeto em 2 linhas (opcional)",
    "zh":"用两行描述你的项目（可选）", "ar":"مشروعك في سطرين (اختياري)"},
  "lancer": {
@@ -186,7 +186,7 @@ T = {
    "es":"🚀 Iniciar mi proyecto", "pt":"🚀 Lançar meu projeto",
    "zh":"🚀 启动我的项目", "ar":"🚀 ابدأ مشروعي"},
  "recu": {
-   "fr":"✅ Reçu ! Un conseiller te contacte sous 24–48 h avec un devis personnalisé.",
+   "fr":"✅ Reçu ! Un conseiller vous contacte sous 24–48 h avec un devis personnalisé.",
    "en":"✅ Received! An advisor will contact you within 24–48h with a personalized quote.",
    "es":"✅ ¡Recibido! Un asesor te contactará en 24–48h con un presupuesto personalizado.",
    "pt":"✅ Recebido! Um consultor entrará em contato em 24–48h com um orçamento personalizado.",
@@ -197,7 +197,7 @@ T = {
    "es":"Nombre y contacto son obligatorios.", "pt":"Nome e contato são obrigatórios.",
    "zh":"姓名和联系方式为必填项。", "ar":"الاسم ووسيلة التواصل مطلوبان."},
  "disclaimer": {
-   "fr":"Nous préparons et organisons tes démarches avec toi. Personne ne peut garantir une admission ou un visa — méfie-toi de ceux qui le promettent.",
+   "fr":"Nous préparons et organisons vos démarches avec vous. Personne ne peut garantir une admission ou un visa — méfiez-vous de ceux qui le promettent.",
    "en":"We prepare and organize your steps with you. No one can guarantee an admission or a visa — beware of those who promise it.",
    "es":"Preparamos y organizamos tus trámites contigo. Nadie puede garantizar una admisión o una visa — desconfía de quienes lo prometen.",
    "pt":"Preparamos e organizamos suas etapas com você. Ninguém pode garantir uma admissão ou visto — desconfie de quem promete.",
@@ -253,28 +253,28 @@ T = {
 
 # --- Textes des comptes / connexion / premium (ajout) ---
 T["compte_titre"] = {"fr":"👤 Mon compte","en":"👤 My account","es":"👤 Mi cuenta","pt":"👤 Minha conta","zh":"👤 我的账户","ar":"👤 حسابي","ja":"👤 マイアカウント","ko":"👤 내 계정","id":"👤 Akun saya"}
-T["compte_invite"] = {"fr":"Connecte-toi pour débloquer les bourses détaillées et suivre tes projets.","en":"Sign in to unlock detailed scholarships and track your projects.","es":"Inicia sesión para desbloquear las becas detalladas y seguir tus proyectos.","pt":"Entre para desbloquear as bolsas detalhadas e acompanhar seus projetos.","zh":"登录以解锁详细奖学金并跟踪你的项目。","ar":"سجّل الدخول لفتح المنح التفصيلية ومتابعة مشاريعك.","ja":"ログインすると詳細な奨学金情報が見られ、プロジェクトを追跡できます。","ko":"로그인하면 상세 장학금 정보를 열람하고 프로젝트를 추적할 수 있습니다.","id":"Masuk untuk membuka beasiswa terperinci dan melacak proyekmu."}
+T["compte_invite"] = {"fr":"Connectez-vous pour débloquer les bourses détaillées et suivre vos projets.","en":"Sign in to unlock detailed scholarships and track your projects.","es":"Inicia sesión para desbloquear las becas detalladas y seguir tus proyectos.","pt":"Entre para desbloquear as bolsas detalhadas e acompanhar seus projetos.","zh":"登录以解锁详细奖学金并跟踪你的项目。","ar":"سجّل الدخول لفتح المنح التفصيلية ومتابعة مشاريعك.","ja":"ログインすると詳細な奨学金情報が見られ、プロジェクトを追跡できます。","ko":"로그인하면 상세 장학금 정보를 열람하고 프로젝트를 추적할 수 있습니다.","id":"Masuk untuk membuka beasiswa terperinci dan melacak proyekmu."}
 T["btn_connexion"] = {"fr":"Se connecter / S'inscrire","en":"Sign in / Sign up","es":"Iniciar sesión / Registrarse","pt":"Entrar / Cadastrar","zh":"登录 / 注册","ar":"تسجيل الدخول / إنشاء حساب","ja":"ログイン / 新規登録","ko":"로그인 / 회원가입","id":"Masuk / Daftar"}
 T["btn_deconnexion"] = {"fr":"Se déconnecter","en":"Sign out","es":"Cerrar sesión","pt":"Sair","zh":"退出登录","ar":"تسجيل الخروج","ja":"ログアウト","ko":"로그아웃","id":"Keluar"}
 T["compte_gratuit"] = {"fr":"Compte gratuit","en":"Free account","es":"Cuenta gratuita","pt":"Conta gratuita","zh":"免费账户","ar":"حساب مجاني","ja":"無料アカウント","ko":"무료 계정","id":"Akun gratis"}
 T["premium_actif"] = {"fr":"⭐ Premium actif","en":"⭐ Premium active","es":"⭐ Premium activo","pt":"⭐ Premium ativo","zh":"⭐ 高级会员已激活","ar":"⭐ العضوية المميزة مفعّلة","ja":"⭐ プレミアム有効","ko":"⭐ 프리미엄 활성","id":"⭐ Premium aktif"}
 T["onglet_connexion"] = {"fr":"Se connecter","en":"Sign in","es":"Iniciar sesión","pt":"Entrar","zh":"登录","ar":"تسجيل الدخول","ja":"ログイン","ko":"로그인","id":"Masuk"}
 T["onglet_inscription"] = {"fr":"Créer un compte","en":"Create account","es":"Crear cuenta","pt":"Criar conta","zh":"注册账户","ar":"إنشاء حساب","ja":"アカウント作成","ko":"계정 만들기","id":"Buat akun"}
-T["bienvenue"] = {"fr":"👤 Bienvenue sur Yorbity","en":"👤 Welcome to Yorbity","es":"👤 Bienvenido a Yorbity","pt":"👤 Bem-vindo ao Yorbity","zh":"👤 欢迎来到 Yorbity","ar":"👤 مرحبًا بك في Yorbity","ja":"👤 Yorbity へようこそ","ko":"👤 Yorbity에 오신 것을 환영합니다","id":"👤 Selamat datang di Yorbity"}
+T["bienvenue"] = {"fr":"👤 Bienvenue sur Swimpe","en":"👤 Welcome to Swimpe","es":"👤 Bienvenido a Swimpe","pt":"👤 Bem-vindo ao Swimpe","zh":"👤 欢迎来到 Swimpe","ar":"👤 مرحبًا بك في Swimpe","ja":"👤 Swimpe へようこそ","ko":"👤 Swimpe에 오신 것을 환영합니다","id":"👤 Selamat datang di Swimpe"}
 T["champ_email"] = {"fr":"E-mail","en":"E-mail","es":"Correo","pt":"E-mail","zh":"电子邮箱","ar":"البريد الإلكتروني","ja":"メール","ko":"이메일","id":"E-mail"}
 T["champ_pwd"] = {"fr":"Mot de passe","en":"Password","es":"Contraseña","pt":"Senha","zh":"密码","ar":"كلمة المرور","ja":"パスワード","ko":"비밀번호","id":"Kata sandi"}
-T["champ_pwd2"] = {"fr":"Confirme le mot de passe","en":"Confirm password","es":"Confirma la contraseña","pt":"Confirme a senha","zh":"确认密码","ar":"أكّد كلمة المرور","ja":"パスワード確認","ko":"비밀번호 확인","id":"Konfirmasi kata sandi"}
+T["champ_pwd2"] = {"fr":"Confirmez le mot de passe","en":"Confirm password","es":"Confirma la contraseña","pt":"Confirme a senha","zh":"确认密码","ar":"أكّد كلمة المرور","ja":"パスワード確認","ko":"비밀번호 확인","id":"Konfirmasi kata sandi"}
 T["champ_nom"] = {"fr":"Nom complet","en":"Full name","es":"Nombre completo","pt":"Nome completo","zh":"全名","ar":"الاسم الكامل","ja":"氏名","ko":"성명","id":"Nama lengkap"}
 T["champ_pays"] = {"fr":"Nationalité","en":"Nationality","es":"Nacionalidad","pt":"Nacionalidade","zh":"国籍","ar":"الجنسية","ja":"国籍","ko":"국적","id":"Kewarganegaraan"}
 T["champ_tel"] = {"fr":"Téléphone / WhatsApp (optionnel)","en":"Phone / WhatsApp (optional)","es":"Teléfono / WhatsApp (opcional)","pt":"Telefone / WhatsApp (opcional)","zh":"电话 / WhatsApp（可选）","ar":"الهاتف / واتساب (اختياري)","ja":"電話 / WhatsApp（任意）","ko":"전화 / WhatsApp (선택)","id":"Telepon / WhatsApp (opsional)"}
-T["tel_note"] = {"fr":"Sert à récupérer ton compte par WhatsApp si tu perds ton mot de passe.","en":"Used to recover your account via WhatsApp if you lose your password.","es":"Sirve para recuperar tu cuenta por WhatsApp si pierdes tu contraseña.","pt":"Serve para recuperar sua conta pelo WhatsApp se perder a senha.","zh":"若忘记密码，可通过 WhatsApp 找回账户。","ar":"يُستخدم لاستعادة حسابك عبر واتساب إذا فقدت كلمة المرور.","ja":"パスワードを忘れた場合、WhatsApp でアカウントを復元するために使います。","ko":"비밀번호를 잊었을 때 WhatsApp으로 계정을 복구하는 데 사용됩니다.","id":"Digunakan untuk memulihkan akunmu lewat WhatsApp jika lupa kata sandi."}
+T["tel_note"] = {"fr":"Sert à récupérer votre compte par WhatsApp si vous perdez votre mot de passe.","en":"Used to recover your account via WhatsApp if you lose your password.","es":"Sirve para recuperar tu cuenta por WhatsApp si pierdes tu contraseña.","pt":"Serve para recuperar sua conta pelo WhatsApp se perder a senha.","zh":"若忘记密码，可通过 WhatsApp 找回账户。","ar":"يُستخدم لاستعادة حسابك عبر واتساب إذا فقدت كلمة المرور.","ja":"パスワードを忘れた場合、WhatsApp でアカウントを復元するために使います。","ko":"비밀번호를 잊었을 때 WhatsApp으로 계정을 복구하는 데 사용됩니다.","id":"Digunakan untuk memulihkan akunmu lewat WhatsApp jika lupa kata sandi."}
 T["btn_connecter"] = {"fr":"Se connecter","en":"Sign in","es":"Iniciar sesión","pt":"Entrar","zh":"登录","ar":"تسجيل الدخول","ja":"ログイン","ko":"로그인","id":"Masuk"}
 T["btn_creer"] = {"fr":"Créer mon compte","en":"Create my account","es":"Crear mi cuenta","pt":"Criar minha conta","zh":"创建我的账户","ar":"إنشاء حسابي","ja":"アカウントを作成","ko":"계정 만들기","id":"Buat akun saya"}
 T["btn_retour"] = {"fr":"Retour","en":"Back","es":"Volver","pt":"Voltar","zh":"返回","ar":"رجوع","ja":"戻る","ko":"뒤로","id":"Kembali"}
 T["pwd_hint"] = {"fr":"Mot de passe (8 caractères min., 1 chiffre)","en":"Password (8 chars min., 1 digit)","es":"Contraseña (mín. 8 caracteres, 1 número)","pt":"Senha (mín. 8 caracteres, 1 número)","zh":"密码（至少8位，含1个数字）","ar":"كلمة المرور (8 أحرف على الأقل، رقم واحد)","ja":"パスワード（8文字以上、数字1つ）","ko":"비밀번호 (8자 이상, 숫자 1개)","id":"Kata sandi (min. 8 karakter, 1 angka)"}
 T["pwd_diff"] = {"fr":"Les deux mots de passe ne correspondent pas.","en":"The two passwords do not match.","es":"Las dos contraseñas no coinciden.","pt":"As duas senhas não coincidem.","zh":"两次输入的密码不一致。","ar":"كلمتا المرور غير متطابقتين.","ja":"パスワードが一致しません。","ko":"두 비밀번호가 일치하지 않습니다.","id":"Kedua kata sandi tidak cocok."}
 T["compte_cree"] = {"fr":"✅ Compte créé ! Bienvenue.","en":"✅ Account created! Welcome.","es":"✅ ¡Cuenta creada! Bienvenido.","pt":"✅ Conta criada! Bem-vindo.","zh":"✅ 账户已创建！欢迎。","ar":"✅ تم إنشاء الحساب! مرحبًا.","ja":"✅ アカウントを作成しました！ようこそ。","ko":"✅ 계정이 생성되었습니다! 환영합니다.","id":"✅ Akun dibuat! Selamat datang."}
-T["donnees_protegees"] = {"fr":"🔒 Tes données sont protégées. Ton mot de passe est chiffré, nous ne pouvons jamais le lire.","en":"🔒 Your data is protected. Your password is encrypted, we can never read it.","es":"🔒 Tus datos están protegidos. Tu contraseña está cifrada, nunca podemos leerla.","pt":"🔒 Seus dados estão protegidos. Sua senha é criptografada, nunca podemos lê-la.","zh":"🔒 你的数据受到保护。你的密码已加密，我们无法读取。","ar":"🔒 بياناتك محمية. كلمة مرورك مشفّرة ولا يمكننا قراءتها أبدًا.","ja":"🔒 データは保護されています。パスワードは暗号化され、私たちが読むことはできません。","ko":"🔒 데이터가 보호됩니다. 비밀번호는 암호화되어 저희가 읽을 수 없습니다.","id":"🔒 Datamu terlindungi. Kata sandimu terenkripsi, kami tidak bisa membacanya."}
+T["donnees_protegees"] = {"fr":"🔒 Vos données sont protégées. Votre mot de passe est chiffré, nous ne pouvons jamais le lire.","en":"🔒 Your data is protected. Your password is encrypted, we can never read it.","es":"🔒 Tus datos están protegidos. Tu contraseña está cifrada, nunca podemos leerla.","pt":"🔒 Seus dados estão protegidos. Sua senha é criptografada, nunca podemos lê-la.","zh":"🔒 你的数据受到保护。你的密码已加密，我们无法读取。","ar":"🔒 بياناتك محمية. كلمة مرورك مشفّرة ولا يمكننا قراءتها أبدًا.","ja":"🔒 データは保護されています。パスワードは暗号化され、私たちが読むことはできません。","ko":"🔒 데이터가 보호됩니다. 비밀번호는 암호화되어 저희가 읽을 수 없습니다.","id":"🔒 Datamu terlindungi. Kata sandimu terenkripsi, kami tidak bisa membacanya."}
 T["mes_projets"] = {"fr":"📁 Mes projets","en":"📁 My projects","es":"📁 Mis proyectos","pt":"📁 Meus projetos","zh":"📁 我的项目","ar":"📁 مشاريعي","ja":"📁 マイプロジェクト","ko":"📁 내 프로젝트","id":"📁 Proyek saya"}
 T["btn_premium"] = {"fr":"⭐ Passer au Premium","en":"⭐ Go Premium","es":"⭐ Hazte Premium","pt":"⭐ Seja Premium","zh":"⭐ 升级高级会员","ar":"⭐ اشترك في بريميوم","ja":"⭐ プレミアムにする","ko":"⭐ 프리미엄 전환","id":"⭐ Jadi Premium"}
 
@@ -300,11 +300,11 @@ except ImportError:
     pass
 
 T["contact_titre"] = {"fr":"📬 Nous contacter","en":"📬 Contact us","es":"📬 Contáctanos","pt":"📬 Fale conosco","zh":"📬 联系我们","ar":"📬 اتصل بنا","ja":"📬 お問い合わせ","ko":"📬 문의하기","id":"📬 Hubungi kami"}
-T["contact_texte"] = {"fr":"Une question sur ton projet ? Écris-nous, on répond vite.","en":"A question about your project? Write to us, we reply fast.","es":"¿Una pregunta sobre tu proyecto? Escríbenos, respondemos rápido.","pt":"Uma dúvida sobre seu projeto? Escreva, respondemos rápido.","zh":"对你的项目有疑问？给我们留言，我们会尽快回复。","ar":"سؤال حول مشروعك؟ راسلنا، نرد بسرعة.","ja":"プロジェクトについて質問がありますか？お気軽にご連絡ください。","ko":"프로젝트에 대해 궁금한 점이 있나요? 연락 주시면 빠르게 답변드립니다.","id":"Ada pertanyaan tentang proyekmu? Tulis kepada kami, kami balas cepat."}
+T["contact_texte"] = {"fr":"Une question sur votre projet ? Écrivez-nous, on répond vite.","en":"A question about your project? Write to us, we reply fast.","es":"¿Una pregunta sobre tu proyecto? Escríbenos, respondemos rápido.","pt":"Uma dúvida sobre seu projeto? Escreva, respondemos rápido.","zh":"对你的项目有疑问？给我们留言，我们会尽快回复。","ar":"سؤال حول مشروعك؟ راسلنا، نرد بسرعة.","ja":"プロジェクトについて質問がありますか？お気軽にご連絡ください。","ko":"프로젝트에 대해 궁금한 점이 있나요? 연락 주시면 빠르게 답변드립니다.","id":"Ada pertanyaan tentang proyekmu? Tulis kepada kami, kami balas cepat."}
 
 T["demarches"] = {"fr":"📋 Mes démarches","en":"📋 My procedures","es":"📋 Mis trámites","pt":"📋 Meus trâmites","zh":"📋 我的办理进度","ar":"📋 إجراءاتي","ja":"📋 進行中の手続き","ko":"📋 진행 중인 절차","id":"📋 Proses saya"}
 T["gestion_dossiers"] = {"fr":"🛠 Gestion des dossiers","en":"🛠 Case management","es":"🛠 Gestión de expedientes","pt":"🛠 Gestão de dossiês","zh":"🛠 档案管理","ar":"🛠 إدارة الملفات","ja":"🛠 案件管理","ko":"🛠 파일 관리","id":"🛠 Manajemen berkas"}
-T["aucune_demarche"] = {"fr":"Aucune démarche en cours. Quand tu nous confies un service, il apparaît ici avec sa progression.","en":"No procedure in progress. When you entrust us with a service, it appears here with its progress.","es":"Ningún trámite en curso. Cuando nos confíes un servicio, aparecerá aquí con su progreso.","pt":"Nenhum trâmite em andamento. Quando você nos confiar um serviço, ele aparecerá aqui com o progresso.","zh":"暂无进行中的办理。当你委托我们服务后，进度会显示在这里。","ar":"لا توجد إجراءات جارية. عندما تعهد إلينا بخدمة، ستظهر هنا مع تقدمها.","ja":"進行中の手続きはありません。サービスをご依頼いただくと、進捗がここに表示されます。","ko":"진행 중인 절차가 없습니다. 서비스를 맡기시면 진행 상황이 여기에 표시됩니다.","id":"Tidak ada proses berjalan. Saat kamu mempercayakan layanan, progresnya muncul di sini."}
+T["aucune_demarche"] = {"fr":"Aucune démarche en cours. Quand vous nous confiez un service, il apparaît ici avec sa progression.","en":"No procedure in progress. When you entrust us with a service, it appears here with its progress.","es":"Ningún trámite en curso. Cuando nos confíes un servicio, aparecerá aquí con su progreso.","pt":"Nenhum trâmite em andamento. Quando você nos confiar um serviço, ele aparecerá aqui com o progresso.","zh":"暂无进行中的办理。当你委托我们服务后，进度会显示在这里。","ar":"لا توجد إجراءات جارية. عندما تعهد إلينا بخدمة، ستظهر هنا مع تقدمها.","ja":"進行中の手続きはありません。サービスをご依頼いただくと、進捗がここに表示されます。","ko":"진행 중인 절차가 없습니다. 서비스를 맡기시면 진행 상황이 여기에 표시됩니다.","id":"Tidak ada proses berjalan. Saat kamu mempercayakan layanan, progresnya muncul di sini."}
 T["msg_equipe"] = {"fr":"💬 Message de l'équipe :","en":"💬 Message from the team:","es":"💬 Mensaje del equipo:","pt":"💬 Mensagem da equipe:","zh":"💬 团队留言：","ar":"💬 رسالة الفريق:","ja":"💬 チームからのメッセージ：","ko":"💬 팀 메시지:","id":"💬 Pesan tim:"}
 T["ouvert_le"] = {"fr":"Ouvert le","en":"Opened on","es":"Abierto el","pt":"Aberto em","zh":"开启于","ar":"فُتح في","ja":"開始日","ko":"개설일","id":"Dibuka pada"}
 T["maj_le"] = {"fr":"dernière mise à jour","en":"last updated","es":"última actualización","pt":"última atualização","zh":"最近更新","ar":"آخر تحديث","ja":"最終更新","ko":"마지막 업데이트","id":"pembaruan terakhir"}
@@ -316,7 +316,7 @@ T["statut_soumis"] = {"fr":"📤 Soumis","en":"📤 Submitted","es":"📤 Enviad
 T["statut_termine"] = {"fr":"✅ Terminé","en":"✅ Completed","es":"✅ Completado","pt":"✅ Concluído","zh":"✅ 已完成","ar":"✅ مكتمل","ja":"✅ 完了","ko":"✅ 완료","id":"✅ Selesai"}
 T["mon_espace"] = {"fr":"👤 Mon espace","en":"👤 My space","es":"👤 Mi espacio","pt":"👤 Meu espaço","zh":"👤 我的空间","ar":"👤 مساحتي","ja":"👤 マイスペース","ko":"👤 내 공간","id":"👤 Ruang saya"}
 T["projets_sauv"] = {"fr":"📁 Mes projets sauvegardés","en":"📁 My saved projects","es":"📁 Mis proyectos guardados","pt":"📁 Meus projetos salvos","zh":"📁 我保存的项目","ar":"📁 مشاريعي المحفوظة","ja":"📁 保存したプロジェクト","ko":"📁 저장된 프로젝트","id":"📁 Proyek tersimpan"}
-T["aucun_projet"] = {"fr":"Tu n'as pas encore de projet sauvegardé. Lance une recherche ci-dessous !","en":"No saved projects yet. Start a search below!","es":"Aún no tienes proyectos guardados. ¡Inicia una búsqueda abajo!","pt":"Você ainda não tem projetos salvos. Inicie uma busca abaixo!","zh":"你还没有保存的项目。在下方开始搜索吧！","ar":"ليس لديك مشاريع محفوظة بعد. ابدأ بحثًا أدناه!","ja":"保存されたプロジェクトはまだありません。下から検索を始めましょう！","ko":"저장된 프로젝트가 없습니다. 아래에서 검색을 시작하세요!","id":"Belum ada proyek tersimpan. Mulai pencarian di bawah!"}
+T["aucun_projet"] = {"fr":"Vous n'avez pas encore de projet sauvegardé. Lancez une recherche ci-dessous !","en":"No saved projects yet. Start a search below!","es":"Aún no tienes proyectos guardados. ¡Inicia una búsqueda abajo!","pt":"Você ainda não tem projetos salvos. Inicie uma busca abaixo!","zh":"你还没有保存的项目。在下方开始搜索吧！","ar":"ليس لديك مشاريع محفوظة بعد. ابدأ بحثًا أدناه!","ja":"保存されたプロジェクトはまだありません。下から検索を始めましょう！","ko":"저장된 프로젝트가 없습니다. 아래에서 검색을 시작하세요!","id":"Belum ada proyek tersimpan. Mulai pencarian di bawah!"}
 T["retour_recherche"] = {"fr":"← Retour à la recherche","en":"← Back to search","es":"← Volver a la búsqueda","pt":"← Voltar à busca","zh":"← 返回搜索","ar":"← العودة إلى البحث","ja":"← 検索に戻る","ko":"← 검색으로 돌아가기","id":"← Kembali ke pencarian"}
 T["cree_le"] = {"fr":"créé le","en":"created on","es":"creado el","pt":"criado em","zh":"创建于","ar":"أُنشئ في","ja":"作成日","ko":"생성일","id":"dibuat pada"}
 T["mode_test_info"] = {"fr":"🧪 Mode test : paiements simulés.","en":"🧪 Test mode: simulated payments.","es":"🧪 Modo prueba: pagos simulados.","pt":"🧪 Modo teste: pagamentos simulados.","zh":"🧪 测试模式：模拟支付。","ar":"🧪 وضع الاختبار: مدفوعات محاكاة.","ja":"🧪 テストモード：決済はシミュレーションです。","ko":"🧪 테스트 모드: 결제는 시뮬레이션입니다.","id":"🧪 Mode uji: pembayaran simulasi."}
