@@ -28,3 +28,8 @@ venv/
 .DS_Store
 *.avant_couche
 *.avant_tableau
+
+# Sauvegardes et outils jetables
+*.bak_*
+*.avant_*
+app/api/patch_lenteur.py
