@@ -1,0 +1,34 @@
+name: keep-alive-supabase
+
+# Garde la base Supabase active. Plan gratuit : mise en pause apres ~7 jours
+# d'inactivite. On ecrit un battement reel toutes les 48h (marge de securite
+# car GitHub peut retarder/sauter des executions planifiees).
+# Declenchable aussi a la main via l'onglet Actions -> Run workflow.
+
+on:
+  schedule:
+    - cron: "17 6 */2 * *"
+  workflow_dispatch:
+
+jobs:
+  ping:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Recuperer le depot
+        uses: actions/checkout@v4
+
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installer psycopg2
+        run: pip install --quiet psycopg2-binary
+
+      - name: Ecrire le battement en base
+        env:
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
+        run: python .github/keepalive/ping_db.py
+
+      - name: Reveiller l'app Streamlit (best-effort, non bloquant)
+        run: curl -sS -m 30 -o /dev/null "https://swimpe-app-gxjuhhnhuhbbfcrwfr6wvg.streamlit.app" || true
