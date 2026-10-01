@@ -51,7 +51,7 @@ section[data-testid="stSidebar"] .stButton>button{background:#fff;border:1px sol
             '<div class="sw-util">'
             '<span><a href="https://swimpe.com" target="_blank">swimpe.com</a>'
             '&nbsp;&nbsp;·&nbsp;&nbsp;<span class="ici">Application · Espace membre</span></span>'
-            '<span><a href="https://swimpe.com/verifier.html" target="_blank">Vérifier une offre</a></span>'
+            '<span><a href="https://swimpe.com/chiffres.html#arnaque" target="_blank">Vérifier une offre</a></span>'
             '</div>', unsafe_allow_html=True)
     except Exception:
         pass
