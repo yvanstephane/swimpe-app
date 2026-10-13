@@ -1780,9 +1780,12 @@ st.divider()
 st.markdown("## " + t("contact_titre", LG))
 _cw = os.environ.get("CONTACT_WHATSAPP", "+241 00 00 00 00")
 _ce = os.environ.get("CONTACT_EMAIL", "contact@yorbity.com")
-_fa, _fb = st.columns(2)
-_fa.markdown(f"**WhatsApp :** [{_cw}](https://wa.me/{_cw.replace(' ','').replace('+','')})")
-_fb.markdown(f"**E-mail :** [{_ce}](mailto:{_ce})")
+if _cw.strip():
+    _fa, _fb = st.columns(2)
+    _fa.markdown(f"**WhatsApp :** [{_cw}](https://wa.me/{_cw.replace(' ','').replace('+','')})")
+    _fb.markdown(f"**E-mail :** [{_ce}](mailto:{_ce})")
+else:
+    st.markdown(f"**E-mail :** [{_ce}](mailto:{_ce})")
 st.caption(t("contact_texte", LG))
 
 # _patch_fiches_italie_belgique_mcf_v1
