@@ -70,6 +70,7 @@ from pays_i18n import nom_pays
 import espace, auth, dossiers, services_cfg, config_projets, admin_projets, admin_comptes, mdp_oublie, opportunites_ui, offres_cfg, devises_cfg, eligibilite, offres_sync, recherche_poste, moteur_plans, console_accompagnement
 from traduction import traduire
 import autotrad  # traduction automatique globale (la langue prime sur tout)
+import suivi_local  # patch_suivi : suivi local des candidatures
 
 # Libellés du projet « Métier spécialisé » dans toutes les langues (grise le niveau)
 _METIER_LBLS = {v[3] for v in T["types"].values() if len(v) > 3}
@@ -135,6 +136,9 @@ if espace.user_connecte():
             st.rerun()
         if st.button("📋 " + traduire("Mes démarches", st.session_state.get("lang","fr")), use_container_width=True):
             st.session_state.show_demarches = True
+            st.rerun()
+        if st.button("🗂 " + traduire("Mon suivi", st.session_state.get("lang","fr")), use_container_width=True, key="btn_suivi"):  # patch_suivi
+            st.session_state.show_suivi = True
             st.rerun()
         if espace.est_admin():
             if st.button("🛠 " + traduire("Gestion des dossiers", st.session_state.get("lang","fr")), use_container_width=True):
@@ -1253,6 +1257,12 @@ st.markdown(f"""
   <p style='color:var(--text-color); opacity:.72; margin-top:.15rem; font-size:1.1rem;'>{t('tagline', LG)}</p>
 </div>""", unsafe_allow_html=True)
 
+# --- Bandeau admin : alertes demandes de conseil (patch_bandeau) ---
+try:
+    suivi_local.bandeau_admin()
+except Exception:
+    pass
+
 # ---------- Listes traduites (affichage) + valeurs canoniques (logique) ----------
 T_TYPES    = T["types"][LG]
 T_NIVEAUX  = T["niveaux"][LG]
@@ -1345,6 +1355,11 @@ if "paiement_retour" in _params:
     else:
         st.error("Le paiement n'a pas abouti. Réessaie ou contacte-nous.")
     st.query_params.clear()
+
+# ---------- Mon suivi local (patch_suivi) ----------
+if st.session_state.get("show_suivi") and espace.user_connecte():
+    suivi_local.ecran(espace.user_connecte())
+    st.stop()
 
 # ---------- Espace perso : tableau de bord enrichi ----------
 if st.session_state.get("show_espace") and espace.user_connecte():
@@ -1664,6 +1679,17 @@ with st.sidebar:
             _osy_monT.definir_param("monetisation_active", "1" if _nv_mon else "0")
             st.rerun()
         st.markdown("---")
+        st.markdown("**🆘 " + traduire("Accompagnement :", st.session_state.get("lang","fr")) + "**")  # patch_suivi
+        try:
+            import offres_sync as _osy_cons
+            _on_cons = _osy_cons.param("conseil_actif", "0") != "0"
+        except Exception:
+            _osy_cons = None
+            _on_cons = False
+        _nv_cons = st.checkbox(traduire("Activer le bouton « Demander un conseil »", st.session_state.get("lang","fr")), value=_on_cons, key="cons_active")
+        if _osy_cons is not None and _nv_cons != _on_cons:
+            _osy_cons.definir_param("conseil_actif", "1" if _nv_cons else "0")
+            st.rerun()
         st.markdown("**🗺️ " + traduire("Plans visiteur :", st.session_state.get("lang","fr")) + "**")  # patch_plans_visiteur
         for _cle_pv, _lib_pv, _def_pv in (
             ("plans_visiteur_actif", "Afficher les programmes aux visiteurs", "0"),
