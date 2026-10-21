@@ -1,17 +1,46 @@
 name: keepalive-app
-# Garde l'app Streamlit "reveillee" : un ping regulier empeche la mise en veille
-# (et donc le long temps de reveil au premier visiteur). Repo public = Actions gratuit.
+# Garde l'app Streamlit "reveillee" avec un VRAI navigateur (pas un simple curl,
+# que Streamlit ne compte pas comme une visite). Toutes les ~3 h : ouvre l'app,
+# et si elle dort, clique "Yes, get this app back up!". Repo public = gratuit.
 on:
   schedule:
-    - cron: "*/12 * * * *"   # toutes les ~12 minutes
+    - cron: "23 */3 * * *"   # toutes les ~3 heures (fiable ; seuil de veille ~12 h)
   workflow_dispatch:          # bouton "Run workflow" manuel
 jobs:
-  ping:
+  reveiller:
     runs-on: ubuntu-latest
     steps:
-      - name: Ping app Streamlit
+      - name: Installer Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Installer le navigateur (Playwright)
         run: |
-          APP="https://swimpe-app-gxjuhhnhuhbbfcrwfr6wvg.streamlit.app"
-          echo "Ping $APP"
-          curl -s -o /dev/null -w "page   -> %{http_code}\n" "$APP/" || true
-          curl -s -o /dev/null -w "health -> %{http_code}\n" "$APP/_stcore/health" || true
+          pip install --quiet playwright
+          python -m playwright install --with-deps chromium
+
+      - name: Ouvrir l'app comme un vrai visiteur (et la reveiller si besoin)
+        run: |
+          python - <<'PY'
+          from playwright.sync_api import sync_playwright
+          URL = "https://swimpe-app-gxjuhhnhuhbbfcrwfr6wvg.streamlit.app/"
+          with sync_playwright() as p:
+              nav = p.chromium.launch()
+              page = nav.new_page()
+              page.goto(URL, wait_until="load", timeout=90000)
+              # Si l'app dort, un bouton "Yes, get this app back up!" apparait.
+              try:
+                  bouton = page.get_by_text("get this app back up", exact=False)
+                  if bouton.count() > 0:
+                      print("App endormie -> clic sur le reveil")
+                      bouton.first.click()
+                  else:
+                      print("App deja reveillee")
+              except Exception as e:
+                  print("Pas de bouton de reveil (app active) :", e)
+              # Laisse le temps a la vraie session de s'etablir (compte comme visite)
+              page.wait_for_timeout(45000)
+              print("Visite terminee :", page.title())
+              nav.close()
+          PY
