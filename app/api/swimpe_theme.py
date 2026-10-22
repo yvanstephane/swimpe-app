@@ -23,12 +23,21 @@ def injecter():
       --sw-filet:#E3E7F4;--sw-muet:#5A6486;--sw-vert:#116B45;--sw-vert-p:#E7F4EE;
       --sw-ambre:#8A6116;--sw-ambre-p:#FFF3D6;}
 .stButton>button{border-radius:6px;font-weight:600}
-.stButton>button[kind="primary"]{background:var(--sw-bleu);border-color:var(--sw-bleu)}
-.stButton>button[kind="primary"]:hover{background:var(--sw-bleu2);border-color:var(--sw-bleu2)}
+.stButton>button[kind="primary"]{background:var(--sw-bleu);border-color:var(--sw-bleu);color:#fff}
+.stButton>button[kind="primary"]:hover{background:var(--sw-bleu2);border-color:var(--sw-bleu2);color:#fff}
 div[data-testid="stVerticalBlockBorderWrapper"]{border-color:var(--sw-filet)!important;border-radius:6px}
 div[data-testid="stAlert"]{border-radius:6px}
 section[data-testid="stSidebar"]{background:var(--sw-gris)}
-section[data-testid="stSidebar"] .stButton>button{background:#fff;border:1px solid var(--sw-filet)}
+/* Boutons NORMAUX de la barre de gauche : fond blanc, texte encre.
+   Le :not([kind="primary"]) laisse le bouton bleu principal garder son fond bleu. */
+section[data-testid="stSidebar"] .stButton>button:not([kind="primary"]){background:#fff;border:1px solid var(--sw-filet)}
+section[data-testid="stSidebar"] .stButton>button:not([kind="primary"]) *{color:var(--sw-encre)!important}
+/* Bouton bleu principal (Sign in / Sign up) : fond bleu ET texte blanc FORCE,
+   y compris le texte enveloppe dans stMarkdownContainer -> plus jamais invisible. */
+section[data-testid="stSidebar"] .stButton>button[kind="primary"]{background:var(--sw-bleu)!important;border-color:var(--sw-bleu)!important}
+section[data-testid="stSidebar"] .stButton>button[kind="primary"] *{color:#fff!important}
+section[data-testid="stSidebar"] .stButton>button[kind="primary"]:hover{background:var(--sw-bleu2)!important;border-color:var(--sw-bleu2)!important}
+section[data-testid="stSidebar"] .stButton>button[kind="primary"]:hover *{color:#fff!important}
 .sw-util{background:var(--sw-encre);color:#C7D2F4;font-size:12.5px;
   border-radius:6px;padding:8px 16px;margin:-8px 0 14px 0;
   display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px}

@@ -66,7 +66,7 @@ def ecran_auth(origines_dict):
 
     with onglet_co:
         with st.form("form_connexion"):
-            email = st.text_input(t("champ_email", _lg()))
+            email = st.text_input("E-mail")  # libellé propre (corrige « {country} - {price} »)
             pwd = st.text_input(t("champ_pwd", _lg()), type="password")
             c1, c2 = st.columns(2)
             ok = c1.form_submit_button(t("btn_connecter", _lg()), type="primary", use_container_width=True)
@@ -92,7 +92,7 @@ def ecran_auth(origines_dict):
         with st.form("form_inscription"):
             nom = st.text_input(t("champ_nom", _lg()))
             st.caption("🪪 " + t("nom_legal_note", _lg()))
-            email = st.text_input(t("champ_email", _lg()) + " ")
+            email = st.text_input("E-mail ")  # libellé propre (corrige « {country} - {price} »)
             pays = st.selectbox(t("champ_pays", _lg()), ["—"] + sorted(origines_dict.keys()))
             tel = st.text_input(t("champ_tel", _lg()))
             st.caption("💬 " + t("tel_note", _lg()))  # patch_inscription_ux
