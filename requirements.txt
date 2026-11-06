@@ -6,3 +6,4 @@ Babel
 pycountry
 python-dotenv
 psycopg2-binary
+Pillow

@@ -16,6 +16,23 @@ import datetime
 
 DB = "data/mobilite.db"
 
+try:
+    import carte_image
+except Exception:
+    carte_image = None
+
+
+@st.cache_data(show_spinner=False)
+def _png(carte_texte):
+    """Image PNG de la carte (en cache tant que le texte ne change pas)."""
+    if carte_image is None or not carte_texte:
+        return None
+    try:
+        return carte_image.generer_png(carte_texte)
+    except Exception:
+        return None
+
+
 # Valeurs alignées sur les contraintes CHECK de la table posts_facebook.
 STATUTS = ["brouillon", "valide", "publie"]
 BADGE_STATUT = {"brouillon": "✏️ Brouillon", "valide": "✅ Validé", "publie": "📣 Publié"}
@@ -243,6 +260,29 @@ def _bloc_post(p):
             meta.append(f"#{p['gabarit']}")
         meta.append(LABEL_REGISTRE.get(p.get("registre") or "juste_milieu", ""))
         st.caption(" · ".join(x for x in meta if x))
+
+        # ---- Bloc PUBLIER (assisté, depuis le téléphone) ----
+        with st.expander("📤 Publier (image · texte · Facebook)"):
+            png = _png(p.get("carte_texte") or "")
+            if png:
+                st.image(png)
+                st.download_button("⬇️ Télécharger l'image", png,
+                                   file_name=f"swimpe_{str(pid)[:8]}.png",
+                                   mime="image/png", key=f"dl_{pid}",
+                                   use_container_width=True)
+            else:
+                st.caption("Image indisponible (Pillow non installé sur le serveur).")
+            st.markdown("**1.** Télécharge l'image · **2.** copie le texte · "
+                        "**3.** ouvre Facebook, colle + attache l'image, publie · "
+                        "**4.** colle le lien en 1er commentaire.")
+            if p.get("post_texte"):
+                st.caption("📝 Texte du post (appuie sur l'icône copier) :")
+                st.code(p["post_texte"], language=None)
+            if p.get("commentaire"):
+                st.caption("💬 Commentaire à coller (le lien) :")
+                st.code(p["commentaire"], language=None)
+            st.link_button("📘 Ouvrir Facebook", "https://www.facebook.com/",
+                           use_container_width=True)
 
         # Actions selon le statut
         a = st.columns(4)
