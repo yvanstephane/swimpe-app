@@ -67,7 +67,7 @@ if not getattr(sqlite3, "_yorbity_patience", False):
 import streamlit as st
 from i18n import t, T, detecter_langue, LANGUES, RTL
 from pays_i18n import nom_pays
-import espace, auth, dossiers, services_cfg, config_projets, admin_projets, admin_comptes, mdp_oublie, opportunites_ui, offres_cfg, devises_cfg, eligibilite, offres_sync, recherche_poste, moteur_plans, console_accompagnement, posts_facebook_ui
+import espace, auth, dossiers, services_cfg, config_projets, admin_projets, admin_comptes, mdp_oublie, opportunites_ui, offres_cfg, devises_cfg, eligibilite, offres_sync, recherche_poste, moteur_plans, console_accompagnement, posts_facebook_ui, veille_ui
 from traduction import traduire
 import autotrad  # traduction automatique globale (la langue prime sur tout)
 import suivi_local  # patch_suivi : suivi local des candidatures
@@ -1330,6 +1330,8 @@ if espace.est_admin() and console_accompagnement.ecran(D, ORIGINES):
     st.stop()
 if espace.est_admin() and posts_facebook_ui.ecran():
     st.stop()
+if espace.est_admin() and veille_ui.ecran():
+    st.stop()
 import plans_visiteur as _pv_mod  # patch_plans_visiteur : vue visiteur,
 # placee AVANT le bloc qui fait st.query_params.clear() plus bas.
 if _pv_mod.ecran(ORIGINES):
@@ -1768,6 +1770,9 @@ with st.sidebar:
             st.rerun()
         if st.button("📣 Posts Facebook", key="btn_cfg_posts_fb", use_container_width=True):
             st.session_state.show_posts_fb = True
+            st.rerun()
+        if st.button("👁 Veille", key="btn_cfg_veille", use_container_width=True):
+            st.session_state.show_veille = True
             st.rerun()
         st.markdown("**🌍 " + traduire("Pays d'origine masqués (non proposés) :", st.session_state.get("lang","fr")) + "**")
         _off_act = sorted(services_cfg.origines_desactivees())
